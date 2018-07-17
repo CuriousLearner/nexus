@@ -1,0 +1,61 @@
+{% load compress %}{% load raven %}
+{% load staticfiles i18n %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
+    <title>{% block title %}nexus{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="version" content="{{ site_info.RELEASE_VERSION }}">
+    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
+    
+    {% if site_info.IS_RAVEN_INSTALLED %}
+        <script>Raven.config('{% sentry_public_dsn %}').install()</script>
+    {% endif %}
+
+    {% block css %}
+    <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
+    {% compress css %}
+    <link href="{% static 'css/main.scss' %}"  type="text/x-scss" rel="stylesheet">
+    {% endcompress %}
+    {% endblock css %}
+    {% block head_extras %}{% endblock %}
+  </head>
+
+  <body class="{% block body_classes %}{% endblock body_classes %} ">
+    <!--[if lt IE 8]>
+    <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    {% block header %}
+      <h1>nexus</h1>
+    {% endblock header %}
+
+    {% block content %}
+      <p>Coming soon!</p>
+    {% endblock content %}
+
+    {% block footer %} {% endblock footer %}
+
+    <!-- Le javascript
+    ================================================== -->
+    {# Placed at the end of the document so the pages load faster #}
+    {% block js %}
+      <!-- Latest JQuery -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+      <!-- Your stuff: Third-party javascript libraries go here -->
+
+      <!-- place project specific Javascript in this file -->
+      {% compress js %}
+      <script src="{% static 'js/main.js' %}"></script>
+      {% endcompress %}
+
+      {% if debug %}
+        <!--Livereloading support -->
+        <script>{% include "devrecargar/devrecargar.js" %}</script>
+      {% endif %}
+    {% endblock js %}
+  </body>
+</html>

@@ -1,0 +1,6 @@
+---
+pg_hstore: False
+pg_gis: False
+pg_db: '{{ project_name }}-{{ deploy_environment }}'
+pg_user: dev
+pg_password: password

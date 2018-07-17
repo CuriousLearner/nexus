@@ -1,0 +1,37 @@
+# For more information about the configurations used in this file, please
+# see the Travis CI documentation: https://docs.travis-ci.com
+
+language: python
+sudo: false
+python:
+- '3.6.4'
+
+addons:
+  postgresql: "9.5"
+  apt:
+    packages:
+      - postgresql-9.5-postgis-2.3
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
+
+install:
+  - pip install -r requirements/development.txt
+
+before_script:
+- export DATABASE_URL=postgres://postgres@localhost/nexus
+- psql -c "CREATE DATABASE nexus;" -U postgres
+
+script:
+- flake8
+- pytest --cov -v --tb=native
+- ansible-playbook -i provisioner/hosts provisioner/site.yml --syntax-check
+
+notifications:
+  email:
+    on_success: change  # [always|never|change]
+    on_failure: always  # [always|never|change]

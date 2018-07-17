@@ -1,0 +1,65 @@
+---
+- name: get the latest code
+  git: repo={{ project_repo_url }} dest={{ project_path }} version={{ repo_version }} accept_hostkey=true
+  become: false
+  register: gitresult
+  when: vm == 0
+  tags: ['always']
+
+- debug: msg="Git SHA-1 before={{ gitresult.before }} after={{ gitresult.after }}"
+  tags: ['always']
+
+- name: ensure python virtualenv exist
+  command: virtualenv {{ venv_path }} -p python3.6 creates={{ venv_path }}
+  become: false
+  tags: ['always']
+
+- name: install django python dependencies
+  pip: requirements={{ project_path }}/{{ django_requirements_file }}  executable={{ venv_path }}/bin/pip
+  become: false
+  tags: ['deploy']
+
+- name: Install packages based on package.json.
+  npm: path={{ project_path }} global=no
+  become: true
+  when: sass_with_django_compressor
+  tags: ['deploy']
+
+- name: copy env configuration
+  template: src=env.env.j2 dest={{ project_path }}/.env force=no
+  become: false
+  tags: ['configure']
+
+- name: collect static
+  django_manage: command=collectstatic app_path={{ project_path }} virtualenv={{ venv_path }}
+  become: false
+  tags: ['deploy']
+
+- name: Run django-compressor offline
+  django_manage: command=compress app_path={{ project_path }} virtualenv={{ venv_path }}
+  become: false
+  tags: ['deploy']
+  when: sass_with_django_compressor
+  environment:
+    PATH: "$PATH:{{ project_path }}/node_modules/.bin:/usr/bin/"
+
+- name: Run database migrations
+  django_manage: command=migrate app_path={{ project_path }} virtualenv={{ venv_path }}
+  become: false
+  tags: ['deploy']
+
+- name: Build documentation for "/docs" url.
+  command: "{{ venv_path }}/bin/mkdocs build"
+  args:
+    chdir: "{{ project_path }}"
+  become: false
+  tags: ['deploy', 'documentation']
+
+- import_tasks: uwsgi-setup.yml
+
+- name: reload uwsgi processes
+  command: uwsgi --reload {{ uwsgi_pid_file }}
+  become: true
+  when: not uwsgiconf.changed
+  tags: ['deploy']
+  notify: reload celery  # reload celery everytime uwsgi conf changes

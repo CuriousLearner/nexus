@@ -1,0 +1,39 @@
+# See: https://github.com/mkdocs/mkdocs/blob/master/docs/user-guide/configuration.md
+site_name: nexus
+site_description: Streamline & automate the boring parts
+site_author: CuriousLearner
+repo_url: https://github.com/CuriousLearner/nexus-web
+
+pages:
+- Home: 'index.md'
+- API:
+  - 'Overview & Usages': 'api/overview.md'
+  - 'REST Endpoints': 'api/endpoints.md'
+  - 'Errors': 'api/errors.md'
+  - 'Changelog': 'api/changelog.md'
+- Backend:
+  - 'Server Configurations': 'backend/server_config.md'
+  - 'Coding Rules': 'backend/coding_rules.md'
+- 'Release Notes': 'release_notes.md'
+
+
+theme: 'mkdocs'
+
+copyright: ''
+
+# directory to output HTML build
+site_dir: _docs_html
+
+# Determines if a broken link to a page within the documentation is considered
+# a warning or an error (link to a page not listed in the pages setting). Set to
+# true to halt processing when a broken link is found, false prints a warning.
+strict: true
+
+# Determines the address used when running mkdocs serve.
+# Set it to 8001, so that it doesn't conflict with django's 8000 port
+dev_addr: '127.0.0.1:8001'
+
+markdown_extensions: [smarty, sane_lists]
+
+extra_javascript:
+- "js/github_issues_link.js"

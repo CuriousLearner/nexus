@@ -1,0 +1,65 @@
+# {{ ansible_managed }}
+
+server {
+    listen       {{ ngnix_listen }};
+    listen       [::]:{{ ngnix_listen }};
+    server_name  {{ domain_name }};
+
+    ssl on;
+    ssl_certificate     {{ ssl_certificate }};
+    ssl_certificate_key {{ ssl_certificate_key }};
+    ssl_dhparam         {{ ssl_dhparam }};
+
+
+    ssl_protocols {{ ssl_protocols }};
+    ssl_ciphers '{{ ssl_ciphers }}';
+    ssl_prefer_server_ciphers on;
+
+    ssl_session_timeout {{ ssl_session_timeout }};
+    ssl_session_cache {{ ssl_session_cache }};
+    ssl_session_tickets off;
+
+    # OCSP Stapling ---
+    # fetch OCSP records from URL in ssl_certificate and cache them
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    ## verify chain of trust of OCSP response using Root CA and Intermediate certs
+    ssl_trusted_certificate {{ ssl_trusted_certificate }};
+
+
+    access_log   {{ access_log_file }};
+    error_log    {{ error_log_file }};
+
+
+    client_max_body_size {{ nginx_client_max_body_size }};
+
+    {% if use_letsencrypt %}
+    location /.well-known/acme-challenge {
+            root {{ letsencrypt_challange_root }};
+            try_files $uri =404;
+    }
+    {% endif %}
+
+    location /docs {
+        # mkdocs html generated via "product_data" role
+        alias {{ project_path }}/_docs_html/;
+    }
+
+    # Setup named location for Django requests and handle proxy details
+    location / {
+        uwsgi_pass unix:///tmp/django-{{ domain_name }}-uwsgi.sock;
+        include /etc/nginx/uwsgi_params;
+
+        # set correct scheme
+        uwsgi_param UWSGI_SCHEME $http_x_forwarded_proto;
+    }
+
+    location /static/ {
+        alias {{ project_path }}/.staticfiles/;
+    }
+
+    location /media/ {
+        alias {{ project_path }}/.media/;
+    }
+}

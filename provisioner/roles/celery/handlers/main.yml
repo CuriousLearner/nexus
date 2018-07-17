@@ -1,0 +1,6 @@
+---
+- name: restart celery
+  systemd: state=restarted daemon_reload=yes name=celery-{{ project_namespace }}
+
+- name: reload celery
+  systemd: state=reloaded name=celery-{{ project_namespace }}

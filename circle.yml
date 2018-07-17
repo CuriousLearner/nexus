@@ -1,0 +1,39 @@
+## Customize the test machine
+machine:
+  python:
+    version: '3.6.4'
+  environment:
+    # each command runs in its own shell, so just adding an export FOO=bar command won't work
+    DATABASE_URL: "postgres://ubuntu@localhost/circle_test"
+  #services: # By default popular ones are running on our build machines (bound to localhost), including Postgres, MySQL, Redis and MongoDB
+  # -redis
+
+## Customize checkout
+#checkout:
+#  post:
+#	   - git submodule sync
+
+## Customize dependencies
+dependencies:
+  override:
+    - pip install ansible
+    - pip install -r requirements/development.txt
+
+
+
+## Customize test commands
+test:
+  override:
+    - flake8
+    - pytest --cov --cov-report term-missing -v --tb=native --junitxml=$CIRCLE_TEST_REPORTS/summary.xml
+    - coverage html -d $CIRCLE_ARTIFACTS
+    - ansible-playbook -i provisioner/hosts provisioner/site.yml --syntax-check
+
+## Customize deployment commands
+
+
+## Custom notifications
+#notify:
+ # webhooks:
+    # A list of hashes representing hooks. Only the url field is supported.
+   # - url: https://someurl.com/hooks/circle

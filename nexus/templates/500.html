@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Server Error" %}{% endblock %}
+{% block head_extras %}
+<meta name="robots" content="NONE,NOARCHIVE">
+{% endblock head_extras %}
+{% block body_classes %}{{ block.super }} page-error page-500 {% endblock body_classes %}
+
+{% block content %}
+<h2>Ooops!!! 500</h2>
+
+<p>{% trans "Looks like something went wrong!" %}</p>
+
+<p>{% trans "We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try refreshing." %}</p>
+{% endblock content %}

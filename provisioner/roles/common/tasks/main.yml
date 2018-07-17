@@ -1,0 +1,62 @@
+---
+
+# Uncomment following if ipv6 is not available or not tunelled through ipv4 properly
+# Disable ipv6 when running in VM(vagrant)
+#- name: Disable ipv6 for all interfaces
+#  sysctl: name="net.ipv6.conf.all.disable_ipv6" value=1 state=present
+#  when: vm == 1
+#
+#- name: Disable ipv6 for default interface
+#  sysctl: name="net.ipv6.conf.default.disable_ipv6" value=1 state=present
+#  when: vm == 1
+#
+#- name: Disable ipv6 for local interface
+#  sysctl: name="net.ipv6.conf.lo.disable_ipv6" value=1 state=present
+#  when: vm == 1
+
+# Ansible requires aptitude and python2 for various tasks
+- name: Install Aptitude and Python-minimal for ansible
+  raw: apt-get install -qq python-apt aptitude
+
+- name: Set hostname
+  action: shell hostnamectl set-hostname {{ domain_name }}
+  when: vm == 0
+
+- name: set system locale
+  command: update-locale LC_ALL={{ lc_all }} LANG={{ lc_lang }} LC_CTYPE={{ lc_ctype }} LC_COLLATE={{ lc_collate }}
+
+- name: set locale file
+  become: yes
+  template: src=locale.j2 dest=/etc/default/locale
+
+- name: set timezone
+  file: src=/usr/share/zoneinfo/{{ common_timezone }}
+        dest=/etc/localtime
+        force=yes
+        state=link
+
+- name: 'Add python3.6 (ppa:deadsnakes/ppa) repository'
+  apt_repository:
+    repo: 'ppa:deadsnakes/ppa'
+    update_cache: yes
+
+- name: update apt cache
+  shell: apt update
+  become: yes
+  register: apt_updated
+
+- name: ensure a default bashrc and inputrc file
+  copy: src={{ item.src }} dest=/home/{{ user }}/{{ item.dest }} owner={{ user }} group={{ user }}
+  with_items:
+    - { src: 'bashrc', dest: '.bashrc' }
+    - { src: 'inputrc', dest: '.inputrc' }
+
+- name: apt_get install common packages
+  apt: pkg={{ item }} state=present
+  with_items: "{{base_ubuntu.common.apt_packages}}"
+
+- name: ensure there is a group www-data
+  group: name=www-data state=present system=yes
+
+- name: ensure there is a user www-data
+  user: name=www-data group=www-data system=yes

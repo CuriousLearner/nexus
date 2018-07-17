@@ -1,0 +1,6 @@
+---
+- name: reload redis
+  service: name=redis-server state=reloaded
+
+- name: restart redis
+  service: name=redis-server state=restarted

@@ -1,0 +1,21 @@
+---
+pg_hstore: False
+pg_db: '{{ project_name }}-{{ deploy_environment }}'
+pg_user: dev
+pg_password: password
+django_requirements_file: requirements.txt
+
+# uwsgi related variables
+uwsgi_user: www-data
+uwsgi_group: www-data
+uwsgi_workers: 2
+uwsgi_worker_connections: 5000
+uwsgi_debug: False
+uwsgi_timeout: 30
+uwsgi_keepalive: 2
+uwsgi_loglevel: info
+uwsgi_conf_path: /etc/uwsgi-emperor/vassals
+uwsgi_socket: /tmp/django-{{ domain_name }}-uwsgi.sock
+uwsgi_pid_file: /tmp/django-{{ domain_name }}-wsgi.pid
+
+project_log_dir: /var/log/django/{{ deploy_environment }}/{{ project_name}}

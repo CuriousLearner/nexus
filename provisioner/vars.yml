@@ -1,0 +1,7 @@
+---
+project_name: nexus
+project_repo_url: git@github.com:CuriousLearner/nexus-web.git
+project_repo_remote: origin
+repo_version: master
+pg_gis: False
+sass_with_django_compressor: True
