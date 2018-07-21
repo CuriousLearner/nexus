@@ -4,10 +4,10 @@
 
 ## Create a post
 
-Create a post of contents (text + image).
+Create a post of contents.
 
 ```
-POST api/posts/create
+POST api/posts
 ```
 
 **Paramaters**
@@ -18,6 +18,7 @@ id           | identity of the post
 posted_by    | user who is posting the content
 posted_at    | social media ploatform to post
 posted_time  | time at which post should be posted
+content_type | type of content, text or image
 content      | content of the post
 image        | image in the post
 is_approved  | whether the post is approved or not
@@ -30,8 +31,9 @@ is_posted    | whether the post is posted or not
     "posted_by": "John Micky",
     "posted_at": "Twitter",
     "posted_time": "",
+    "content_type": "text",
     "content": "Anything that user has to write",
-    "image": "Uploaded Image",
+    "image": "",
     "is_approved": "False",
     "is_posted": "False"
 }
@@ -42,14 +44,23 @@ is_posted    | whether the post is posted or not
 
 Status: 201 Created
 {
-    "message": "Post is queued and waiting for moderation"
+    "id": "724",
+    "posted_by": "John Micky",
+    "posted_at": "Twitter",
+    "posted_time": "",
+    "content_type": "text",
+    "content": "Anything that user has to write",
+    "image": "http://xyz.com/path/of/image.jpg",
+    "is_approved": "False",
+    "is_posted": "False"
+
 }
 ```
 
 ## Update a post
 
 ```
-PATCH api/posts/update
+PATCH api/posts/:post_id (Requires Authorization)
 ```
 
 **Parameters**
@@ -59,13 +70,15 @@ Name         | Description
 new_content  | new content of the post
 new_image    | new image in the post
 posted_time  | time at which post should be posted
+content_type | current content type of the post
 
 **Request**
 ```json
 {
-    "new_content": "Newly updated content",
-    "new_image": "Uploaded image",
-    "posted_time": "2018-10-10T13:43:42Z"
+    "new_content": "",
+    "new_image":"http://xyz.com/path/of/image.jpg",
+    "posted_time": "2018-10-10T13:43:42Z",
+    "content_type": "image"
 }
 ```
 
@@ -74,21 +87,44 @@ posted_time  | time at which post should be posted
 
 Status: 200 OK
 {
-    "message": "Post is updated"
+    "id": "724",
+    "posted_by": "John Micky",
+    "posted_at": "Twitter",
+    "posted_time": "2018-10-10T13:43:42Z",
+    "content_type": "image",
+    "content": "",
+    "image": "http://xyz.com/path/of/image.jpg",
+    "is_approved": "False",
+    "is_posted": "False"
 }
 ```
 
 ## Review a post
 
 ```
-GET api/posts/review
+GET api/posts/:post_id
 ```
 
-**Request**
+**Response**
 ```json
+
+Status: 200 OK
 {
-    "id": "724"
+    "posted_by": "John Micky",
+    "posted_at": "Twitter",
+    "posted_time": "2018-10-10T13:43:42Z",
+    "content_type": "text",
+    "content": "Anything that user has to say",
+    "image": "",
+    "is_approved": "False",
+    "is_posted": "False"
 }
+```
+
+## Approving a post
+
+```
+PATCH api/posts/:post_id/approve
 ```
 
 **Response**
@@ -106,48 +142,45 @@ Status: 200 OK
 }
 ```
 
-## Approving a post
+## Deleting a post
 
 ```
-PATCH api/posts/approve
+DELETE api/posts/:post_id
 ```
+
+**Response**
+```json
+
+Status: 204 No-Content
+```
+
+## Upload image
+
+```
+POST api/image
+```
+
+**Paramaters**
+
+Name         | Description
+-------------|--------------------------------------
+id           | identity of the post
+local_url    | image in the post
 
 **Request**
 ```json
 {
     "id": "724",
+    "local_url": "local url of image"
 }
 ```
 
 **Response**
 ```json
 
-Status: 200 OK
+Status: 201 Created
 {
-    "is_approved": "True",
-    "is_posted": "False",
-    "posted_time": "2018-10-10T13:43:42Z"
+    "url": "http://xyz.com/path/of/image.jpg"
 }
 ```
 
-## Deleting a post
-
-```
-DELETE api/posts/delete
-```
-
-**Request**
-```json
-{
-    "id": "724"
-}
-```
-
-**Response**
-```json
-
-Status: 200 OK
-{
-    "message": "Post is deleted"
-}
-```
