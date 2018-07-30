@@ -8,7 +8,7 @@
 
 [editorconfig]: http://editorconfig.org/
 [flake8]: http://flake8.readthedocs.org/en/latest/
-[django-coding style]: https://docs.djangoproject.com/en/1.7/internals/contributing/writing-code/coding-style/
+[django-coding style]: https://docs.djangoproject.com/en/2.0/internals/contributing/writing-code/coding-style/
 
 
 # Coding Rules
