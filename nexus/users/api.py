@@ -1,5 +1,6 @@
 # Third Party Stuff
 from rest_framework import viewsets
+from rest_framework.decorators import action
 
 # nexus Stuff
 from nexus.base import response
@@ -26,3 +27,7 @@ class CurrentUserViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return response.Ok(serializer.data)
+
+    @action(methods=['POST', ], detail=False)
+    def sample_method(self, request):
+        return response.NoContent()
