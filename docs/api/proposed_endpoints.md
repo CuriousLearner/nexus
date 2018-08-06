@@ -7,35 +7,35 @@
 Create a post of contents.
 
 ```
-POST api/posts
+POST api/posts (requires authentication)
 ```
 
-**Paramaters**
+**Parameters**
 
-Name         | Description
--------------|--------------------------------------
-id           | identity of the post
-posted_by    | user who is posting the content
-posted_at    | social media ploatform to post
-posted_time  | time at which post should be posted
-content_type | type of content, text or image
-content      | content of the post
-image        | image in the post
-is_approved  | whether the post is approved or not
-is_posted    | whether the post is posted or not
+Name          | Data Type   | Description
+--------------|-------------|------------------------------------------
+id            | UUID        | identity of the post
+posted_by     | text        | authorized user who is posting the content
+post_platform | text        | social media ploatform to post
+submitted_at  | datetime    | time at which user submits the post
+posted_at     | datetime    | time at which post should be posted
+content       | text        | content of the post
+image         | text        | url of image in the post
+is_approved   | boolean     | whether the post is approved or not
+is_posted     | boolean     | whether the post is posted or not
 
 **Request**
 ```json
 {
-    "id": "724",
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "John Micky",
-    "posted_at": "Twitter",
-    "posted_time": "",
-    "content_type": "text",
+    "post_platform": "Twitter",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "posted_at": "null",
     "content": "Anything that user has to write",
-    "image": "",
-    "is_approved": "False",
-    "is_posted": "False"
+    "image": "null",
+    "is_approved": "false",
+    "is_posted": "false"
 }
 ```
 
@@ -44,15 +44,15 @@ is_posted    | whether the post is posted or not
 
 Status: 201 Created
 {
-    "id": "724",
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "John Micky",
-    "posted_at": "Twitter",
-    "posted_time": "",
-    "content_type": "text",
+    "post_platform": "Twitter",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "posted_at": "null",
     "content": "Anything that user has to write",
-    "image": "http://xyz.com/path/of/image.jpg",
-    "is_approved": "False",
-    "is_posted": "False"
+    "image": "null",
+    "is_approved": "false",
+    "is_posted": "false"
 
 }
 ```
@@ -60,25 +60,20 @@ Status: 201 Created
 ## Update a post
 
 ```
-PATCH api/posts/:post_id (Requires Authorization)
+PATCH api/posts/:post_id (requires authentication)
 ```
-
-**Parameters**
-
-Name         | Description
--------------|--------------------------------------
-new_content  | new content of the post
-new_image    | new image in the post
-posted_time  | time at which post should be posted
-content_type | current content type of the post
 
 **Request**
 ```json
 {
-    "new_content": "",
-    "new_image":"http://xyz.com/path/of/image.jpg",
-    "posted_time": "2018-10-10T13:43:42Z",
-    "content_type": "image"
+    "posted_by": "John Micky",
+    "post_platform": "Facebook",
+    "content": "Some new content",
+    "image":"http://xyz.com/url/of/uploaded_image.jpg",
+    "submitted_at": "2018-09-03T14:23:01Z",
+    "posted_at": "2018-10-10T13:43:42Z",
+    "is_approved": "false",
+    "is_posted": "false"
 }
 ```
 
@@ -87,15 +82,15 @@ content_type | current content type of the post
 
 Status: 200 OK
 {
-    "id": "724",
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "John Micky",
-    "posted_at": "Twitter",
-    "posted_time": "2018-10-10T13:43:42Z",
-    "content_type": "image",
-    "content": "",
-    "image": "http://xyz.com/path/of/image.jpg",
-    "is_approved": "False",
-    "is_posted": "False"
+    "post_platform": "Facebook",
+    "submitted_at": "2018-09-03T14:23:01Z",
+    "posted_at": "2018-10-10T13:43:42Z",
+    "content": "Some new content",
+    "image": "http://xyz.com/url/of/uploaded_image.jpg",
+    "is_approved": "false",
+    "is_posted": "false"
 }
 ```
 
@@ -111,17 +106,17 @@ GET api/posts/:post_id
 Status: 200 OK
 {
     "posted_by": "John Micky",
-    "posted_at": "Twitter",
-    "posted_time": "2018-10-10T13:43:42Z",
-    "content_type": "text",
+    "post_platform": "Twitter",
+    "submitted_at": "2018-09-03T14:23:01Z",
+    "posted_at": "2018-10-10T13:43:42Z",
     "content": "Anything that user has to say",
-    "image": "",
-    "is_approved": "False",
-    "is_posted": "False"
+    "image": "http://xyz.com/url/of/uploaded_image.jpg",
+    "is_approved": "false",
+    "is_posted": "false"
 }
 ```
 
-## Approving a post
+## Approving a post (requires authentication)
 
 ```
 PATCH api/posts/:post_id/approve
@@ -133,19 +128,20 @@ PATCH api/posts/:post_id/approve
 Status: 200 OK
 {
     "posted_by": "John Micky",
-    "posted_at": "Twitter",
-    "posted_time": "2018-10-10T13:43:42Z",
+    "post_platform": "Twitter",
+    "submitted_at": "2018-09-03T14:23:01Z",
+    "posted_at": "2018-10-10T13:43:42Z",
     "content": "Anything that user has to say",
-    "image": "Uploaded Image",
-    "is_approved": "False",
-    "is_posted": "False"
+    "image": "http://xyz.com/url/to/uploaded_image.jpg",
+    "is_approved": "true",
+    "is_posted": "false"
 }
 ```
 
 ## Deleting a post
 
 ```
-DELETE api/posts/:post_id
+DELETE api/posts/:post_id (requires authentication)
 ```
 
 **Response**
@@ -157,30 +153,24 @@ Status: 204 No-Content
 ## Upload image
 
 ```
-POST api/image
+POST api/posts/multipart/image (requires authentication)
 ```
 
-**Paramaters**
-
-Name         | Description
--------------|--------------------------------------
-id           | identity of the post
-local_url    | image in the post
-
-**Request**
-```json
-{
-    "id": "724",
-    "local_url": "local url of image"
-}
-```
+Image will be uploaded as multipart data as a streaming HTTP request.
 
 **Response**
 ```json
 
 Status: 201 Created
 {
-    "url": "http://xyz.com/path/of/image.jpg"
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "posted_by": "John Micky",
+    "post_platform": "Twitter",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "posted_at": "null",
+    "content": "Anything that user has to write",
+    "image": "http://xyz.com/url/of/uploaded_image.jpg",
+    "is_approved": "false",
+    "is_posted": "false"
 }
 ```
-
