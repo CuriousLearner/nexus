@@ -233,7 +233,7 @@ Status: 200 OK
 ## Register a user
 
 ```
-POST /api/register/
+POST /api/auth/register/
 ```
 
 **Parameters**
@@ -257,6 +257,7 @@ user_type   | choices   | Type of user like admin, volunteer, attendee
 
 **Request**
 ```json
+
 {
     "id": null,
     "first_name": "John",
@@ -297,11 +298,12 @@ Status: 201 Created
 ## Update user details
 
 ```
-PATCH /api/register/:uuid (requires authentication)
+PATCH /api/me (requires authentication)
 ```
 
 **Request**
 ```json
+
 {
     "first_name": "Jaun",
     "last_name": "Hawley",
@@ -335,8 +337,10 @@ Status: 200 OK
 ## Delete User
 
 ```
-DELETE /api/register/:uuid (requires authentication)
+DELETE /api/me (requires authentication)
 ```
+
+_NOTE_: This will be a soft-delete.
 
 **Response**
 ```json
@@ -348,7 +352,7 @@ Status: 204 No-Content
 ## Get a user details
 
 ```
-GET /api/register/:uuid (requires authentication)
+GET /api/me (requires authentication)
 ```
 
 **Response**
