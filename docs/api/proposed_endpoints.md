@@ -1,10 +1,8 @@
 [TOC]
 
-# Posts related actions
+# Social Media Posts
 
 ## Create a post
-
-Create a post of contents.
 
 ```
 POST /api/posts (requires authentication)
@@ -15,31 +13,33 @@ POST /api/posts (requires authentication)
 Name          | Data Type   | Description
 --------------|-------------|------------------------------------------
 id            | UUID        | identity of the post
-posted_by     | UUID        | Foreign key to `Users` model
-posted_at     | text        | social media ploatform to post
+posted_by     | UUID        | foreign key to `Users` model
+posted_on     | text        | social media ploatform to post
 created_at    | datetime    | time at which user submits the post
-modified_at   | datetime    | time at which post is modified/updated
-scheduled_time| datetime    | time at which the post is scheduled to be posted
+modified_at   | datetime    | time at which the post is modified/updated
+scheduled_time| datetime    | time that the user schedules for his post to be posted
 text          | text        | content of the post
 image         | text        | url of image in the post
 is_approved   | boolean     | whether the post is approved or not
 approved_time | datetime    | time at which the post is approved
 is_posted     | boolean     | whether the post is posted or not
+posted_time   | datetime    | time at which the post will be posted
 
 **Request**
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "twitter",
+    "posted_on": "twitter",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z",
-    "scheduled_time": null,
+    "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
     "is_approved": "false",
     "approved_time": null,
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
 }
 ```
 
@@ -50,15 +50,16 @@ Status: 201 Created
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "twitter",
+    "posted_on": "twitter",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z",
-    "scheduled_time": null,
+    "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
     "is_approved": "false",
     "approved_time": null,
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
 
 }
 ```
@@ -73,15 +74,16 @@ PATCH /api/posts/:post_id (requires authentication)
 ```json
 {
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "facebook",
-    "text": "Some new content",
+    "posted_on": "facebook",
+    "text": "some new content",
     "image":"http://xyz.com/url/of/uploaded_image.jpg",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-09-03T14:23:01Z",
-    "scheduled_time": "2018-10-10T13:43:42Z",
+    "scheduled_time": "2018-10-01T11:00:00Z",
     "is_approved": "false",
     "approved_time": null,
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
 }
 ```
 
@@ -92,15 +94,16 @@ Status: 200 OK
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "facebook",
+    "posted_on": "facebook",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-09-03T14:23:01Z",
-    "scheduled_time": "2018-10-10T13:43:42Z",
-    "text": "Some new content",
+    "scheduled_time": "2018-10-01T11:00:00Z",
+    "text": "some new content",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
     "is_approved": "false",
     "approved_time": null,
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
 }
 ```
 
@@ -117,39 +120,26 @@ Status: 200 OK
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "twitter",
+    "posted_on": "twitter",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-09-03T14:23:01Z",
-    "scheduled_time": "2018-10-10T13:43:42Z",
+    "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
     "is_approved": "false",
     "approved_time": null,
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
 }
 ```
 
-## Approving a post (requires authentication)
+## Approving a post
 
 ```
-POST /api/posts/:post_id/approve
+POST /api/posts/:post_id/approve (requires authentication)
 ```
 
-Only an Admin or a Moderator can approve a post.
-
-**Request**
-```json
-    "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "twitter",
-    "created_at": "2018-08-01T17:30:42Z",
-    "modified_at": "2018-09-03T14:23:01Z",
-    "scheduled_time": "2018-10-10T13:43:42Z",
-    "text": "anything that user has to write",
-    "image": "http://xyz.com/url/to/uploaded_image.jpg",
-    "is_approved": "true",
-    "approved_time": "2018-09-05T15:20:00Z",
-    "is_posted": "false"
-```
+__NOTE__:Only an Admin or a Moderator can approve a post.
 
 **Response**
 ```json
@@ -158,15 +148,16 @@ Status: 200 OK
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "twitter",
+    "posted_on": "twitter",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-09-03T14:23:01Z",
-    "scheduled_time": "2018-10-10T13:43:42Z",
+    "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/to/uploaded_image.jpg",
     "is_approved": "true",
     "approved_time": "2018-09-05T15:20:00Z",
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
 }
 ```
 
@@ -182,7 +173,7 @@ DELETE /api/posts/:post_id (requires authentication)
 Status: 204 No-Content
 ```
 
-## Upload image
+## Add an image to the social media post
 
 ```
 POST /api/posts/:post_id/upload_image (requires authentication)
@@ -197,14 +188,41 @@ Status: 201 Created
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
-    "posted_at": "twitter",
+    "posted_on": "twitter",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-09-03T14:23:01Z",
-    "scheduled_time": null,
+    "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
     "is_approved": "false",
     "approved_time": null,
-    "is_posted": "false"
+    "is_posted": "false",
+    "posted_time": null
+}
+```
+
+## Delete the image from social media post
+
+```
+DELETE /api/posts/:post_id/delete_image (requires authentication)
+```
+
+**Response**
+```json
+
+Status: 200 OK
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
+    "posted_on": "twitter",
+    "created_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-09-03T14:23:01Z",
+    "scheduled_time": "2018-10-01T11:00:00Z",
+    "text": "anything that user has to write",
+    "image": null,
+    "is_approved": "false",
+    "approved_time": null,
+    "is_posted": "false",
+    "posted_time": null
 }
 ```
