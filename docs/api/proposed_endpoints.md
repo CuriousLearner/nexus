@@ -1,5 +1,144 @@
 [TOC]
 
+# User Authentication
+
+## Register a user
+
+```
+POST /api/auth/register/
+```
+
+**Parameters**
+
+Name        | Data Type | Description
+------------|-----------|---------------------------
+id          | UUID      | Id of the user
+first_name  | text      | first name of the user
+last_name   | text      | last name of the user
+email_id    | text      | email of user. Errors out if email already registered.
+password    | text      | Hash of the user's password
+gender      | choices   | gender (Like Male, Female, Others)
+tshirt_size | choices   | size of the TShirt (Like Small, Medium etc.)
+contact     | text      | contact number
+ticket_id   | text      | ticket ID generated at registration
+created_at  | datetime  | date and time of registration
+modified_at | datetime  | date and time of modification
+user_type   | choices   | Type of user like admin, volunteer, attendee
+
+
+
+**Request**
+```json
+{
+    "id": null,
+    "first_name": "John",
+    "last_name": "Hawley",
+    "email_id": "john@localhost.com",
+    "password": "VerySafePassword0909",
+    "gender": "Male",
+    "tshirt_size": "Medium",
+    "contact": "+919999999999",
+    "ticket_id": null,
+    "created_at": null,
+    "modified_at": null,
+    "user_type": null
+}
+```
+
+
+**Response**
+Status: 201 Created
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "first_name": "John",
+    "last_name": "Hawley",
+    "email_id": "john@localhost.com",
+    "auth_token": "eyJ0eXAi0iJKV1QiLCJh",
+    "gender": "Male",
+    "tshirt_size": "Medium",
+    "contact": "+919999999999",
+    "ticket_id": "This-is-a-unique-ticket-id",
+    "created_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-01T17:30:42Z",
+    "user_type": "Attendee"
+}
+```
+
+# Current user actions
+
+## Get current logged-in user's details
+
+```
+GET /api/me (requires authentication)
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "first_name": "Jaun",
+    "last_name": "Hawley",
+    "email_id": "jaun@localhost.com",
+    "gender": "Male",
+    "tshirt_size": "Extra Large",
+    "contact": "+919999999998",
+    "ticket_id": "This-is-a-unique-ticket-id",
+    "created_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-02T07:10:42Z",
+    "user_type": "Volunteer"
+}
+```
+
+## Update user details
+
+```
+PATCH /api/me (requires authentication)
+```
+
+**Request**
+```json
+{
+    "first_name": "Jaun",
+    "last_name": "Hawley",
+    "email_id": "jaun@localhost.com",
+    "gender": "Male",
+    "tshirt_size": "Extra Large",
+    "contact": "+919999999998",
+    "user_type": "Volunteer"
+}
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "first_name": "Jaun",
+    "last_name": "Hawley",
+    "email_id": "jaun@localhost.com",
+    "gender": "Male",
+    "tshirt_size": "Extra Large",
+    "contact": "+919999999998",
+    "ticket_id": "This-is-a-unique-ticket-id",
+    "created_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-02T07:10:42Z",
+    "user_type": "Volunteer"
+}
+```
+
+## Delete User
+
+```
+DELETE /api/me (requires authentication)
+```
+
+__NOTE__: This will be a soft-delete.
+
+**Response**
+Status: 204 No-Content
+
 # Social Media Posts
 
 ## Create a post
@@ -44,9 +183,8 @@ posted_time   | datetime    | time at which the post will be posted
 ```
 
 **Response**
-```json
-
 Status: 201 Created
+```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
@@ -88,9 +226,8 @@ PATCH /api/posts/:post_id (requires authentication)
 ```
 
 **Response**
-```json
-
 Status: 200 OK
+```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
@@ -114,9 +251,8 @@ GET /api/posts/:post_id
 ```
 
 **Response**
-```json
-
 Status: 200 OK
+```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
@@ -142,9 +278,8 @@ POST /api/posts/:post_id/approve (requires authentication)
 __NOTE__:Only an Admin or a Moderator can approve a post.
 
 **Response**
-```json
-
 Status: 200 OK
+```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
@@ -168,10 +303,7 @@ DELETE /api/posts/:post_id (requires authentication)
 ```
 
 **Response**
-```json
-
 Status: 204 No-Content
-```
 
 ## Add an image to the social media post
 
@@ -182,9 +314,8 @@ POST /api/posts/:post_id/upload_image (requires authentication)
 Image will be uploaded as multipart data as a streaming HTTP request.
 
 **Response**
-```json
-
 Status: 201 Created
+```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
@@ -208,9 +339,8 @@ DELETE /api/posts/:post_id/delete_image (requires authentication)
 ```
 
 **Response**
-```json
-
 Status: 200 OK
+```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
