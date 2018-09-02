@@ -1,7 +1,7 @@
 nexus
 ==============================
 
-https://travis-ci.org/CuriousLearner/nexus.svg?branch=master
+![](https://travis-ci.org/CuriousLearner/nexus.svg?branch=master)
 
 __Version:__ 0.0.0
 
