@@ -4,6 +4,8 @@
     .container hr{margin-top: 5px; }
 </style>
 
-## DATE HERE
+## Sep 1, 2018
 
-- add changeset message here
+- Add basic code quality pre-commit hooks ([@CuriousLearner])
+
+[@CuriousLearner]: https://github.com/CuriousLearner
