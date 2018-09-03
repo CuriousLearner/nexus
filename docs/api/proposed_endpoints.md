@@ -17,13 +17,13 @@ first_name  | text      | first name of the user
 last_name   | text      | last name of the user
 email_id    | text      | email of user. Errors out if email already registered.
 password    | text      | Hash of the user's password
-gender      | text      | gender (Like Male, Female, Others)
-tshirt_size | text      | size of the TShirt (Like Small, Medium etc.)
+gender      | text      | gender (Like `male`, `female`, `others`)
+tshirt_size | text      | size of the TShirt (Like `small`, `medium`, `large`, `extra large` etc.)
 contact     | text      | contact number
 ticket_id   | text      | ticket ID generated at registration
 created_at  | datetime  | date and time of registration
 modified_at | datetime  | date and time of modification
-user_type   | text      | Type of user like admin, volunteer, attendee
+user_type   | text      | Type of user like `admin`, `volunteer`, `attendee`
 
 
 
@@ -35,8 +35,8 @@ user_type   | text      | Type of user like admin, volunteer, attendee
     "last_name": "Hawley",
     "email_id": "john@localhost.com",
     "password": "VerySafePassword0909",
-    "gender": "Male",
-    "tshirt_size": "Medium",
+    "gender": "male",
+    "tshirt_size": "medium",
     "contact": "+919999999999",
     "ticket_id": null,
     "created_at": null,
@@ -55,8 +55,8 @@ Status: 201 Created
     "last_name": "Hawley",
     "email_id": "john@localhost.com",
     "auth_token": "eyJ0eXAi0iJKV1QiLCJh",
-    "gender": "Male",
-    "tshirt_size": "Medium",
+    "gender": "male",
+    "tshirt_size": "medium",
     "contact": "+919999999999",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
@@ -81,8 +81,8 @@ Status: 200 OK
     "first_name": "Jaun",
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
-    "gender": "Male",
-    "tshirt_size": "Extra Large",
+    "gender": "male",
+    "tshirt_size": "extra large",
     "contact": "+919999999998",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
@@ -103,8 +103,8 @@ PATCH /api/me (requires authentication)
     "first_name": "Jaun",
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
-    "gender": "Male",
-    "tshirt_size": "Extra Large",
+    "gender": "male",
+    "tshirt_size": "extra large",
     "contact": "+919999999998",
     "user_type": "Volunteer"
 }
@@ -118,8 +118,8 @@ Status: 200 OK
     "first_name": "Jaun",
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
-    "gender": "Male",
-    "tshirt_size": "Extra Large",
+    "gender": "male",
+    "tshirt_size": "extra large",
     "contact": "+919999999998",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
@@ -380,7 +380,6 @@ description        | text          | Description of the proposal
 submitted_at       | datetime      | Time of submission of proposal
 approved_at        | datetime      | Time of approval
 modified_at        | datetime      | Time of modification
-proposed_time      | datetime      | Proposed time of event
 status             | text          | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
 
 
@@ -393,8 +392,7 @@ status             | text          | Status of proposal like `retracted`, `accep
     "level": "beginner",
     "duration": "01:30:00",
     "abstract": "This is the abstract of the talk",
-    "description": "This is the description of the of the talk and can be quite long",
-    "proposed_time": "2018-10-10T11:10:00:00Z"
+    "description": "This is the description of the of the talk and can be quite long"
 }
 ```
 
@@ -413,7 +411,6 @@ Status: 201 Created
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": null,
     "modified_at": "2018-08-01T17:30:42Z",
-    "proposed_time": "2018-10-10T11:10:00:00Z",
     "status": "submitted"
 }
 ```
@@ -447,7 +444,6 @@ Status: 201 Created
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": null,
     "modified_at": "2018-08-03T09:20:00Z",
-    "proposed_time": "2018-10-10T11:10:00:00Z",
     "status": "submitted"
 }
 ```
@@ -473,7 +469,6 @@ Status: 201 Created
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
-    "proposed_time": "2018-10-10T11:10:00:00Z",
     "status": "accepted"
 }
 ```
@@ -499,7 +494,6 @@ Status: 201 Created
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
-    "proposed_time": "2018-10-10T11:10:00:00Z",
     "status": "submitted"
 }
 ```
@@ -525,7 +519,6 @@ Status: 201 Created
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
-    "proposed_time": "2018-10-10T11:10:00:00Z",
     "status": "retracted"
 }
 ```
