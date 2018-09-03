@@ -23,8 +23,8 @@ contact     | text      | contact number
 ticket_id   | text      | ticket ID generated at registration
 created_at  | datetime  | date and time of registration
 modified_at | datetime  | date and time of modification
-user_type   | text      | Type of user like `admin`, `volunteer`, `attendee`
-
+is_admin    | boolean   | true if the user is an admin
+is_volunteer| boolean   | true if the user is a volunteer
 
 
 **Request**
@@ -41,7 +41,6 @@ user_type   | text      | Type of user like `admin`, `volunteer`, `attendee`
     "ticket_id": null,
     "created_at": null,
     "modified_at": null,
-    "user_type": null
 }
 ```
 
@@ -61,7 +60,8 @@ Status: 201 Created
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z",
-    "user_type": "Attendee"
+    "is_admin": false,
+    "is_volunteer": false
 }
 ```
 
@@ -87,7 +87,8 @@ Status: 200 OK
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-02T07:10:42Z",
-    "user_type": "Volunteer"
+    "is_admin": false,
+    "is_volunteer": false
 }
 ```
 
@@ -106,7 +107,6 @@ PATCH /api/me (requires authentication)
     "gender": "male",
     "tshirt_size": "extra large",
     "contact": "+919999999998",
-    "user_type": "Volunteer"
 }
 ```
 
@@ -124,7 +124,8 @@ Status: 200 OK
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-02T07:10:42Z",
-    "user_type": "Volunteer"
+    "is_admin": false,
+    "is_volunteer": false
 }
 ```
 
