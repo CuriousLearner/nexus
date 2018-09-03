@@ -388,7 +388,7 @@ status             | text          | Status of proposal like `retracted`, `accep
 ```json
 {
     "title": "Sample title of the talk",
-    "speaker": "070af5d3-03a0a38-9a75-5b76de8826d2",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "kind": "talk",
     "level": "beginner",
     "duration": "01:30:00",
