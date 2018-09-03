@@ -8,4 +8,9 @@
 
 - Add basic code quality pre-commit hooks ([@CuriousLearner])
 
+## Sep 3, 2018
+
+- Add attributes to complete `User` model ([@GeekyShacklebolt])
+
 [@CuriousLearner]: https://github.com/CuriousLearner
+[@GeekyShacklebolt]: https://github.com/GeekyShacklebolt
