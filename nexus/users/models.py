@@ -5,30 +5,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from extended_choices import Choices
+from phonenumber_field.modelfields import PhoneNumberField
 
 # nexus Stuff
 from nexus.base.models import UUIDModel
-
-
-GENDER = Choices(
-    ('MALE', 'M', _('Male')),
-    ('FEMALE', 'F', _('Female')),
-    ('OTHERS', 'O', _('Others')),
-)
-
-TSHIRT_SIZE = Choices(
-    ('SMALL', 'S', _('Small')),
-    ('MEDIUM', 'M', _('Medium')),
-    ('LARGE', 'L', _('Large')),
-    ('EXTRA_LARGE', 'XL', _('Extra_Large')),
-    ('DOUBLE_EXTRA_LARGE', 'XXL', _('Double Extra Large')),
-)
-
-USER_TYPE = Choices(
-    ('ADMIN', 'ADM', _('Administrator')),
-    ('VOLUNTEER', 'VOL', _('Volunteer')),
-    ('ATTENDEE', 'ATT', _('Attendee')),
-)
 
 
 class UserManager(BaseUserManager):
@@ -52,6 +32,27 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
+
+    GENDER = Choices(
+        ('MALE', 'M', _('Male')),
+        ('FEMALE', 'F', _('Female')),
+        ('OTHERS', 'O', _('Others')),
+    )
+
+    TSHIRT_SIZE = Choices(
+        ('SMALL', 'S', _('Small')),
+        ('MEDIUM', 'M', _('Medium')),
+        ('LARGE', 'L', _('Large')),
+        ('EXTRA_LARGE', 'XL', _('Extra_Large')),
+        ('DOUBLE_EXTRA_LARGE', 'XXL', _('Double Extra Large')),
+    )
+
+    USER_TYPE = Choices(
+        ('ADMIN', 'ADM', _('Administrator')),
+        ('VOLUNTEER', 'VOL', _('Volunteer')),
+        ('ATTENDEE', 'ATT', _('Attendee')),
+    )
+
     first_name = models.CharField(_('First Name'), max_length=120, blank=True)
     last_name = models.CharField(_('Last Name'), max_length=120, blank=True)
     # https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/fields/#citext-fields
@@ -69,7 +70,7 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
 
     gender = models.CharField(_('Gender'), choices=GENDER, max_length=6)
     tshirt_size = models.CharField(_('Tshirt Size'), choices=TSHIRT_SIZE, max_length=10)
-    contact = models.CharField(_('Contact'), blank=False, null=True, max_length=13)
+    phone_number = models.PhoneNumberField(_('Phone Number'), blank=False, null=True, max_length=13)
     ticked_id = models.CharField(_('Ticket Id'), blank=False, null=False)
     user_type = models.CharField(_('User Role'), choices=USER_TYPE, max_length=13)
 
