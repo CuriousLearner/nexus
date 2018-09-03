@@ -18,7 +18,7 @@ last_name   | text      | last name of the user
 email_id    | text      | email of user. Errors out if email already registered.
 password    | text      | Hash of the user's password
 gender      | text      | gender (Like `male`, `female`, `others`)
-tshirt_size | text      | size of the TShirt (Like `small`, `medium`, `large`, `extra large` etc.)
+tshirt_size | text      | size of the TShirt (Like `small`, `medium`, `large`, `extra_large` etc.)
 contact     | text      | contact number
 ticket_id   | text      | ticket ID generated at registration
 created_at  | datetime  | date and time of registration
@@ -82,7 +82,7 @@ Status: 200 OK
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
     "gender": "male",
-    "tshirt_size": "extra large",
+    "tshirt_size": "extra_large",
     "contact": "+919999999998",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
@@ -105,7 +105,7 @@ PATCH /api/me (requires authentication)
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
     "gender": "male",
-    "tshirt_size": "extra large",
+    "tshirt_size": "extra_large",
     "contact": "+919999999998",
 }
 ```
@@ -119,7 +119,7 @@ Status: 200 OK
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
     "gender": "male",
-    "tshirt_size": "extra large",
+    "tshirt_size": "extra_large",
     "contact": "+919999999998",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
