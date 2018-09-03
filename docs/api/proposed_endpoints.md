@@ -357,45 +357,40 @@ Status: 200 OK
 }
 ```
 
-# Talks
+# Proposals
 
-## Create Talk
+## Create Proposal
 
 ```
-POST /api/talk 
+POST /api/proposal
 ```
 
 **Parameters**
 
 Name               | Data type     | Description
 -------------------|---------------|---------------------
-id                 | UUID          | Unique ID for the talk
-talk_name          | text          | Name of talk
+id                 | UUID          | Unique ID for the proposal
+name               | text          | Name of proposal
 speaker            | text          | Speaker for the talk
-type               | choices       | Type like talk, dev sprint, workshop
-level              | choices       | Level of talk beginner, intermediate, advanced
-duration           | text          | Duration of talk 
-submitted_at       | datetime      | Time of submission of talk
-approved_at        | datetime      | Time of talk approval
+type               | choices       | Type of proposal like talk, dev sprint, workshop
+level              | choices       | Level of proposal beginner, intermediate, advanced
+duration           | text          | Duration of talk, sprint or workshop 
+submitted_at       | datetime      | Time of submission of proposal
+approved_at        | datetime      | Time of approval
 modified_at        | datetime      | Time of modification
-proposed_time      | datetime      | Proposed time of talk
-talk_status        | choices       | Status of talk like retracted, accepted, unaccepted, submitted, etc.
+proposed_time      | datetime      | Proposed time of event
+status             | choices       | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
 
 
 **Request**
 ```json
 {
-    "id": null,
-    "talk_name": "Sample name of the talk",
+    "name": "Sample name of the talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "type": "talk",
     "level": "beginner",
-    "duration": "1Hours 30Minutes",
-    "submitted_at": null,
-    "approved_at": null,
-    "modified_at": null,
-    "proposed_time": "2018-10-10T11:10:00:00Z",
-    "talk_status": null
+    "duration": "01:30:00",
+    "proposed_time": "2018-10-10T11:10:00:00Z"
 }
 ```
 
@@ -404,29 +399,29 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "talk_name": "Sample name of the talk",
+    "name": "Sample name of the talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "type": "talk",
     "level": "beginner",
-    "duration": "1Hours 30Minutes",
+    "duration": "01:30:00",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": null,
     "modified_at": "2018-08-01T17:30:42Z",
     "proposed_time": "2018-10-10T11:10:00:00Z",
-    "talk_status": "submitted"
+    "status": "submitted"
 }
 ```
 
-## Update talk details
+## Update proposal details
 
 ```
-PATCH /api/talk/:id (request authentication)
+PATCH /api/proposal/:id (request authentication)
 ```
 
 **Request**
 ```json
 {
-    "talk_name": "Corrected name of talk",
+    "name": "Corrected name of talk",
     "level": "advanced"
 }
 ```
@@ -436,23 +431,23 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "talk_name": "Corrected name of talk",
+    "name": "Corrected name of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "type": "talk",
     "level": "advanced",
-    "duration": "1Hours 30Minutes",
+    "duration": "01:30:00",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": null,
     "modified_at": "2018-08-03T09:20:00Z",
     "proposed_time": "2018-10-10T11:10:00:00Z",
-    "talk_status": "submitted"
+    "status": "submitted"
 }
 ```
 
-## Accept the talk
+## Accept the proposal
 
 ```
-POST /api/talk/:id/accept
+POST /api/proposal/:id/accept
 ```
 
 **Response**
@@ -460,23 +455,23 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "talk_name": "Corrected name of talk",
+    "name": "Corrected name of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "type": "talk",
     "level": "advanced",
-    "duration": "1Hours 30Minutes",
+    "duration": "01:30:00",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
     "proposed_time": "2018-10-10T11:10:00:00Z",
-    "talk_status": "accepted"
+    "status": "accepted"
 }
 ```
 
-## Get talk details
+## Get proposal details
 
 ```
-GET /api/talk/:id
+GET /api/proposal/:id
 ```
 
 **Response**
@@ -484,23 +479,23 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "talk_name": "Corrected name of talk",
+    "name": "Corrected name of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "type": "talk",
     "level": "advanced",
-    "duration": "1Hours 30Minutes",
+    "duration": "01:30:00",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
     "proposed_time": "2018-10-10T11:10:00:00Z",
-    "talk_status": "submitted"
+    "status": "submitted"
 }
 ```
 
-## Retract the talk
+## Retract the proposal
 
 ```
-PATCH /api/talk/:id/retract (requires authentication)
+POST /api/proposal/:id/retract (requires authentication)
 ```
 
 **Response**
@@ -508,16 +503,16 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "talk_name": "Corrected name of talk",
+    "name": "Corrected name of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "type": "talk",
     "level": "advanced",
-    "duration": "1Hours 30Minutes",
+    "duration": "01:30:00",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
     "proposed_time": "2018-10-10T11:10:00:00Z",
-    "talk_status": "retracted"
+    "status": "retracted"
 }
 ```
 
