@@ -17,13 +17,13 @@ first_name  | text      | first name of the user
 last_name   | text      | last name of the user
 email_id    | text      | email of user. Errors out if email already registered.
 password    | text      | Hash of the user's password
-gender      | choices   | gender (Like Male, Female, Others)
-tshirt_size | choices   | size of the TShirt (Like Small, Medium etc.)
+gender      | text      | gender (Like Male, Female, Others)
+tshirt_size | text      | size of the TShirt (Like Small, Medium etc.)
 contact     | text      | contact number
 ticket_id   | text      | ticket ID generated at registration
 created_at  | datetime  | date and time of registration
 modified_at | datetime  | date and time of modification
-user_type   | choices   | Type of user like admin, volunteer, attendee
+user_type   | text      | Type of user like admin, volunteer, attendee
 
 
 
@@ -370,26 +370,30 @@ POST /api/proposal
 Name               | Data type     | Description
 -------------------|---------------|---------------------
 id                 | UUID          | Unique ID for the proposal
-name               | text          | Name of proposal
+title              | text          | Title of proposal
 speaker            | text          | Speaker for the talk
-type               | choices       | Type of proposal like talk, dev sprint, workshop
-level              | choices       | Level of proposal beginner, intermediate, advanced
+kind               | text          | Type of proposal like talk, dev sprint, workshop
+level              | text          | Level of proposal beginner, intermediate, advanced
 duration           | text          | Duration of talk, sprint or workshop 
+abstract           | text          | Abstract of the proposal
+description        | text          | Description of the proposal
 submitted_at       | datetime      | Time of submission of proposal
 approved_at        | datetime      | Time of approval
 modified_at        | datetime      | Time of modification
 proposed_time      | datetime      | Proposed time of event
-status             | choices       | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
+status             | text          | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
 
 
 **Request**
 ```json
 {
-    "name": "Sample name of the talk",
-    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
-    "type": "talk",
+    "title": "Sample title of the talk",
+    "speaker": "070af5d3-03a0a38-9a75-5b76de8826d2",
+    "kind": "talk",
     "level": "beginner",
     "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
     "proposed_time": "2018-10-10T11:10:00:00Z"
 }
 ```
@@ -399,11 +403,13 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Sample name of the talk",
+    "title": "Sample title of the talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
-    "type": "talk",
+    "kind": "talk",
     "level": "beginner",
     "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": null,
     "modified_at": "2018-08-01T17:30:42Z",
@@ -421,7 +427,7 @@ PATCH /api/proposal/:id (request authentication)
 **Request**
 ```json
 {
-    "name": "Corrected name of talk",
+    "title": "Corrected title of talk",
     "level": "advanced"
 }
 ```
@@ -431,11 +437,13 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Corrected name of talk",
+    "title": "Corrected title of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
-    "type": "talk",
+    "kind": "talk",
     "level": "advanced",
     "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": null,
     "modified_at": "2018-08-03T09:20:00Z",
@@ -455,11 +463,13 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Corrected name of talk",
+    "title": "Corrected title of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
-    "type": "talk",
+    "kind": "talk",
     "level": "advanced",
     "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
@@ -479,11 +489,13 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Corrected name of talk",
+    "title": "Corrected title of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
-    "type": "talk",
+    "kind": "talk",
     "level": "advanced",
     "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
@@ -503,11 +515,13 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Corrected name of talk",
+    "title": "Corrected title of talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
-    "type": "talk",
+    "kind": "talk",
     "level": "advanced",
     "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
     "approved_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
