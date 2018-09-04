@@ -34,23 +34,17 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
 
     GENDER = Choices(
-        ('MALE', 'M', _('Male')),
-        ('FEMALE', 'F', _('Female')),
-        ('OTHERS', 'O', _('Others')),
+        ('MALE', 'M', _('male')),
+        ('FEMALE', 'F', _('female')),
+        ('OTHERS', 'O', _('others')),
     )
 
     TSHIRT_SIZE = Choices(
-        ('SMALL', 'S', _('Small')),
-        ('MEDIUM', 'M', _('Medium')),
-        ('LARGE', 'L', _('Large')),
-        ('EXTRA_LARGE', 'XL', _('Extra_Large')),
-        ('DOUBLE_EXTRA_LARGE', 'XXL', _('Double Extra Large')),
-    )
-
-    USER_TYPE = Choices(
-        ('ADMIN', 'ADM', _('Administrator')),
-        ('VOLUNTEER', 'VOL', _('Volunteer')),
-        ('ATTENDEE', 'ATT', _('Attendee')),
+        ('SMALL', 'S', _('small')),
+        ('MEDIUM', 'M', _('medium')),
+        ('LARGE', 'L', _('large')),
+        ('EXTRA_LARGE', 'XL', _('extra_large')),
+        ('DOUBLE_EXTRA_LARGE', 'XXL', _('double extra large')),
     )
 
     first_name = models.CharField(_('First Name'), max_length=120, blank=True)
@@ -72,7 +66,8 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
     tshirt_size = models.CharField(_('Tshirt Size'), choices=TSHIRT_SIZE, max_length=10)
     phone_number = models.PhoneNumberField(_('Phone Number'), blank=False, null=True, max_length=13)
     ticked_id = models.CharField(_('Ticket Id'), blank=False, null=False)
-    user_type = models.CharField(_('User Role'), choices=USER_TYPE, max_length=13)
+    is_admin = models.BooleanField(_('Is the user an admin'), default=False)
+    is_volunteer = models.BooleanField(_('Is the user a volunteer'), default=False)
 
     class Meta:
         verbose_name = _('user')
