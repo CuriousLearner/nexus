@@ -168,18 +168,9 @@ posted_time   | datetime    | time at which the post will be posted
 **Request**
 ```json
 {
-    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
     "posted_on": "twitter",
-    "created_at": "2018-08-01T17:30:42Z",
-    "modified_at": "2018-08-01T17:30:42Z",
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
-    "image": null,
-    "is_approved": false,
-    "approved_time": null,
-    "is_posted": false,
-    "posted_time": null
 }
 ```
 
@@ -212,17 +203,10 @@ PATCH /api/posts/:post_id (requires authentication)
 **Request**
 ```json
 {
-    "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
     "posted_on": "facebook",
     "text": "some new content",
     "image":"http://xyz.com/url/of/uploaded_image.jpg",
-    "created_at": "2018-08-01T17:30:42Z",
-    "modified_at": "2018-09-03T14:23:01Z",
     "scheduled_time": "2018-10-01T11:00:00Z",
-    "is_approved": false,
-    "approved_time": null,
-    "is_posted": false,
-    "posted_time": null
 }
 ```
 
