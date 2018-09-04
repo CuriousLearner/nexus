@@ -176,9 +176,9 @@ posted_time   | datetime    | time at which the post will be posted
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -195,9 +195,9 @@ Status: 201 Created
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 
 }
@@ -219,9 +219,9 @@ PATCH /api/posts/:post_id (requires authentication)
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-09-03T14:23:01Z",
     "scheduled_time": "2018-10-01T11:00:00Z",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -238,9 +238,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "some new content",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -263,9 +263,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -290,9 +290,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/to/uploaded_image.jpg",
-    "is_approved": "true",
+    "is_approved": true,
     "approved_time": "2018-09-05T15:20:00Z",
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -326,9 +326,9 @@ Status: 201 Created
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -351,9 +351,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
