@@ -17,14 +17,42 @@ def test_user_registration(client):
     url = reverse('auth-register')
     credentials = {
         'email': 'test@test.com',
-        'password': 'localhost'
+        'password': 'localhost',
+        'first_name': 'John',
+        'last_name': 'Hawley',
+        'gender': 'O',
+        'tshirt_size': 'XXL',
+        'phone_number': None,
     }
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 201
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name', 'auth_token'
+        'id', 'email', 'first_name', 'last_name', 'auth_token', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser'
     ]
     assert set(expected_keys).issubset(response.data.keys())
+
+
+def test_user_registration_for_already_registered_email(client):
+    url = reverse('auth-register')
+    f.create_user(email='test@example.com', password='test')
+
+    credentials = {
+        'email': 'test@example.com',
+        'password': 'localhost',
+        'first_name': 'John',
+        'last_name': 'Hawley',
+        'gender': 'O',
+        'tshirt_size': 'XXL',
+        'phone_number': None,
+    }
+    response = client.json.post(url, json.dumps(credentials))
+    assert response.status_code == 400
+    expected_keys = [
+        'errors', 'error_type'
+    ]
+    assert set(expected_keys).issubset(response.data.keys())
+    assert response.data['error_type'] == 'ValidationError'
 
 
 def test_user_login(client):

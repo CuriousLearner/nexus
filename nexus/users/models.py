@@ -62,12 +62,13 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
     USERNAME_FIELD = 'email'
     objects = UserManager()
 
-    gender = models.CharField(_('Gender'), choices=GENDER, max_length=6)
-    tshirt_size = models.CharField(_('Tshirt Size'), choices=TSHIRT_SIZE, max_length=10)
-    phone_number = models.PhoneNumberField(_('Phone Number'), blank=False, null=True, max_length=13)
-    ticked_id = models.CharField(_('Ticket Id'), blank=False, null=False)
-    is_admin = models.BooleanField(_('Is the user an admin'), default=False)
-    is_volunteer = models.BooleanField(_('Is the user a volunteer'), default=False)
+    gender = models.CharField(_('Gender'), default='O', choices=GENDER, max_length=6)
+    tshirt_size = models.CharField(_('Tshirt Size'), default='L', choices=TSHIRT_SIZE, max_length=10)
+    phone_number = PhoneNumberField(_('Phone Number'), blank=False, null=True, max_length=13)
+    ticket_id = models.CharField(_('Ticket Id'), default=_('Not assigned'), blank=False, null=False, max_length=32)
+    is_core_organizer = models.BooleanField(_('core organizer status'), default=False,
+                                            help_text='Is the user a core organizer')
+    is_volunteer = models.BooleanField(_('volunteer status'), default=False, help_text='Is the user a volunteer')
 
     class Meta:
         verbose_name = _('user')
