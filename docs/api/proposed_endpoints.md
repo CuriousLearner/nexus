@@ -372,7 +372,6 @@ status             | text          | Status of proposal like `retracted`, `accep
 ```json
 {
     "title": "Sample title of the talk",
-    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "kind": "talk",
     "level": "beginner",
     "duration": "01:30:00",
@@ -440,7 +439,7 @@ POST /api/proposal/:id/accept
 ```
 
 **Response**
-Status: 201 Created
+Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
@@ -465,7 +464,7 @@ GET /api/proposal/:id
 ```
 
 **Response**
-Status: 201 Created
+Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
@@ -490,7 +489,7 @@ POST /api/proposal/:id/retract (requires authentication)
 ```
 
 **Response**
-Status: 201 Created
+Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
