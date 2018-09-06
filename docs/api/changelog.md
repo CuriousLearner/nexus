@@ -4,9 +4,9 @@
     .container hr{margin-top: 5px; }
 </style>
 
-## Sep 3, 2018
+## Sep 7, 2018
 
-- Add attributes to complete `User` model ([@GeekyShacklebolt])
+- Add fields in model `User` and implement `POST /api/auth/register` ([@GeekyShacklebolt])
 
 ## Sep 1, 2018
 

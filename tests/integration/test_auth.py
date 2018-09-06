@@ -13,7 +13,36 @@ from .. import factories as f
 pytestmark = pytest.mark.django_db
 
 
-def test_user_registration(client):
+def test_user_registration_with_required_credentials(client):
+    url = reverse('auth-register')
+    credentials = {
+        'email': 'test@test.com',
+        'password': 'localhost'
+    }
+    response = client.json.post(url, json.dumps(credentials))
+    assert response.status_code == 201
+    expected_keys = [
+        'id', 'email', 'first_name', 'last_name', 'auth_token',
+    ]
+    assert set(expected_keys).issubset(response.data.keys())
+
+
+def test_user_registration_without_required_credentials(client):
+    url = reverse('auth-register')
+    credentials = {
+        'email': 'test@test.com',
+    }
+    response = client.json.post(url, json.dumps(credentials))
+    assert response.status_code == 400
+    expected_keys = [
+        'errors', 'error_type'
+    ]
+    assert set(expected_keys).issubset(response.data.keys())
+    assert response.data['error_type'] == 'ValidationError'
+    assert response.data['errors'][0]['message'] == 'This field is required.'
+
+
+def test_user_registration_with_required_and_other_credentials(client):
     url = reverse('auth-register')
     credentials = {
         'email': 'test@test.com',
@@ -22,10 +51,15 @@ def test_user_registration(client):
         'last_name': 'Hawley',
         'gender': 'O',
         'tshirt_size': 'XXL',
-        'phone_number': None,
+        'phone_number': ''
     }
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 201
+    assert response.data['first_name'] == 'John'
+    assert response.data['last_name'] == 'Hawley'
+    assert response.data['gender'] == 'O'
+    assert response.data['tshirt_size'] == 'XXL'
+    assert response.data['phone_number'] is ''
     expected_keys = [
         'id', 'email', 'first_name', 'last_name', 'auth_token', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
         'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser'
@@ -39,12 +73,7 @@ def test_user_registration_for_already_registered_email(client):
 
     credentials = {
         'email': 'test@example.com',
-        'password': 'localhost',
-        'first_name': 'John',
-        'last_name': 'Hawley',
-        'gender': 'O',
-        'tshirt_size': 'XXL',
-        'phone_number': None,
+        'password': 'localhost'
     }
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 400
@@ -53,6 +82,7 @@ def test_user_registration_for_already_registered_email(client):
     ]
     assert set(expected_keys).issubset(response.data.keys())
     assert response.data['error_type'] == 'ValidationError'
+    assert response.data['errors'][0]['message'] == 'user with this Email Address already exists.'
 
 
 def test_user_login(client):
@@ -69,6 +99,23 @@ def test_user_login(client):
         'id', 'email', 'first_name', 'last_name', 'auth_token'
     ]
     assert set(expected_keys).issubset(response.data.keys())
+
+
+def test_user_login_with_incorrect_credentials(client):
+    url = reverse('auth-login')
+    u = f.create_user(email='test@example.com', password='test')
+    credentials = {
+        'email': u.email,
+        'password': 'wrong_password'
+    }
+    response = client.json.post(url, json.dumps(credentials))
+    assert response.status_code == 400
+    expected_keys = [
+        'errors', 'error_type'
+    ]
+    assert set(expected_keys).issubset(response.data.keys())
+    assert response.data['error_type'] == 'WrongArguments'
+    assert response.data['errors'][0]['message'] == 'Invalid username/password. Please try again!'
 
 
 def test_user_password_change(client):
