@@ -10,21 +10,21 @@ POST /api/auth/register/
 
 **Parameters**
 
-Name        | Data Type | Description
-------------|-----------|---------------------------
-id          | UUID      | Id of the user
-first_name  | text      | first name of the user
-last_name   | text      | last name of the user
-email_id    | text      | email of user. Errors out if email already registered.
-password    | text      | Hash of the user's password
-gender      | text      | gender (Like `male`, `female`, `others`)
-tshirt_size | text      | size of the TShirt (Like `small`, `medium`, `large`, `extra_large` etc.)
-contact     | text      | contact number
-ticket_id   | text      | ticket ID generated at registration
-created_at  | datetime  | date and time of registration
-modified_at | datetime  | date and time of modification
-is_admin    | boolean   | true if the user is an admin
-is_volunteer| boolean   | true if the user is a volunteer
+Name              | Data Type | Description
+------------------|-----------|---------------------------
+id                | UUID      | Id of the user
+first_name        | text      | first name of the user
+last_name         | text      | last name of the user
+email_id          | text      | email of user. Errors out if email already registered.
+password          | text      | Hash of the user's password
+gender            | text      | gender (Like `male`, `female`, `others`)
+tshirt_size       | text      | size of the TShirt (Like `small`, `medium`, `large`, `extra_large` etc.)
+contact           | text      | contact number
+ticket_id         | text      | ticket ID generated at registration
+created_at        | datetime  | date and time of registration
+modified_at       | datetime  | date and time of modification
+is_core_organizer | boolean   | true if the user is an admin
+is_volunteer      | boolean   | true if the user is a volunteer
 
 
 **Request**
@@ -60,7 +60,7 @@ Status: 201 Created
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z",
-    "is_admin": false,
+    "is_core_organizer": false,
     "is_volunteer": false
 }
 ```
@@ -87,7 +87,7 @@ Status: 200 OK
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-02T07:10:42Z",
-    "is_admin": false,
+    "is_core_organizer": false,
     "is_volunteer": false
 }
 ```
@@ -124,7 +124,7 @@ Status: 200 OK
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-02T07:10:42Z",
-    "is_admin": false,
+    "is_core_organizer": false,
     "is_volunteer": false
 }
 ```
