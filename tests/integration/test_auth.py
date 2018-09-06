@@ -43,6 +43,31 @@ def test_user_login(client):
     assert set(expected_keys).issubset(response.data.keys())
 
 
+def test_user_login_with_incorrect_credentials(client):
+    url = reverse('auth-login')
+    u = f.create_user(email='test@example.com', password='test')
+    credentials = {
+        'email': u.email,
+        'password': 'wrong_password'
+    }
+    response = client.json.post(url, json.dumps(credentials))
+    assert response.status_code == 400
+    expected_keys = [
+        'errors', 'error_type'
+    ]
+    assert set(expected_keys).issubset(response.data.keys())
+    assert response.data['error_type'] == 'WrongArguments'
+    assert response.data['errors'][0]['message'] == 'Invalid username/password. Please try again!'
+
+
+def test_user_logout(client):
+    url = reverse('auth-logout')
+    f.create_user(email='test@example.com', password='test')
+
+    response = client.json.post(url, None)
+    assert response.status_code == 200
+
+
 def test_user_password_change(client):
     url = reverse('auth-password-change')
     current_password = 'password1'
