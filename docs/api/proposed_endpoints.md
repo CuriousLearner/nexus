@@ -23,7 +23,7 @@ contact           | text      | contact number
 ticket_id         | text      | ticket ID generated at registration
 created_at        | datetime  | date and time of registration
 modified_at       | datetime  | date and time of modification
-is_core_organizer | boolean   | true if the user is an admin
+is_core_organizer | boolean   | true if the user is a core organizer
 is_volunteer      | boolean   | true if the user is a volunteer
 
 
