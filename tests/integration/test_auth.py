@@ -22,7 +22,8 @@ def test_user_registration_with_required_credentials(client):
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 201
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name', 'auth_token',
+        'id', 'first_name', 'last_name', 'email', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser', 'auth_token'
     ]
     assert set(expected_keys).issubset(response.data.keys())
 
@@ -51,20 +52,20 @@ def test_user_registration_with_required_and_other_credentials(client):
         'last_name': 'Hawley',
         'gender': 'O',
         'tshirt_size': 'XXL',
-        'phone_number': ''
+        'phone_number': '+911234567890'
     }
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 201
-    assert response.data['first_name'] == 'John'
-    assert response.data['last_name'] == 'Hawley'
-    assert response.data['gender'] == 'O'
-    assert response.data['tshirt_size'] == 'XXL'
-    assert response.data['phone_number'] is ''
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name', 'auth_token', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
-        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser'
+        'id', 'first_name', 'last_name', 'email', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser', 'auth_token'
     ]
     assert set(expected_keys).issubset(response.data.keys())
+    assert response.data['first_name'] == credentials['first_name']
+    assert response.data['last_name'] == credentials['last_name']
+    assert response.data['gender'] == credentials['gender']
+    assert response.data['tshirt_size'] == credentials['tshirt_size']
+    assert response.data['phone_number'] == credentials['phone_number']
 
 
 def test_user_registration_for_already_registered_email(client):
@@ -96,7 +97,8 @@ def test_user_login(client):
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 200
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name', 'auth_token'
+        'id', 'first_name', 'last_name', 'email', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser', 'auth_token'
     ]
     assert set(expected_keys).issubset(response.data.keys())
 
@@ -141,7 +143,8 @@ def test_user_password_change(client):
     response = client.json.post(url, json.dumps(credentials))
     assert response.status_code == 200
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name', 'auth_token'
+        'id', 'first_name', 'last_name', 'email', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser', 'auth_token'
     ]
     assert set(expected_keys).issubset(response.data.keys())
 

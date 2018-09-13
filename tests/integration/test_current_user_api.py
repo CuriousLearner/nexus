@@ -25,7 +25,8 @@ def test_get_current_user_api(client):
     # assert response is None
     assert response.status_code == 200
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name'
+        'id', 'first_name', 'last_name', 'email', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser'
     ]
     assert set(expected_keys).issubset(response.data.keys())
     assert response.data['id'] == str(user.id)
@@ -35,25 +36,33 @@ def test_patch_current_user_api(client):
     url = reverse('me')
     user = f.create_user(email='test@example.com', first_name='test', last_name='test')
 
-    data = {
+    # user can update only the following fields
+    credentials = {
         'first_name': 'modified_test',
         'last_name': 'modified_test',
-        'email': 'modified_test@example.com'
+        'email': 'modified_test@example.com',
+        'gender': 'M',
+        'tshirt_size': 'XXL',
+        'phone_number': '+912233445566'
     }
 
     # should require auth
-    response = client.json.patch(url, json.dumps(data))
+    response = client.json.patch(url, json.dumps(credentials))
     assert response.status_code == 401
 
     client.login(user)
-    response = client.json.patch(url, json.dumps(data))
+    response = client.json.patch(url, json.dumps(credentials))
     # assert response is None
     assert response.status_code == 200
     expected_keys = [
-        'id', 'email', 'first_name', 'last_name'
+        'id', 'first_name', 'last_name', 'email', 'gender', 'tshirt_size', 'ticket_id', 'phone_number',
+        'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser'
     ]
     assert set(expected_keys).issubset(response.data.keys())
 
-    assert response.data['first_name'] == 'modified_test'
-    assert response.data['last_name'] == 'modified_test'
-    assert response.data['email'] == 'modified_test@example.com'
+    assert response.data['first_name'] == credentials['first_name']
+    assert response.data['last_name'] == credentials['last_name']
+    assert response.data['email'] == credentials['email']
+    assert response.data['gender'] == credentials['gender']
+    assert response.data['tshirt_size'] == credentials['tshirt_size']
+    assert response.data['phone_number'] == credentials['phone_number']

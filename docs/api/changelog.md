@@ -6,7 +6,7 @@
 
 ## Sep 7, 2018
 
-- Add fields in model `User` and implement `POST /api/auth/register` ([@GeekyShacklebolt])
+- Add new attributes in `users` app and update related API ([@GeekyShacklebolt])
 
 ## Sep 1, 2018
 
