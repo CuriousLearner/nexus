@@ -1,10 +1,9 @@
 from rest_framework import serializers
 
-from . import models
+from nexus.proposals import models
 
 
 class ProposalSerializer(serializers.ModelSerializer):
-
     speaker = serializers.EmailField(source='posted_by.email', read_only=True)
 
     class Meta:
