@@ -34,4 +34,3 @@ class TestProposalModel(TestCase):
         assert proposal.submitted_at
         assert proposal.approved_at is None
         assert proposal.modified_at
-
