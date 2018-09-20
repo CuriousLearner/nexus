@@ -9,22 +9,22 @@ from nexus.base.models import TimeStampedUUIDModel
 
 class Proposal(TimeStampedUUIDModel):
     PROPOSAL_KIND = Choices(
-        ('talk', 't', _('Talk')),
-        ('dev_sprint', 'd', _('Dev Sprint')),
-        ('workshop', 'w', _('Workshop'))
+        ('TALK', 't', _('Talk')),
+        ('DEV_SPRINT', 'd', _('Dev Sprint')),
+        ('WORKSHOP', 'w', _('Workshop'))
     )
 
     LEVELS_CHOICES = Choices(
-        ('beginner', 'b', _('Beginner')),
-        ('intermediate', 'i', _('Intermediate')),
-        ('advanced', 'a', _('Advanced'))
+        ('BEGINNER', 'b', _('Beginner')),
+        ('INTERMEDIATE', 'i', _('Intermediate')),
+        ('ADVANCED', 'a', _('Advanced'))
     )
 
     STATUS_CHOICES = Choices(
-        ('retracted', 'r', _('Retracted')),
-        ('accepted', 'i', _('Accepted')),
-        ('unaccepted', 'u', _('Unaccpted')),
-        ('submitted', 's', _('Submitted'))
+        ('RETRACTED', 'r', _('Retracted')),
+        ('ACCEPTED', 'a', _('Accepted')),
+        ('UNACCEPTED', 'u', _('Unaccpted')),
+        ('SUBMITTED', 's', _('Submitted'))
     )
 
     title = models.CharField(_('Title'), max_length=120, null=False, blank=False)
@@ -32,11 +32,12 @@ class Proposal(TimeStampedUUIDModel):
                                 null=False, blank=False)
     kind = models.CharField(_('Kind'), choices=PROPOSAL_KIND, max_length=10, null=False, blank=False)
     level = models.CharField(_('Content Level'), choices=LEVELS_CHOICES, max_length=12, null=False, blank=False)
-    duration = models.TimeField(_('Duration'), null=False, blank=False)
+    duration = models.DurationField(_('Duration'), null=False, blank=False)
     abstract = models.TextField(verbose_name=_('Abstract'), null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=False, blank=False)
-    approved_at = models.DateTimeField(_('Approved at'), null=True, blank=True)
-    status = models.CharField(_('Status'), choices=STATUS_CHOICES, max_length=10, null=False, blank=False)
+    approved_at = models.DateTimeField(_('Approved at'), default=None, null=True, blank=True)
+    status = models.CharField(_('Status'), default=STATUS_CHOICES.SUBMITTED, choices=STATUS_CHOICES,
+                              max_length=10, null=False, blank=False)
     submitted_at = models.DateTimeField(auto_now_add=True, editable=False)
 
     class Meta:
