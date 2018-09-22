@@ -11,9 +11,12 @@ There is a bit of magic going on behind the scenes with `G` method from https://
 """
 
 # Third Party Stuff
+import pytest
 from django.apps import apps
 from django.conf import settings
 from django_dynamic_fixture import G
+
+pytestmark = pytest.mark.django_db
 
 
 def create_user(**kwargs):
@@ -23,3 +26,7 @@ def create_user(**kwargs):
     user.set_password(kwargs.get('password', 'test'))
     user.save()
     return user
+
+
+def create_proposal(**kwargs):
+    return G(apps.get_model('proposals.Proposal'), **kwargs)

@@ -1,13 +1,12 @@
-from django.utils import timezone
-
 # Third Party Stuff
-from rest_framework import viewsets
+from django.utils import timezone
+from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
-from rest_framework import mixins
 
+# nexus Stuff
+from nexus.base import response
 from nexus.proposals import models, serializers
 from nexus.proposals.permissions import IsCoreOrganizer, IsOwner
-from nexus.base import response
 
 
 class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -17,7 +16,7 @@ class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     serializer_class = serializers.ProposalSerializer
 
     @action(methods=['PATCH'], detail=True, permission_classes=(IsCoreOrganizer,))
-    def accept(self, request, pk=None):
+    def accept(self, request, pk):
         data = {'status': 'accepted', 'approved_at': timezone.now()}
         instance = self.get_object()
         serializer = self.serializer_class(instance, data, partial=True)
@@ -26,7 +25,7 @@ class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         return response.Ok(serializer.data)
 
     @action(methods=['PATCH'], detail=True, permission_classes=(IsOwner,))
-    def retract(self, request, pk=None):
+    def retract(self, request, pk):
         data = {'status': 'retracted'}
         instance = self.get_object()
         serializer = self.serializer_class(instance, data, partial=True)
