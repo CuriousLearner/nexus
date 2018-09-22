@@ -7,6 +7,7 @@ from rest_framework import mixins
 
 from nexus.proposals import models, serializers
 from nexus.proposals.permissions import IsCoreOrganizer, IsOwner
+from nexus.base import response
 
 
 class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -16,12 +17,13 @@ class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     serializer_class = serializers.ProposalSerializer
 
     @action(methods=['PATCH'], detail=True, permission_classes=(IsCoreOrganizer,))
-    def approve(self, request, pk=None):
+    def accept(self, request, pk=None):
         data = {'status': 'accepted', 'approved_at': timezone.now()}
         instance = self.get_object()
         serializer = self.serializer_class(instance, data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        return response.Ok(serializer.data)
 
     @action(methods=['PATCH'], detail=True, permission_classes=(IsOwner,))
     def retract(self, request, pk=None):
@@ -30,3 +32,4 @@ class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         serializer = self.serializer_class(instance, data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        return response.Ok(serializer.data)
