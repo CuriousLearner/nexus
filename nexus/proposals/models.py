@@ -9,22 +9,22 @@ from nexus.base.models import TimeStampedUUIDModel
 
 class Proposal(TimeStampedUUIDModel):
     PROPOSAL_KIND = Choices(
-        ('TALK', 't', _('Talk')),
-        ('DEV_SPRINT', 'd', _('Dev Sprint')),
-        ('WORKSHOP', 'w', _('Workshop'))
+        ('TALK', 'talk', _('Talk')),
+        ('DEV_SPRINT', 'dev_sprint', _('Dev Sprint')),
+        ('WORKSHOP', 'workshop', _('Workshop'))
     )
 
     LEVELS_CHOICES = Choices(
-        ('BEGINNER', 'b', _('Beginner')),
-        ('INTERMEDIATE', 'i', _('Intermediate')),
-        ('ADVANCED', 'a', _('Advanced'))
+        ('BEGINNER', 'beginner', _('Beginner')),
+        ('INTERMEDIATE', 'intermediate', _('Intermediate')),
+        ('ADVANCED', 'advanced', _('Advanced'))
     )
 
     STATUS_CHOICES = Choices(
-        ('RETRACTED', 'r', _('Retracted')),
-        ('ACCEPTED', 'a', _('Accepted')),
-        ('UNACCEPTED', 'u', _('Unaccpted')),
-        ('SUBMITTED', 's', _('Submitted'))
+        ('RETRACTED', 'retracted', _('Retracted')),
+        ('ACCEPTED', 'accepted', _('Accepted')),
+        ('UNACCEPTED', 'unaccepted', _('Unaccpted')),
+        ('SUBMITTED', 'submitted', _('Submitted'))
     )
 
     title = models.CharField(_('Title'), max_length=120, null=False, blank=False)

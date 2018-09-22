@@ -14,8 +14,8 @@ class TestProposalModel(TestCase):
     def test_create_proposal(self):
         proposal = {
             'title': 'Model testing',
-            'kind': 't',
-            'level': 'b',
+            'kind': 'talk',
+            'level': 'beginner',
             'duration': '01:00:00',
             'abstract': 'Abstract of proposal',
             'description': 'Description of proposal',
@@ -25,9 +25,9 @@ class TestProposalModel(TestCase):
         assert proposal.id
         assert proposal.title == 'Model testing'
         assert str(proposal.speaker) == str(self.user)
-        assert proposal.status == 's'
-        assert proposal.kind == 't'
-        assert proposal.level == 'b'
+        assert proposal.status == 'submitted'
+        assert proposal.kind == 'talk'
+        assert proposal.level == 'beginner'
         assert proposal.duration == '01:00:00'
         assert proposal.abstract == 'Abstract of proposal'
         assert proposal.description == 'Description of proposal'

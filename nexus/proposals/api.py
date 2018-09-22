@@ -18,14 +18,14 @@ class ProposalViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     @action(methods=['PATCH'], detail=True, permission_classes=(IsCoreOrganizer,))
     def approve(self, request, pk=None):
         data = {'status': 'accepted', 'approved_at': timezone.now()}
-        self.update_proposal_status(data)
+        instance = self.get_object()
+        serializer = self.serializer_class(instance, data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
 
     @action(methods=['PATCH'], detail=True, permission_classes=(IsOwner,))
     def retract(self, request, pk=None):
         data = {'status': 'retracted'}
-        self.update_proposal_status(data)
-
-    def update_proposal_status(self, data):
         instance = self.get_object()
         serializer = self.serializer_class(instance, data, partial=True)
         serializer.is_valid(raise_exception=True)
