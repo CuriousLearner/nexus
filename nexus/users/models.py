@@ -34,14 +34,14 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
 
     GENDER_CHOICES = Choices(
-        ('NOT_SELECTED', 'NA', _('Not Selected')),
+        ('NOT_SELECTED', 'not_provided', _('Not Selected')),
         ('MALE', 'M', _('Male')),
         ('FEMALE', 'F', _('Female')),
         ('OTHERS', 'O', _('Others')),
     )
 
     TSHIRT_SIZE_CHOICES = Choices(
-        ('NOT_SELECTED', 'NA', _('Not Selected')),
+        ('NOT_SELECTED', 'not_provided', _('Not Selected')),
         ('SMALL', 'S', _('Small')),
         ('MEDIUM', 'M', _('Medium')),
         ('LARGE', 'L', _('Large')),
