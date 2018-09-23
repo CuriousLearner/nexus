@@ -12,10 +12,27 @@ POST /api/auth/login
 
 **Parameters**
 
-Name     | Description
----------|-------------------------------------
-email    | email of the user. 
-password | password of the user.
+Name              | Data Type | Required | Default Value  | Discription
+------------------|-----------|----------|----------------|--------------------
+email             | text      | true     | null           | email of the user.
+password          | text      | true     | null           | password of the user.
+first_name        | text      | false    | ''             | first name of the user.
+last_name         | text      | false    | ''             | last name of the user.
+gender            | choices   | false    | 'not_provided' | gender of the user.
+tshirt_size       | choices   | false    | 'not_provided' | tshirt size of the user.
+ticket_id         | text      | false    | 'not_assigned' | ticket id of the ticket alloted to user.
+phone_number      | text      | false    | ''             | mobile number of the user.
+is_core_organizer | boolean   | false    | false          | designates whether the user is a core organizer.
+is_volunteer      | boolean   | false    | false          | designates whether the user is a volunteer.
+date_joined       | datetime  | false    | *date_time     | date and time when the user registered.
+is_active         | boolean   | false    | true           | designates whether the user is active.
+is_staff          | boolean   | false    | false          | designates whether the user is staff.
+is_superuser      | boolean   | false    | false          | designates whether the user is a superuser
+
+__NOTE__
+- *date_time: current date and time of timezone in which user is registered.
+- Error out in case of invalid email/password.
+- Error out in case of missing **required** attributes.
 
 **Request**
 ```json
@@ -26,15 +43,24 @@ password | password of the user.
 ```
 
 **Response**
-```json
-
 Status: 200 OK
+```json
 {
-    "auth_token": "eyJ0eXAiOiJKV1QiL",
-    "email": "ak123@sanyamkhurana.com",
-    "id": "f9dceed1-0f19-49f4-a874-0c2e131abf79",
-    "first_name": "",
-    "last_name": ""
+    "id": "171956bd-717f-4021-a901-c5be80fd469b",
+    "first_name": "John",
+    "last_name": "Howley",
+    "email": "hello@example.com",
+    "gender": "NA",
+    "tshirt_size": "NA",
+    "ticket_id": "Not assigned",
+    "phone_number": "",
+    "is_core_organizer": false,
+    "is_volunteer": false,
+    "date_joined": "2018-09-10T19:26:06.217889Z",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false,
+    "auth_token": "AkJ0b.Ai0iJEv1EiLCJhbGciOiJIUeI1NiJ9.eyJ1c2VyX2F1dGhlbnRpY2F0eW9uX2lEIjoiMTcxOTU2YmEtNe3Ai00MDIxLWe5MDetYeViATgwemE0NjliIn0.loCdI3te2sICj8e5c6ip5TW_eFNn5RTj4HU-e2q0m"
 }
 ```
 
@@ -44,31 +70,41 @@ Status: 200 OK
 POST /api/auth/register
 ```
 
-**Parameters**
-
-Name     | Description
----------|-------------------------------------
-email    | email of the user. Errors out if email already registered.
-password | password of the user.
+__NOTE__
+- Error out if email is already registered.
 
 **Request**
 ```json
 {
     "email": "hello@example.com",
-    "password": "VerySafePassword0909"
+    "password": "VerySafePassword0909",
+    "first_name": "John",
+    "last_name": "Howley",
+    "gender": "M",
+    "tshirt_size": "L",
+    "phone_number": "+911234567890"
 }
 ```
 
 **Response**
-```json
-
 Status: 201 Created
+```json
 {
-    "auth_token": "eyJ0eXAiOiJKV1QiLCJh",
-    "email": "test@test.com",
-    "id": "f9dceed1-0f19-49f4-a874-0c2e131abf79",
-    "first_name": "",
-    "last_name": ""
+    "id": "1f19560d-f1ff-4021-a901-c50e80fd4690",
+    "first_name": "John",
+    "last_name": "Howley",
+    "email": "hello@example.com",
+    "gender": "M",
+    "tshirt_size": "L",
+    "ticket_id": "Not assigned",
+    "phone_number": "+911234567890",
+    "is_core_organizer": false,
+    "is_volunteer": false,
+    "date_joined": "2018-09-10T19:26:06.217889Z",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false,
+    "auth_token": "eyJ0aXAiOiJqV1QiLCJhbGciOiJIUaI1NiJ9.ayJ1c2VyX2F1dGhlbnRpY2F0aW9uX2lqIjoiMTcxOTU2YmQtNa3ai00MDIxLWa5MDatYaViaTgwamQ0NjliIn0.loCdI3tAa2sICj8a5c6ip5TW_aFnn5RTj4HU-D6zq3c"
 }
 ```
 
@@ -94,10 +130,7 @@ new_password     | New password of the user.
 ```
 
 **Response**
-```
 Status: 204 No-Content
-```
-
 
 ## Request password for reset
 
@@ -121,9 +154,8 @@ email | (required) valid email of an existing user.
 ```
 
 **Response**
-```json
-
 Status: 200 OK
+```json
 {
     "message": "Further instructions will be sent to the email if it exists"
 }
@@ -155,11 +187,9 @@ token         | Token decoded from the url (verification link)
 ```
 
 **Response**
-```
 Status: 204 No-Content
-```
 
-**Note**
+__Note__
 - The verification link uses the format of key `password-confirm` in `FRONTEND_URLS` dict in settings/common.
 
 
@@ -170,14 +200,24 @@ Status: 204 No-Content
 GET /api/me (requires authentication)
 ```
 
-__Response__
-
+**Response**
+Status: 200 OK
 ```json
 {
     "id": "629b1e03-53f0-43ef-9a03-17164cf782ac",
     "first_name": "John",
-    "last_name": "Hawley",
-    "email": "john@localhost.com"
+    "last_name": "Howley",
+    "email": "hello@example.com",
+    "gender": "NA",
+    "tshirt_size": "NA",
+    "ticket_id": "Not assigned",
+    "phone_number": "",
+    "is_core_organizer": false,
+    "is_volunteer": false,
+    "date_joined": "2018-09-10T19:26:06.217889Z",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false
 }
 ```
 
@@ -186,21 +226,46 @@ __Response__
 PATCH /api/me (requires authentication)
 ```
 
-__Example__
-```json
-{
-    "first_name": "James",
-    "last_name": "Warner"
-}
-```
+__NOTE__
+- Complete resource goes in request but a user itself is not allowed to update `read_only_fields` viz. `id`, `ticket_id`, `is_core_organizer`, `is_volunteer`, `date_joined`, `is_active`, `is_staff`, `is_superuser`
 
-__Response__
-
+**Request**
 ```json
 {
     "id": "629b1e03-53f0-43ef-9a03-17164cf782ac",
     "first_name": "James",
     "last_name": "Warner",
-    "email": "john@localhost.com",
+    "email": "james@example.com",
+    "gender": "M",
+    "tshirt_size": "XL",
+    "ticket_id": "Not assigned",
+    "phone_number": "+91123456789",
+    "is_core_organizer": false,
+    "is_volunteer": false,
+    "date_joined": "2018-09-10T19:26:06.217889Z",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false
+}
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "629b1e03-53f0-43ef-9a03-17164cf782ac",
+    "first_name": "James",
+    "last_name": "Warner",
+    "email": "james@example.com",
+    "gender": "M",
+    "tshirt_size": "XL",
+    "ticket_id": "Not assigned",
+    "phone_number": "+911234567890",
+    "is_core_organizer": false,
+    "is_volunteer": false,
+    "date_joined": "2018-09-10T19:26:06.217889Z",
+    "is_active": true,
+    "is_staff": false,
+    "is_superuser": false
 }
 ```

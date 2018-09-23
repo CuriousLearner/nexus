@@ -4,8 +4,13 @@
     .container hr{margin-top: 5px; }
 </style>
 
+## Sep 7, 2018
+
+- Add new attributes in `users` app and update related API ([@GeekyShacklebolt])
+
 ## Sep 1, 2018
 
 - Add basic code quality pre-commit hooks ([@CuriousLearner])
 
 [@CuriousLearner]: https://github.com/CuriousLearner
+[@GeekyShacklebolt]: https://github.com/GeekyShacklebolt
