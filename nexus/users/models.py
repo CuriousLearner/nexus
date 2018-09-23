@@ -34,42 +34,45 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
 
     GENDER_CHOICES = Choices(
-        ('NOT_SELECTED', 'not_provided', _('Not Selected')),
-        ('MALE', 'M', _('Male')),
-        ('FEMALE', 'F', _('Female')),
-        ('OTHERS', 'O', _('Others')),
+        ('NOT_SELECTED', 'not_selected', _('Not Selected')),
+        ('MALE', 'male', _('Male')),
+        ('FEMALE', 'female', _('Female')),
+        ('OTHERS', 'others', _('Others')),
     )
 
     TSHIRT_SIZE_CHOICES = Choices(
-        ('NOT_SELECTED', 'not_provided', _('Not Selected')),
-        ('SMALL', 'S', _('Small')),
-        ('MEDIUM', 'M', _('Medium')),
-        ('LARGE', 'L', _('Large')),
-        ('EXTRA_LARGE', 'XL', _('Extra Large')),
-        ('DOUBLE_EXTRA_LARGE', 'XXL', _('Double Extra Large')),
+        ('NOT_SELECTED', 'not_selected', _('Not Selected')),
+        ('SMALL', 'small', _('Small')),
+        ('MEDIUM', 'medium', _('Medium')),
+        ('LARGE', 'large', _('Large')),
+        ('EXTRA_LARGE', 'extra_large', _('Extra Large')),
+        ('DOUBLE_EXTRA_LARGE', 'extra_extra_large', _('Extra Extra Large')),
     )
 
     first_name = models.CharField(_('First Name'), null=False, blank=True, max_length=120)
     last_name = models.CharField(_('Last Name'), null=False, blank=True, max_length=120)
     # https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/fields/#citext-fields
     email = CIEmailField(_('Email Address'), unique=True, db_index=True)
-    is_staff = models.BooleanField(_('Staff Status'), default=False,
-                                   help_text='Designates whether the user can log into this admin site.')
+    is_staff = models.BooleanField(
+        _('Staff Status'), default=False,
+        help_text='Designates whether the user can log into this admin site.')
 
     is_active = models.BooleanField('Active', default=True,
                                     help_text='Designates whether this user should be treated as '
                                               'active. Unselect this instead of deleting accounts.')
     date_joined = models.DateTimeField(_('Date Of Joining'), default=timezone.now, null=False, blank=False)
 
-    gender = models.CharField(_('Gender'), default=GENDER_CHOICES.NOT_SELECTED, choices=GENDER_CHOICES, null=False,
-                              blank=False, max_length=12)
+    gender = models.CharField(
+        _('Gender'), default=GENDER_CHOICES.NOT_SELECTED,
+        choices=GENDER_CHOICES, null=False, blank=False, max_length=12
+    )
     tshirt_size = models.CharField(_('Tshirt Size'), default=TSHIRT_SIZE_CHOICES.NOT_SELECTED,
-                                   choices=TSHIRT_SIZE_CHOICES, null=False, blank=False, max_length=12)
+                                   choices=TSHIRT_SIZE_CHOICES, null=False, blank=False, max_length=30)
     phone_number = PhoneNumberField(_('Phone Number'), default='', null=False, blank=True, max_length=13)
     ticket_id = models.CharField(_('Ticket Id'), default=_('Not assigned'), null=False, blank=False, max_length=32)
-    is_core_organizer = models.BooleanField(_('Core Organizer Status'), default=False, null=False, blank=True,
+    is_core_organizer = models.BooleanField(_('User is core_organizer'), default=False, null=False, blank=True,
                                             help_text='Designates whether this user is a Core Organizer')
-    is_volunteer = models.BooleanField(_('Volunteer Status'), default=False, null=False, blank=True,
+    is_volunteer = models.BooleanField(_('User is volunteer'), default=False, null=False, blank=True,
                                        help_text='Designates whether this user is a Volunteer')
 
     USERNAME_FIELD = 'email'

@@ -5,7 +5,6 @@ import json
 import pytest
 from django.urls import reverse
 
-
 from .. import factories as f
 
 pytestmark = pytest.mark.django_db
@@ -41,8 +40,8 @@ def test_patch_current_user_api(client):
         'first_name': 'modified_test',
         'last_name': 'modified_test',
         'email': 'modified_test@example.com',
-        'gender': 'M',
-        'tshirt_size': 'XXL',
+        'gender': 'male',
+        'tshirt_size': 'extra_extra_large',
         'phone_number': '+912233445566'
     }
 

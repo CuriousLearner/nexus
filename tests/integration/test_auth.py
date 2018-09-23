@@ -50,8 +50,8 @@ def test_user_registration_with_required_and_other_credentials(client):
         'password': 'localhost',
         'first_name': 'John',
         'last_name': 'Hawley',
-        'gender': 'O',
-        'tshirt_size': 'XXL',
+        'gender': 'others',
+        'tshirt_size': 'extra_extra_large',
         'phone_number': '+911234567890'
     }
     response = client.json.post(url, json.dumps(credentials))
