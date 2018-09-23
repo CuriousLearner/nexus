@@ -5,8 +5,16 @@ from rest_framework import serializers
 from nexus.proposals import models
 
 
+def _get_user_from_context(context):
+    if 'user' in context:
+        return context['user']
+    if 'request' in context:
+        return context['request'].user
+    return None
+
+
 class ProposalSerializer(serializers.ModelSerializer):
-    speaker = serializers.EmailField(source='speaker.email', read_only=True)
+    speaker = serializers.EmailField(source='speaker__email', read_only=True)
 
     class Meta:
         model = models.Proposal
@@ -20,6 +28,12 @@ class ProposalSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        speaker = self.context['request'].user
+        speaker = _get_user_from_context(self.context)
         validated_data['speaker'] = speaker
         return models.Proposal.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        for k, v in validated_data.items():
+            instance['k'] = v
+        instance.save()
+        return instance

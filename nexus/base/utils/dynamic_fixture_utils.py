@@ -18,7 +18,7 @@ class PatchedSequentialDataFixture(SequentialDataFixture):
 
     def durationfield_config(self, field, key):
         return '%s:%s:%s' % (
-            random.randint(0, 24), random.randint(0, 60), random.randint(0, 60)
+            random.randint(0, 24), random.randint(0, 59), random.randint(0, 59)
         )
 
     def jsonfield_config(self, field, key):

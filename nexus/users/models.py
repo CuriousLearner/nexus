@@ -41,6 +41,10 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
                                     help_text='Designates whether this user should be treated as '
                                               'active. Unselect this instead of deleting accounts.')
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    is_core_organizer = models.BooleanField(
+        _('Core Organizer Status'), default=False, null=False, blank=True,
+        help_text='Designates whether this user is a Core Organizer'
+    )
 
     USERNAME_FIELD = 'email'
     objects = UserManager()
