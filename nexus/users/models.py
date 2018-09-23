@@ -62,9 +62,9 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
     date_joined = models.DateTimeField(_('Date Of Joining'), default=timezone.now, null=False, blank=False)
 
     gender = models.CharField(_('Gender'), default=GENDER_CHOICES.NOT_SELECTED, choices=GENDER_CHOICES, null=False,
-                              blank=False, max_length=6)
+                              blank=False, max_length=12)
     tshirt_size = models.CharField(_('Tshirt Size'), default=TSHIRT_SIZE_CHOICES.NOT_SELECTED,
-                                   choices=TSHIRT_SIZE_CHOICES, null=False, blank=False, max_length=10)
+                                   choices=TSHIRT_SIZE_CHOICES, null=False, blank=False, max_length=12)
     phone_number = PhoneNumberField(_('Phone Number'), default='', null=False, blank=True, max_length=13)
     ticket_id = models.CharField(_('Ticket Id'), default=_('Not assigned'), null=False, blank=False, max_length=32)
     is_core_organizer = models.BooleanField(_('Core Organizer Status'), default=False, null=False, blank=True,
