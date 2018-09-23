@@ -1,7 +1,10 @@
 # Third Party Stuff
+import pytest
 from django.apps import apps
 from django.urls import reverse
 from tests import factories as f
+
+pytestmark = pytest.mark.django_db
 
 
 def test_proposal_submission_api(client):

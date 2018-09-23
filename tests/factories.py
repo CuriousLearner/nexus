@@ -11,12 +11,9 @@ There is a bit of magic going on behind the scenes with `G` method from https://
 """
 
 # Third Party Stuff
-import pytest
 from django.apps import apps
 from django.conf import settings
 from django_dynamic_fixture import G
-
-pytestmark = pytest.mark.django_db
 
 
 def create_user(**kwargs):
