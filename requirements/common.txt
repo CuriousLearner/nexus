@@ -27,7 +27,7 @@ django-phonenumber-field==2.0.0
 
 # REST APIs
 # -------------------------------------
-djangorestframework==3.8.2
+djangorestframework==3.7.7
 django-rest-swagger==2.2.0
 
 # Static files
