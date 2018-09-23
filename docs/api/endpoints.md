@@ -12,24 +12,25 @@ POST /api/auth/login
 
 **Parameters**
 
-Name              | Data Type  | Description
-------------------|------------|------------------------
-email             | text       | **(required)** email of the user.
-password          | text       | **(required)** password of the user.
-first_name        | text       | first name of the user.
-last_name         | text       | last name of the user.
-gender            | choices    | gender of the user.
-tshirt_size       | choices    | tshirt size of the user.
-ticket_id         | text       | ticket id of the ticket alloted to user.
-phone_number      | text       | mobile number of the user.
-is_core_organizer | boolean    | designates whether the user is a core organizer.
-is_volunteer      | boolean    | designates whether the user is a volunteer.
-date_joined       | datetime   | date and time when the user registered.
-is_active         | boolean    | designates whether the user is active.
-is_staff          | boolean    | designates whether the user is staff.
-is_superuser      | boolean    | designates whether the user is a superuser
+Name              | Data Type | Required | Default Value  | Discription
+------------------|-----------|----------|----------------|--------------------
+email             | text      | true     | null           | email of the user.
+password          | text      | true     | null           | password of the user.
+first_name        | text      | false    | ''             | first name of the user.
+last_name         | text      | false    | ''             | last name of the user.
+gender            | choices   | false    | 'not_provided' | gender of the user.
+tshirt_size       | choices   | false    | 'not_provided' | tshirt size of the user.
+ticket_id         | text      | false    | 'not_assigned' | ticket id of the ticket alloted to user.
+phone_number      | text      | false    | ''             | mobile number of the user.
+is_core_organizer | boolean   | false    | false          | designates whether the user is a core organizer.
+is_volunteer      | boolean   | false    | false          | designates whether the user is a volunteer.
+date_joined       | datetime  | false    | *date_time     | date and time when the user registered.
+is_active         | boolean   | false    | true           | designates whether the user is active.
+is_staff          | boolean   | false    | false          | designates whether the user is staff.
+is_superuser      | boolean   | false    | false          | designates whether the user is a superuser
 
 __NOTE__
+- *date_time: current date and time of timezone in which user is registered.
 - Error out in case of invalid email/password.
 - Error out in case of missing **required** attributes.
 
