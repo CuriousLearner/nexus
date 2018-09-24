@@ -18,9 +18,9 @@ email             | text      | true     | null           | email of the user.
 password          | text      | true     | null           | password of the user.
 first_name        | text      | false    | ''             | first name of the user.
 last_name         | text      | false    | ''             | last name of the user.
-gender            | choices   | false    | 'not_provided' | gender of the user.
-tshirt_size       | choices   | false    | 'not_provided' | tshirt size of the user.
-ticket_id         | text      | false    | 'not_assigned' | ticket id of the ticket alloted to user.
+gender            | choices   | false    | 'not_selected' | gender of the user.
+tshirt_size       | choices   | false    | 'not_selected' | tshirt size of the user.
+ticket_id         | uuid      | false    | *uuid          | ticket id of the ticket alloted to user.
 phone_number      | text      | false    | ''             | mobile number of the user.
 is_core_organizer | boolean   | false    | false          | designates whether the user is a core organizer.
 is_volunteer      | boolean   | false    | false          | designates whether the user is a volunteer.
@@ -30,7 +30,8 @@ is_staff          | boolean   | false    | false          | designates whether t
 is_superuser      | boolean   | false    | false          | designates whether the user is a superuser
 
 __NOTE__
-- *date_time: current date and time of timezone in which user is registered.
+- *uuid: randomly generated uuid.
+- *date_time: date and time when the user gets registered.
 - Error out in case of invalid email/password.
 - Error out in case of missing **required** attributes.
 
@@ -52,7 +53,7 @@ Status: 200 OK
     "email": "hello@example.com",
     "gender": "NA",
     "tshirt_size": "NA",
-    "ticket_id": "Not assigned",
+    "ticket_id": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "phone_number": "",
     "is_core_organizer": false,
     "is_volunteer": false,
@@ -96,7 +97,7 @@ Status: 201 Created
     "email": "hello@example.com",
     "gender": "M",
     "tshirt_size": "L",
-    "ticket_id": "Not assigned",
+    "ticket_id": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "phone_number": "+911234567890",
     "is_core_organizer": false,
     "is_volunteer": false,
@@ -210,7 +211,7 @@ Status: 200 OK
     "email": "hello@example.com",
     "gender": "NA",
     "tshirt_size": "NA",
-    "ticket_id": "Not assigned",
+    "ticket_id": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "phone_number": "",
     "is_core_organizer": false,
     "is_volunteer": false,
@@ -227,7 +228,7 @@ PATCH /api/me (requires authentication)
 ```
 
 __NOTE__
-- Complete resource goes in request but a user itself is not allowed to update `read_only_fields` viz. `id`, `ticket_id`, `is_core_organizer`, `is_volunteer`, `date_joined`, `is_active`, `is_staff`, `is_superuser`
+- User can update any attribute except the following `read_only_fields` - `id`, `ticket_id`, `is_core_organizer`, `is_volunteer`, `date_joined`, `is_active`, `is_staff`, `is_superuser`
 
 **Request**
 ```json
@@ -238,7 +239,7 @@ __NOTE__
     "email": "james@example.com",
     "gender": "M",
     "tshirt_size": "XL",
-    "ticket_id": "Not assigned",
+    "ticket_id": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "phone_number": "+91123456789",
     "is_core_organizer": false,
     "is_volunteer": false,
@@ -259,7 +260,7 @@ Status: 200 OK
     "email": "james@example.com",
     "gender": "M",
     "tshirt_size": "XL",
-    "ticket_id": "Not assigned",
+    "ticket_id": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "phone_number": "+911234567890",
     "is_core_organizer": false,
     "is_volunteer": false,

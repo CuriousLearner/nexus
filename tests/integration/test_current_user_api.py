@@ -36,7 +36,7 @@ def test_patch_current_user_api(client):
     user = f.create_user(email='test@example.com', first_name='test', last_name='test')
 
     # user can update only the following fields
-    credentials = {
+    data = {
         'first_name': 'modified_test',
         'last_name': 'modified_test',
         'email': 'modified_test@example.com',
@@ -46,11 +46,11 @@ def test_patch_current_user_api(client):
     }
 
     # should require auth
-    response = client.json.patch(url, json.dumps(credentials))
+    response = client.json.patch(url, json.dumps(data))
     assert response.status_code == 401
 
     client.login(user)
-    response = client.json.patch(url, json.dumps(credentials))
+    response = client.json.patch(url, json.dumps(data))
     # assert response is None
     assert response.status_code == 200
     expected_keys = [
@@ -59,9 +59,9 @@ def test_patch_current_user_api(client):
     ]
     assert set(expected_keys).issubset(response.data.keys())
 
-    assert response.data['first_name'] == credentials['first_name']
-    assert response.data['last_name'] == credentials['last_name']
-    assert response.data['email'] == credentials['email']
-    assert response.data['gender'] == credentials['gender']
-    assert response.data['tshirt_size'] == credentials['tshirt_size']
-    assert response.data['phone_number'] == credentials['phone_number']
+    assert response.data['first_name'] == data['first_name']
+    assert response.data['last_name'] == data['last_name']
+    assert response.data['email'] == data['email']
+    assert response.data['gender'] == data['gender']
+    assert response.data['tshirt_size'] == data['tshirt_size']
+    assert response.data['phone_number'] == data['phone_number']

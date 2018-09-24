@@ -1,3 +1,6 @@
+# Standard Library
+import uuid
+
 # Third Party Stuff
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.postgres.fields import CIEmailField
@@ -69,7 +72,7 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
     tshirt_size = models.CharField(_('Tshirt Size'), default=TSHIRT_SIZE_CHOICES.NOT_SELECTED,
                                    choices=TSHIRT_SIZE_CHOICES, null=False, blank=False, max_length=30)
     phone_number = PhoneNumberField(_('Phone Number'), default='', null=False, blank=True, max_length=13)
-    ticket_id = models.CharField(_('Ticket Id'), default=_('Not assigned'), null=False, blank=False, max_length=32)
+    ticket_id = models.UUIDField(_('Ticket Id'), default=uuid.uuid4, null=False, blank=False)
     is_core_organizer = models.BooleanField(_('User is core_organizer'), default=False, null=False, blank=True,
                                             help_text='Designates whether this user is a Core Organizer')
     is_volunteer = models.BooleanField(_('User is volunteer'), default=False, null=False, blank=True,

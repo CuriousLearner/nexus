@@ -41,6 +41,7 @@ def test_user_registration_without_required_credentials(client):
     assert set(expected_keys).issubset(response.data.keys())
     assert response.data['error_type'] == 'ValidationError'
     assert response.data['errors'][0]['message'] == 'This field is required.'
+    assert response.data['errors'][0]['field'] == 'password'
 
 
 def test_user_registration_with_required_and_other_credentials(client):
@@ -84,6 +85,7 @@ def test_user_registration_for_already_registered_email(client):
     assert set(expected_keys).issubset(response.data.keys())
     assert response.data['error_type'] == 'ValidationError'
     assert response.data['errors'][0]['message'] == 'user with this Email Address already exists.'
+    assert response.data['errors'][0]['field'] == 'email'
 
 
 def test_user_login(client):
