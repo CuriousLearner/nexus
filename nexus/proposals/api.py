@@ -17,11 +17,16 @@ class ProposalViewSet(mixins.ListModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
     queryset = models.Proposal.objects.all()
-    serializer_class = serializers.ProposalSerializer
+
+    def get_serializer_class(self):
+        if self.action in ['accept', 'retract']:
+            return serializers.StatusUpdateSerializer
+        else:
+            return serializers.CreateSerializer
 
     @action(methods=['PATCH'], detail=True)
     def accept(self, request, pk):
-        data = {'status': 'accepted', 'approved_at': timezone.now()}
+        data = {'status': models.Proposal.STATUS_CHOICES.ACCEPTED, 'approved_at': timezone.now()}
         proposal = get_object_or_404(models.Proposal, pk=pk)
         has_perm('can_accept_proposal', request.user, proposal, raise_exception=True)
         serializer = self.get_serializer(proposal, data, partial=True)
@@ -31,7 +36,7 @@ class ProposalViewSet(mixins.ListModelMixin,
 
     @action(methods=['PATCH'], detail=True)
     def retract(self, request, pk):
-        data = {'status': 'retracted'}
+        data = {'status': models.Proposal.STATUS_CHOICES.RETRACTED}
         proposal = get_object_or_404(models.Proposal, pk=pk)
         has_perm('can_retract_proposal', request.user, proposal, raise_exception=True)
         serializer = self.get_serializer(proposal, data, partial=True)
