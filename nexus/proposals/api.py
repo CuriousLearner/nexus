@@ -19,10 +19,10 @@ class ProposalViewSet(mixins.ListModelMixin,
     queryset = models.Proposal.objects.all()
 
     def get_serializer_class(self):
-        if self.action in ['accept', 'retract']:
-            return serializers.StatusUpdateSerializer
+        if self.action in ('accept', 'retract'):
+            return serializers.ProposalStatusUpdateSerializer
         else:
-            return serializers.CreateSerializer
+            return serializers.ProposalCreateSerializer
 
     @action(methods=['PATCH'], detail=True)
     def accept(self, request, pk):
