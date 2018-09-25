@@ -41,8 +41,8 @@ class Proposal(TimeStampedUUIDModel):
     submitted_at = models.DateTimeField(auto_now_add=True, editable=False)
 
     class Meta:
-        verbose_name = _('proposal')
-        verbose_name_plural = _('proposals')
+        verbose_name = _('Proposal')
+        verbose_name_plural = _('Proposals')
         db_table = "proposals"
 
     def __str__(self):

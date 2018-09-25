@@ -3,14 +3,14 @@ from rest_framework import serializers
 
 # nexus Stuff
 from nexus.proposals import models
-from nexus.base.utils.serializer_utils import get_user_from_context
+from nexus.base.utils.serializer_utils import _get_user_from_context
 
 
-class ProposalCreateSerializer(serializers.ModelSerializer):
+class ProposalSerializer(serializers.ModelSerializer):
     speaker = serializers.EmailField(source='speaker.email', read_only=True)
 
     def create(self, validated_data):
-        speaker = get_user_from_context(self.context)
+        speaker = _get_user_from_context(self.context)
         validated_data['speaker'] = speaker
         return models.Proposal.objects.create(**validated_data)
 
@@ -26,11 +26,11 @@ class ProposalCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-class ProposalStatusUpdateSerializer(ProposalCreateSerializer):
+class ProposalStatusUpdateSerializer(ProposalSerializer):
 
     class Meta:
         model = models.Proposal
-        fields = ProposalCreateSerializer.Meta.fields + ['approved_at', 'status']
+        fields = ProposalSerializer.Meta.fields + ['approved_at', 'status']
 
         read_only_fields = [
             'id', 'submitted_at', 'modified_at'

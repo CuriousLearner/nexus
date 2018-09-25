@@ -1,4 +1,4 @@
-def get_user_from_context(context):
+def _get_user_from_context(context):
     if 'user' in context:
         return context['user']
     if 'request' in context:
