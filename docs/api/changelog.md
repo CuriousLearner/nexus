@@ -4,6 +4,10 @@
     .container hr{margin-top: 5px; }
 </style>
 
+## Sep 27, 2018
+
+- Add an app for `proposals`. ([@storymode7])
+
 ## Sep 7, 2018
 
 - Add new attributes in `users` app and update related API ([@GeekyShacklebolt])
@@ -14,3 +18,4 @@
 
 [@CuriousLearner]: https://github.com/CuriousLearner
 [@GeekyShacklebolt]: https://github.com/GeekyShacklebolt
+[@storymode7]: https://github.com/storymode7

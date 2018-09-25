@@ -270,3 +270,173 @@ Status: 200 OK
     "is_superuser": false
 }
 ```
+
+# Proposals
+
+## Create Proposal
+
+```
+POST /api/proposal
+```
+
+**Parameters**
+
+Name               | Data type     | Required | Description
+-------------------|---------------|----------|---------------------
+id                 | UUID          | false    | Unique ID for the proposal
+title              | text          | true     | Title of proposal
+speaker            | text          | false    | Speaker for the talk
+kind               | text          | true     | Type of proposal like talk, dev sprint, workshop
+level              | text          | true     | Level of proposal beginner, intermediate, advanced
+duration           | text          | true     | Duration of talk, sprint or workshop, format: hh:mm:ss
+abstract           | text          | true     | Abstract of the proposal
+description        | text          | true     | Description of the proposal
+submitted_at       | datetime      | false    | Time of submission of proposal
+approved_at        | datetime      | false    | Time of approval
+modified_at        | datetime      | false    | Time of modification
+status             | text          | false    | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
+
+__NOTE__
+- *uuid: randomly generated uuid.
+- *date_time: date and time when the proposal is submitted/approved/modified
+- Error out in case of invalid duration format.
+- Error out in case of missing **required** attributes.
+
+**Request**
+```json
+{
+    "title": "Sample title of the talk",
+    "kind": "talk",
+    "level": "beginner",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long"
+}
+```
+
+**Response**
+Status: 201 Created
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Sample title of the talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "beginner",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": null,
+    "modified_at": "2018-08-01T17:30:42Z",
+    "status": "submitted"
+}
+```
+
+## Update proposal details
+
+```
+PATCH /api/proposal/:id (request authentication)
+```
+
+**Request**
+```json
+{
+    "title": "Corrected title of talk",
+    "level": "advanced"
+}
+```
+
+**Response**
+Status: 201 Created
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": null,
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "submitted"
+}
+```
+
+## Accept the proposal
+
+```
+POST /api/proposal/:id/accept
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "accepted"
+}
+```
+
+## Get proposal details
+
+```
+GET /api/proposal/:id
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "submitted"
+}
+```
+
+## Retract the proposal
+
+```
+POST /api/proposal/:id/retract (requires authentication)
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "retracted"
+}
+```
