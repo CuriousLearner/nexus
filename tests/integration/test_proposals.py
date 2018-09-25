@@ -29,6 +29,9 @@ def test_proposal_creation_api(client):
     assert response.data["modified_at"] is not None
     assert response.data["status"] == Proposal.STATUS_CHOICES.SUBMITTED
 
+    proposal_instance = Proposal.objects.get(id=response.data["id"])
+    assert str(proposal_instance) == response.data["title"]
+
 
 def test_proposal_acceptance_api(client):
     Proposal = apps.get_model('proposals.Proposal')
