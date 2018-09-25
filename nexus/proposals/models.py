@@ -43,7 +43,6 @@ class Proposal(TimeStampedUUIDModel):
     class Meta:
         verbose_name = _('proposal')
         verbose_name_plural = _('proposals')
-        ordering = ['-submitted_at']
         db_table = "proposals"
 
     def __str__(self):

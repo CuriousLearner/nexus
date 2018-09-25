@@ -7,7 +7,7 @@ from nexus.base.utils.serializer_utils import get_user_from_context
 
 
 class ProposalCreateSerializer(serializers.ModelSerializer):
-    speaker = serializers.EmailField(source='speaker__email', read_only=True)
+    speaker = serializers.EmailField(source='speaker.email', read_only=True)
 
     def create(self, validated_data):
         speaker = get_user_from_context(self.context)

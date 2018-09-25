@@ -16,7 +16,7 @@ class ProposalViewSet(mixins.ListModelMixin,
                       mixins.RetrieveModelMixin,
                       mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
-    queryset = models.Proposal.objects.all()
+    queryset = models.Proposal.objects.order_by('-created_at')
 
     def get_serializer_class(self):
         if self.action in ('accept', 'retract'):
