@@ -10,8 +10,6 @@ django-sites==0.10
 python-dotenv==0.8.2
 django-cors-headers==2.2.0
 
-
-
 # Extensions
 # -------------------------------------
 pytz==2018.3
@@ -43,7 +41,7 @@ django-log-request-id==1.3.2
 
 # Documentation
 # -------------------------------------
-mkdocs==0.17.3
+mkdocs==1.0.2
 
 # Raven is the Sentry client
 # --------------------------
@@ -57,3 +55,9 @@ celery[redis]==4.1.0
 # -------------------------------------
 PyJWT==1.6.0
 django-mail-templated==2.6.5
+
+# Third-Party Apps
+# -------------------------------------
+django-extended-choices==1.3
+django-phonenumber-field==2.0.0
+Markdown==2.6.11

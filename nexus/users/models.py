@@ -1,9 +1,14 @@
+# Standard Library
+import uuid
+
 # Third Party Stuff
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.contrib.postgres.fields import CIEmailField
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from extended_choices import Choices
+from phonenumber_field.modelfields import PhoneNumberField
 
 # nexus Stuff
 from nexus.base.models import UUIDModel
@@ -30,21 +35,48 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
-    first_name = models.CharField(_('First Name'), max_length=120, blank=True)
-    last_name = models.CharField(_('Last Name'), max_length=120, blank=True)
-    # https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/fields/#citext-fields
-    email = CIEmailField(_('email address'), unique=True, db_index=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
-                                   help_text='Designates whether the user can log into this admin site.')
 
-    is_active = models.BooleanField('active', default=True,
+    GENDER_CHOICES = Choices(
+        ('NOT_SELECTED', 'not_selected', _('Not Selected')),
+        ('MALE', 'male', _('Male')),
+        ('FEMALE', 'female', _('Female')),
+        ('OTHERS', 'others', _('Others')),
+    )
+
+    TSHIRT_SIZE_CHOICES = Choices(
+        ('NOT_SELECTED', 'not_selected', _('Not Selected')),
+        ('SMALL', 'small', _('Small')),
+        ('MEDIUM', 'medium', _('Medium')),
+        ('LARGE', 'large', _('Large')),
+        ('EXTRA_LARGE', 'extra_large', _('Extra Large')),
+        ('DOUBLE_EXTRA_LARGE', 'extra_extra_large', _('Extra Extra Large')),
+    )
+
+    first_name = models.CharField(_('First Name'), null=False, blank=True, max_length=120)
+    last_name = models.CharField(_('Last Name'), null=False, blank=True, max_length=120)
+    # https://docs.djangoproject.com/en/1.11/ref/contrib/postgres/fields/#citext-fields
+    email = CIEmailField(_('Email Address'), unique=True, db_index=True)
+    is_staff = models.BooleanField(
+        _('Staff Status'), default=False,
+        help_text='Designates whether the user can log into this admin site.')
+
+    is_active = models.BooleanField('Active', default=True,
                                     help_text='Designates whether this user should be treated as '
                                               'active. Unselect this instead of deleting accounts.')
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
-    is_core_organizer = models.BooleanField(
-        _('Core Organizer Status'), default=False, null=False, blank=True,
-        help_text='Designates whether this user is a Core Organizer'
+    date_joined = models.DateTimeField(_('Date Of Joining'), default=timezone.now, null=False, blank=False)
+
+    gender = models.CharField(
+        _('Gender'), default=GENDER_CHOICES.NOT_SELECTED,
+        choices=GENDER_CHOICES, null=False, blank=False, max_length=12
     )
+    tshirt_size = models.CharField(_('Tshirt Size'), default=TSHIRT_SIZE_CHOICES.NOT_SELECTED,
+                                   choices=TSHIRT_SIZE_CHOICES, null=False, blank=False, max_length=30)
+    phone_number = PhoneNumberField(_('Phone Number'), default='', null=False, blank=True, max_length=13)
+    ticket_id = models.UUIDField(_('Ticket Id'), default=uuid.uuid4, null=False, blank=False)
+    is_core_organizer = models.BooleanField(_('User is core_organizer'), default=False, null=False, blank=True,
+                                            help_text='Designates whether this user is a Core Organizer')
+    is_volunteer = models.BooleanField(_('User is volunteer'), default=False, null=False, blank=True,
+                                       help_text='Designates whether this user is a Volunteer')
 
     USERNAME_FIELD = 'email'
     objects = UserManager()

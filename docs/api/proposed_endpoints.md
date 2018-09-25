@@ -10,21 +10,21 @@ POST /api/auth/register/
 
 **Parameters**
 
-Name        | Data Type | Description
-------------|-----------|---------------------------
-id          | UUID      | Id of the user
-first_name  | text      | first name of the user
-last_name   | text      | last name of the user
-email_id    | text      | email of user. Errors out if email already registered.
-password    | text      | Hash of the user's password
-gender      | choices   | gender (Like Male, Female, Others)
-tshirt_size | choices   | size of the TShirt (Like Small, Medium etc.)
-contact     | text      | contact number
-ticket_id   | text      | ticket ID generated at registration
-created_at  | datetime  | date and time of registration
-modified_at | datetime  | date and time of modification
-user_type   | choices   | Type of user like admin, volunteer, attendee
-
+Name              | Data Type | Description
+------------------|-----------|---------------------------
+id                | UUID      | Id of the user
+first_name        | text      | first name of the user
+last_name         | text      | last name of the user
+email_id          | text      | email of user. Errors out if email already registered.
+password          | text      | Hash of the user's password
+gender            | text      | gender (Like `male`, `female`, `others`)
+tshirt_size       | text      | size of the TShirt (Like `small`, `medium`, `large`, `extra_large` etc.)
+contact           | text      | contact number
+ticket_id         | text      | ticket ID generated at registration
+created_at        | datetime  | date and time of registration
+modified_at       | datetime  | date and time of modification
+is_core_organizer | boolean   | true if the user is a core organizer
+is_volunteer      | boolean   | true if the user is a volunteer
 
 
 **Request**
@@ -35,13 +35,12 @@ user_type   | choices   | Type of user like admin, volunteer, attendee
     "last_name": "Hawley",
     "email_id": "john@localhost.com",
     "password": "VerySafePassword0909",
-    "gender": "Male",
-    "tshirt_size": "Medium",
+    "gender": "male",
+    "tshirt_size": "medium",
     "contact": "+919999999999",
     "ticket_id": null,
     "created_at": null,
     "modified_at": null,
-    "user_type": null
 }
 ```
 
@@ -55,13 +54,14 @@ Status: 201 Created
     "last_name": "Hawley",
     "email_id": "john@localhost.com",
     "auth_token": "eyJ0eXAi0iJKV1QiLCJh",
-    "gender": "Male",
-    "tshirt_size": "Medium",
+    "gender": "male",
+    "tshirt_size": "medium",
     "contact": "+919999999999",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z",
-    "user_type": "Attendee"
+    "is_core_organizer": false,
+    "is_volunteer": false
 }
 ```
 
@@ -81,13 +81,14 @@ Status: 200 OK
     "first_name": "Jaun",
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
-    "gender": "Male",
-    "tshirt_size": "Extra Large",
+    "gender": "male",
+    "tshirt_size": "extra_large",
     "contact": "+919999999998",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-02T07:10:42Z",
-    "user_type": "Volunteer"
+    "is_core_organizer": false,
+    "is_volunteer": false
 }
 ```
 
@@ -103,10 +104,9 @@ PATCH /api/me (requires authentication)
     "first_name": "Jaun",
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
-    "gender": "Male",
-    "tshirt_size": "Extra Large",
+    "gender": "male",
+    "tshirt_size": "extra_large",
     "contact": "+919999999998",
-    "user_type": "Volunteer"
 }
 ```
 
@@ -118,13 +118,14 @@ Status: 200 OK
     "first_name": "Jaun",
     "last_name": "Hawley",
     "email_id": "jaun@localhost.com",
-    "gender": "Male",
-    "tshirt_size": "Extra Large",
+    "gender": "male",
+    "tshirt_size": "extra_large",
     "contact": "+919999999998",
     "ticket_id": "This-is-a-unique-ticket-id",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-02T07:10:42Z",
-    "user_type": "Volunteer"
+    "is_core_organizer": false,
+    "is_volunteer": false
 }
 ```
 
@@ -185,9 +186,9 @@ Status: 201 Created
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 
 }
@@ -221,9 +222,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "some new content",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -246,9 +247,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -273,9 +274,9 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/to/uploaded_image.jpg",
-    "is_approved": "true",
+    "is_approved": true,
     "approved_time": "2018-09-05T15:20:00Z",
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -309,9 +310,9 @@ Status: 201 Created
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
@@ -334,9 +335,175 @@ Status: 200 OK
     "scheduled_time": "2018-10-01T11:00:00Z",
     "text": "anything that user has to write",
     "image": null,
-    "is_approved": "false",
+    "is_approved": false,
     "approved_time": null,
-    "is_posted": "false",
+    "is_posted": false,
     "posted_time": null
 }
 ```
+
+# Proposals
+
+## Create Proposal
+
+```
+POST /api/proposal
+```
+
+**Parameters**
+
+Name               | Data type     | Description
+-------------------|---------------|---------------------
+id                 | UUID          | Unique ID for the proposal
+title              | text          | Title of proposal
+speaker            | text          | Speaker for the talk
+kind               | text          | Type of proposal like talk, dev sprint, workshop
+level              | text          | Level of proposal beginner, intermediate, advanced
+duration           | text          | Duration of talk, sprint or workshop 
+abstract           | text          | Abstract of the proposal
+description        | text          | Description of the proposal
+submitted_at       | datetime      | Time of submission of proposal
+approved_at        | datetime      | Time of approval
+modified_at        | datetime      | Time of modification
+status             | text          | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
+
+
+**Request**
+```json
+{
+    "title": "Sample title of the talk",
+    "kind": "talk",
+    "level": "beginner",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long"
+}
+```
+
+**Response**
+Status: 201 Created
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Sample title of the talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "beginner",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": null,
+    "modified_at": "2018-08-01T17:30:42Z",
+    "status": "submitted"
+}
+```
+
+## Update proposal details
+
+```
+PATCH /api/proposal/:id (request authentication)
+```
+
+**Request**
+```json
+{
+    "title": "Corrected title of talk",
+    "level": "advanced"
+}
+```
+
+**Response**
+Status: 201 Created
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": null,
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "submitted"
+}
+```
+
+## Accept the proposal
+
+```
+POST /api/proposal/:id/accept
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "accepted"
+}
+```
+
+## Get proposal details
+
+```
+GET /api/proposal/:id
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "submitted"
+}
+```
+
+## Retract the proposal
+
+```
+POST /api/proposal/:id/retract (requires authentication)
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "title": "Corrected title of talk",
+    "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
+    "kind": "talk",
+    "level": "advanced",
+    "duration": "01:30:00",
+    "abstract": "This is the abstract of the talk",
+    "description": "This is the description of the of the talk and can be quite long",
+    "submitted_at": "2018-08-01T17:30:42Z",
+    "approved_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-08-03T09:20:00Z",
+    "status": "retracted"
+}
+```
+
