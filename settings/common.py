@@ -33,6 +33,7 @@ INSTALLED_APPS = (
     'rest_framework_swagger',
     'versatileimagefield',  # https://github.com/WGBH/django-versatileimagefield/
     'corsheaders',   # https://github.com/ottoyiu/django-cors-headers/
+    'phonenumber_field',  # https://github.com/stefanfoulis/django-phonenumber-field
 
     'compressor',
     'raven.contrib.django.raven_compat',
