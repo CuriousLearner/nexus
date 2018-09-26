@@ -2,8 +2,8 @@
 import pytest
 from django.apps import apps
 from django.urls import reverse
-from tests import factories as f
 from rest_framework import status
+from tests import factories as f
 
 pytestmark = pytest.mark.django_db
 
@@ -29,25 +29,31 @@ def test_proposal_creation_api(client):
     assert response.data["modified_at"] is not None
     assert response.data["status"] == Proposal.STATUS_CHOICES.SUBMITTED
 
-    proposal_instance = Proposal.objects.get(id=response.data["id"])
-    assert str(proposal_instance) == response.data["title"]
+    proposal = Proposal.objects.get(id=response.data["id"])
+    assert proposal.title == response.data["title"]
 
 
 def test_proposal_acceptance_api(client):
     Proposal = apps.get_model('proposals.Proposal')
-    proposal = f.create_proposal(status=Proposal.STATUS_CHOICES.SUBMITTED)
+    proposal = f.create_proposal(status=Proposal.STATUS_CHOICES.SUBMITTED, approved_at=None)
     url = reverse('proposal-accept', kwargs={'pk': proposal.id})
     response = client.post(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     user = f.create_user(is_core_organizer=False)
 
+    # Check that user who is not core-organizer
+    # is unable to approve proposal
     client.login(user)
     response = client.post(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
+    # Make user a core-organizer to approve this proposal
     user.is_core_organizer = True
     user.save()
     user.refresh_from_db()
+
+    # Check that `approved_at` time is still `None`
+    assert proposal.approved_at is None
 
     client.login(user)
     response = client.post(url)
@@ -59,6 +65,7 @@ def test_proposal_acceptance_api(client):
         'modified_at'
     )
     assert set(response.data.keys()).issubset(expected_keys)
+    # Check that status is approved and `approved_at` now has a value.
     assert proposal.status == Proposal.STATUS_CHOICES.ACCEPTED
     assert proposal.approved_at is not None
 
@@ -71,6 +78,7 @@ def test_proposal_retraction_api(client):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     user = f.create_user(is_core_organizer=False)
 
+    # Check that normal user cannot take this action
     client.login(user)
     response = client.post(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -79,6 +87,7 @@ def test_proposal_retraction_api(client):
     user.save()
     user.refresh_from_db()
 
+    # Check that core-organizer can take this action.
     client.login(user)
     response = client.post(url)
     assert response.status_code == status.HTTP_200_OK

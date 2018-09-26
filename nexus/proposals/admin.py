@@ -12,7 +12,7 @@ class ProposalAdmin(admin.ModelAdmin):
                                       'duration', 'abstract', 'description')}),
         ('Timing', {'fields': ('approved_at',)}),
     )
-    list_display = ('speaker', 'title', 'submitted_at', 'status')  # shows UUID for speaker
+    list_display = ('speaker', 'title', 'submitted_at', 'status')
     list_filter = ('speaker', 'submitted_at', 'status')
     ordering = ('submitted_at',)
     search_fields = ('speaker__email', 'speaker__first_name', 'speaker__last_name')
