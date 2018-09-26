@@ -18,11 +18,11 @@ class ProposalSerializer(serializers.ModelSerializer):
         model = models.Proposal
         fields = [
             'id', 'title', 'speaker', 'status', 'kind', 'level', 'duration',
-            'abstract', 'description', 'submitted_at', 'approved_at',
+            'abstract', 'description', 'submitted_at', 'accepted_at',
             'modified_at',
         ]
         read_only_fields = [
-            'id', 'submitted_at', 'approved_at', 'modified_at', 'status',
+            'id', 'submitted_at', 'accepted_at', 'modified_at', 'status',
         ]
 
 
@@ -30,7 +30,7 @@ class ProposalStatusUpdateSerializer(ProposalSerializer):
 
     class Meta:
         model = models.Proposal
-        fields = ProposalSerializer.Meta.fields + ['approved_at', 'status']
+        fields = ProposalSerializer.Meta.fields + ['accepted_at', 'status']
 
         read_only_fields = [
             'id', 'submitted_at', 'modified_at'

@@ -35,7 +35,7 @@ class Proposal(TimeStampedUUIDModel):
     duration = models.DurationField(_('Duration'), null=False, blank=False)
     abstract = models.TextField(verbose_name=_('Abstract'), null=False, blank=False)
     description = models.TextField(verbose_name=_('Description'), null=False, blank=False)
-    approved_at = models.DateTimeField(_('Approved at'), default=None, null=True, blank=True)
+    accepted_at = models.DateTimeField(_('Accepted at'), default=None, null=True, blank=True)
     status = models.CharField(_('Status'), default=STATUS_CHOICES.SUBMITTED, choices=STATUS_CHOICES,
                               max_length=10, null=False, blank=False)
     submitted_at = models.DateTimeField(auto_now_add=True, editable=False)

@@ -35,25 +35,25 @@ def test_proposal_creation_api(client):
 
 def test_proposal_acceptance_api(client):
     Proposal = apps.get_model('proposals.Proposal')
-    proposal = f.create_proposal(status=Proposal.STATUS_CHOICES.SUBMITTED, approved_at=None)
+    proposal = f.create_proposal(status=Proposal.STATUS_CHOICES.SUBMITTED, accepted_at=None)
     url = reverse('proposal-accept', kwargs={'pk': proposal.id})
     response = client.post(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     user = f.create_user(is_core_organizer=False)
 
     # Check that user who is not core-organizer
-    # is unable to approve proposal
+    # is unable to accept proposal
     client.login(user)
     response = client.post(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    # Make user a core-organizer to approve this proposal
+    # Make user a core-organizer to accept this proposal
     user.is_core_organizer = True
     user.save()
     user.refresh_from_db()
 
-    # Check that `approved_at` time is still `None`
-    assert proposal.approved_at is None
+    # Check that `accepted_at` time is still `None`
+    assert proposal.accepted_at is None
 
     client.login(user)
     response = client.post(url)
@@ -61,13 +61,13 @@ def test_proposal_acceptance_api(client):
     proposal.refresh_from_db()
     expected_keys = (
         'id', 'title', 'speaker', 'status', 'kind', 'level', 'duration',
-        'abstract', 'description', 'submitted_at', 'approved_at',
+        'abstract', 'description', 'submitted_at', 'accepted_at',
         'modified_at'
     )
     assert set(response.data.keys()).issubset(expected_keys)
-    # Check that status is approved and `approved_at` now has a value.
+    # Check that status is accepted and `accepted_at` now has a value.
     assert proposal.status == Proposal.STATUS_CHOICES.ACCEPTED
-    assert proposal.approved_at is not None
+    assert proposal.accepted_at is not None
 
 
 def test_proposal_retraction_api(client):
@@ -94,7 +94,7 @@ def test_proposal_retraction_api(client):
     proposal.refresh_from_db()
     expected_keys = (
         'id', 'title', 'speaker', 'status', 'kind', 'level', 'duration',
-        'abstract', 'description', 'submitted_at', 'approved_at',
+        'abstract', 'description', 'submitted_at', 'accepted_at',
         'modified_at'
     )
     assert set(response.data.keys()).issubset(expected_keys)

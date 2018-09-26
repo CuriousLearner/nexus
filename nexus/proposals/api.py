@@ -29,7 +29,7 @@ class ProposalViewSet(mixins.ListModelMixin,
         has_perm('can_accept_proposal', request.user, proposal, raise_exception=True)
         data = {
             'status': models.Proposal.STATUS_CHOICES.ACCEPTED,
-            'approved_at': timezone.now(),
+            'accepted_at': timezone.now(),
         }
         serializer = self.get_serializer(proposal, data, partial=True)
         serializer.is_valid(raise_exception=True)
