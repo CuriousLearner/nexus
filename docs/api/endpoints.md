@@ -292,13 +292,13 @@ duration           | text          | true     | Duration of `talk`, `dev_sprint`
 abstract           | text          | true     | Abstract of the proposal
 description        | text          | true     | Description of the proposal
 submitted_at       | datetime      | false    | Time of submission of proposal
-approved_at        | datetime      | false    | Time of approval
+accepted_at        | datetime      | false    | Time of acceptance
 modified_at        | datetime      | false    | Time of modification
 status             | text          | false    | Status of proposal with options `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
 
 __NOTE__
 - *uuid: randomly generated uuid.
-- *date_time: date and time when the proposal is submitted/approved/modified
+- *date_time: date and time when the proposal is submitted/accepted/modified
 - Error out in case of invalid duration format.
 - Error out in case of missing **required** attributes.
 
@@ -327,7 +327,7 @@ Status: 201 Created
     "abstract": "This is the abstract of the talk",
     "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
-    "approved_at": null,
+    "accepted_at": null,
     "modified_at": "2018-08-01T17:30:42Z",
     "status": "submitted"
 }
@@ -360,7 +360,7 @@ Status: 201 Created
     "abstract": "This is the abstract of the talk",
     "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
-    "approved_at": null,
+    "accepted_at": null,
     "modified_at": "2018-08-03T09:20:00Z",
     "status": "submitted"
 }
@@ -385,7 +385,7 @@ Status: 200 OK
     "abstract": "This is the abstract of the talk",
     "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
-    "approved_at": "2018-08-01T17:30:42Z",
+    "accepted_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
     "status": "accepted"
 }
@@ -410,7 +410,7 @@ Status: 200 OK
     "abstract": "This is the abstract of the talk",
     "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
-    "approved_at": "2018-08-01T17:30:42Z",
+    "accepted_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
     "status": "submitted"
 }
@@ -435,7 +435,7 @@ Status: 200 OK
     "abstract": "This is the abstract of the talk",
     "description": "This is the description of the of the talk and can be quite long",
     "submitted_at": "2018-08-01T17:30:42Z",
-    "approved_at": "2018-08-01T17:30:42Z",
+    "accepted_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-03T09:20:00Z",
     "status": "retracted"
 }
