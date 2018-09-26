@@ -94,10 +94,10 @@ def test_proposal_retraction_api(client):
 
 def test_proposal_listing_api(client):
 
-    no_of_test_proposals = 3
+    no_of_test_proposals = 6
     data = {
         'page': 2,
-        'per_page': 1,
+        'per_page': 2,
     }
     f.create_proposal(n=no_of_test_proposals)
     url = reverse('proposal-list')
@@ -106,11 +106,8 @@ def test_proposal_listing_api(client):
     client.login(user)
     response = client.get(url, data=data)
     assert response.status_code == status.HTTP_200_OK
-    expected_keys = (
-        'count', 'next', 'previous', 'results'
-    )
-    assert set(response.data.keys()) == set(expected_keys)
     assert response.data['previous'] is not None
     assert response.data['next'] is not None
     assert response.data['count'] == no_of_test_proposals
     assert response.data['results'] is not None
+    assert response.data['results'][0]['submitted_at'] > response.data['results'][1]['submitted_at']

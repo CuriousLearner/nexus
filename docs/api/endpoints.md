@@ -276,7 +276,7 @@ Status: 200 OK
 ## Create Proposal
 
 ```
-POST /api/proposal
+POST /api/proposals
 ```
 
 **Parameters**
@@ -336,7 +336,7 @@ Status: 201 Created
 ## Update proposal details
 
 ```
-PATCH /api/proposal/:id (request authentication)
+PATCH /api/proposals/:id (request authentication)
 ```
 
 **Request**
@@ -369,7 +369,7 @@ Status: 201 Created
 ## Accept the proposal
 
 ```
-POST /api/proposal/:id/accept
+POST /api/proposals/:id/accept
 ```
 
 **Response**
@@ -394,7 +394,7 @@ Status: 200 OK
 ## Get proposal details
 
 ```
-GET /api/proposal/:id
+GET /api/proposals/:id
 ```
 
 **Response**
@@ -419,7 +419,7 @@ Status: 200 OK
 ## Retract the proposal
 
 ```
-POST /api/proposal/:id/retract (requires authentication)
+POST /api/proposals/:id/retract (requires authentication)
 ```
 
 **Response**
