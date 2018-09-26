@@ -286,7 +286,7 @@ Name               | Data type     | Required | Description
 id                 | UUID          | false    | Unique ID for the proposal
 title              | text          | true     | Title of proposal
 speaker            | text          | false    | Speaker for the talk
-kind               | text          | true     | Type of proposal like talk, dev sprint, workshop
+kind               | text          | true     | Type of proposal with options `talk`, `dev sprint`, `workshop`
 level              | text          | true     | Level of proposal beginner, intermediate, advanced
 duration           | text          | true     | Duration of talk, sprint or workshop, format: hh:mm:ss
 abstract           | text          | true     | Abstract of the proposal
@@ -294,7 +294,7 @@ description        | text          | true     | Description of the proposal
 submitted_at       | datetime      | false    | Time of submission of proposal
 approved_at        | datetime      | false    | Time of approval
 modified_at        | datetime      | false    | Time of modification
-status             | text          | false    | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
+status             | text          | false    | Status of proposal with options `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
 
 __NOTE__
 - *uuid: randomly generated uuid.

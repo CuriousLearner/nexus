@@ -7,11 +7,12 @@
 ## Sep 27, 2018
 
 - Add an app for `proposals`. ([@storymode7])
-  This adds following endpoints:
-  - /api/proposals allowing `POST`, `PATCH`, `GET`
-  - /api/proposals/:id which allows to view a specific proposals (`GET`)
-  - /api/proposals/:id/retract to retract a proposal (`POST`)
-  - /api/proposals/:id/accept to accept a proposal (`POST`)
+  This adds following features:
+  - Get list of all proposals via `GET /api/proposals`
+  - Get proposal details via `GET /api/proposals/:id`
+  - Update a proposal via `PATCH /api/proposals/:id`
+  - Retract a proposal via `POST /api/proposals/:id/retract`
+  - Accept a proposal via `POST/api/proposals/:id/accept`
 
 ## Sep 7, 2018
 
