@@ -286,7 +286,7 @@ Name               | Data type     | Required | Description
 id                 | UUID          | false    | Unique ID for the proposal
 title              | text          | true     | Title of proposal
 speaker            | text          | false    | Speaker for the talk
-kind               | text          | true     | Type of proposal with options `talk`, `dev sprint`, `workshop`
+kind               | text          | true     | Type of proposal with options `talk`, `dev sprint`, `workshop`…
 level              | text          | true     | Level of proposal `beginner`, `intermediate`, `advanced`
 duration           | text          | true     | Duration of `talk`, `dev_sprint` or `workshop`, format: `hh:mm:ss`
 abstract           | text          | true     | Abstract of the proposal

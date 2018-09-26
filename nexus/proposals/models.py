@@ -11,20 +11,22 @@ class Proposal(TimeStampedUUIDModel):
     PROPOSAL_KIND = Choices(
         ('TALK', 'talk', _('Talk')),
         ('DEV_SPRINT', 'dev_sprint', _('Dev Sprint')),
-        ('WORKSHOP', 'workshop', _('Workshop'))
+        ('WORKSHOP', 'workshop', _('Workshop')),
+        ('POSTER', 'poster', _('Poster')),
+        ('OTHER', 'other', _('Other')),
     )
 
     LEVELS_CHOICES = Choices(
         ('BEGINNER', 'beginner', _('Beginner')),
         ('INTERMEDIATE', 'intermediate', _('Intermediate')),
-        ('ADVANCED', 'advanced', _('Advanced'))
+        ('ADVANCED', 'advanced', _('Advanced')),
     )
 
     STATUS_CHOICES = Choices(
         ('RETRACTED', 'retracted', _('Retracted')),
         ('ACCEPTED', 'accepted', _('Accepted')),
         ('UNACCEPTED', 'unaccepted', _('Unaccpted')),
-        ('SUBMITTED', 'submitted', _('Submitted'))
+        ('SUBMITTED', 'submitted', _('Submitted')),
     )
 
     title = models.CharField(_('Title'), max_length=120, null=False, blank=False)
