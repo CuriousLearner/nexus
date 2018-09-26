@@ -99,8 +99,7 @@ def test_proposal_listing_api(client):
         'page': 2,
         'per_page': 1,
     }
-    for x in range(no_of_test_proposals):
-        f.create_proposal()
+    f.create_proposal(n=no_of_test_proposals)
     url = reverse('proposal-list')
     user = f.create_user()
 
