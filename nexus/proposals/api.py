@@ -23,7 +23,7 @@ class ProposalViewSet(mixins.ListModelMixin,
         else:
             return serializers.ProposalSerializer
 
-    @action(methods=['PATCH'], detail=True)
+    @action(methods=['POST'], detail=True)
     def accept(self, request, pk):
 
         data = {
@@ -37,7 +37,7 @@ class ProposalViewSet(mixins.ListModelMixin,
         serializer.save()
         return response.Ok(serializer.data)
 
-    @action(methods=['PATCH'], detail=True)
+    @action(methods=['POST'], detail=True)
     def retract(self, request, pk):
 
         data = {

@@ -37,12 +37,12 @@ def test_proposal_acceptance_api(client):
     Proposal = apps.get_model('proposals.Proposal')
     proposal = f.create_proposal(status=Proposal.STATUS_CHOICES.SUBMITTED)
     url = reverse('proposal-accept', kwargs={'pk': proposal.id})
-    response = client.patch(url)
+    response = client.post(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     user = f.create_user(is_core_organizer=False)
 
     client.login(user)
-    response = client.patch(url)
+    response = client.post(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
     user.is_core_organizer = True
@@ -50,7 +50,7 @@ def test_proposal_acceptance_api(client):
     user.refresh_from_db()
 
     client.login(user)
-    response = client.patch(url)
+    response = client.post(url)
     assert response.status_code == status.HTTP_200_OK
     proposal.refresh_from_db()
     expected_keys = (
@@ -67,12 +67,12 @@ def test_proposal_retraction_api(client):
     Proposal = apps.get_model('proposals.Proposal')
     proposal = f.create_proposal(status=Proposal.STATUS_CHOICES.SUBMITTED)
     url = reverse('proposal-retract', kwargs={'pk': proposal.id})
-    response = client.patch(url)
+    response = client.post(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
     user = f.create_user(is_core_organizer=False)
 
     client.login(user)
-    response = client.patch(url)
+    response = client.post(url)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
     user.is_core_organizer = True
@@ -80,7 +80,7 @@ def test_proposal_retraction_api(client):
     user.refresh_from_db()
 
     client.login(user)
-    response = client.patch(url)
+    response = client.post(url)
     assert response.status_code == status.HTTP_200_OK
     proposal.refresh_from_db()
     expected_keys = (
