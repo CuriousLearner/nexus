@@ -2,7 +2,7 @@
 from django.contrib import admin
 
 # nexus Stuff
-from nexus.proposals.models import Proposal, Proposal_kind
+from nexus.proposals.models import Proposal, ProposalKind
 
 
 @admin.register(Proposal)
@@ -18,11 +18,9 @@ class ProposalAdmin(admin.ModelAdmin):
     search_fields = ('speaker__email', 'speaker__first_name', 'speaker__last_name')
 
 
-@admin.register(Proposal_kind)
+@admin.register(ProposalKind)
 class ProposalKindAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Proposal details', {'fields': ('kind',)}),
     )
     list_display = ('kind',)
-
-

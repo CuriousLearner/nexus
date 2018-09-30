@@ -22,6 +22,7 @@ def test_proposal_creation_api(client):
     }
     client.login(user)
 
+    f.create_proposal_kind(kind='talk')
     response = client.post(url, data=data)
     assert response.status_code == status.HTTP_201_CREATED
     assert response.data["speaker"] == user.email

@@ -27,3 +27,7 @@ def create_user(**kwargs):
 
 def create_proposal(**kwargs):
     return G(apps.get_model('proposals.Proposal'), **kwargs)
+
+
+def create_proposal_kind(**kwargs):
+    return G(apps.get_model('proposals.ProposalKind'), **kwargs)
