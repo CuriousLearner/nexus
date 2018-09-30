@@ -8,14 +8,6 @@ from nexus.base.models import TimeStampedUUIDModel
 
 
 class Proposal(TimeStampedUUIDModel):
-    PROPOSAL_KIND = Choices(
-        ('TALK', 'talk', _('Talk')),
-        ('DEV_SPRINT', 'dev_sprint', _('Dev Sprint')),
-        ('WORKSHOP', 'workshop', _('Workshop')),
-        ('POSTER', 'poster', _('Poster')),
-        ('OTHER', 'other', _('Other')),
-    )
-
     LEVELS_CHOICES = Choices(
         ('BEGINNER', 'beginner', _('Beginner')),
         ('INTERMEDIATE', 'intermediate', _('Intermediate')),
@@ -32,7 +24,8 @@ class Proposal(TimeStampedUUIDModel):
     title = models.CharField(_('Title'), max_length=120, null=False, blank=False)
     speaker = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('Speaker'),
                                 null=False, blank=False)
-    kind = models.CharField(_('Kind'), choices=PROPOSAL_KIND, max_length=10, null=False, blank=False)
+    kind = models.ForeignKey('Proposal_kind',
+                             on_delete=models.CASCADE, verbose_name=_('Kind'), null=False, blank=False)
     level = models.CharField(_('Content Level'), choices=LEVELS_CHOICES, max_length=12, null=False, blank=False)
     duration = models.DurationField(_('Duration'), null=False, blank=False)
     abstract = models.TextField(verbose_name=_('Abstract'), null=False, blank=False)
@@ -49,3 +42,15 @@ class Proposal(TimeStampedUUIDModel):
 
     def __str__(self):
         return self.title
+
+
+class Proposal_kind(models.Model):
+    kind = models.CharField(_('Kind'), max_length=10, null=False, blank=False)
+
+    def __str__(self):
+        return self.kind
+
+    class Meta:
+        verbose_name = _('Proposal kind')
+        verbose_name_plural = _('Proposal kinds')
+        db_table = "proposal_details"
