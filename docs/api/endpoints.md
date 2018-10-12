@@ -419,7 +419,7 @@ Status: 200 OK
 ## Retract the proposal
 
 ```
-POST /api/proposals/:id/retract (requires authentication)
+POST /api/proposals/:id/retract (requires authentication and authorization)
 ```
 
 **Response**
