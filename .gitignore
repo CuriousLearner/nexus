@@ -96,3 +96,6 @@ Session.vim
 
 # Pycharm
 .idea/
+
+# VS Code
+.vscode/
