@@ -75,5 +75,7 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TEMPLATE_CONTEXT': True,
 }
 
+DDF_DEFAULT_DATA_FIXTURE = 'nexus.base.utils.dynamic_fixture_utils.PatchedSequentialDataFixture'
+
 # This will expose all browsable api urls. For dev the default value is true
 API_DEBUG = env.bool('API_DEBUG', default=True)

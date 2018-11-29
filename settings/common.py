@@ -28,6 +28,7 @@ INSTALLED_APPS = (
 
     'nexus.base',
     'nexus.users',
+    'nexus.proposals',
 
     'rest_framework',  # http://www.django-rest-framework.org/
     'rest_framework_swagger',
