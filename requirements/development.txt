@@ -10,7 +10,7 @@ devrecargar==0.1.4
 
 # Debugging
 # -------------------------------------
-django-debug-toolbar==1.9.1
+django-debug-toolbar==1.11
 ipdb==0.11
 
 # Testing and coverage
