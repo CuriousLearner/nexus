@@ -5,17 +5,17 @@
 # Static Files and Media Storage
 # -------------------------------------
 django-storages==1.6.5
-boto3==1.6.6
+boto3==1.9.62
 
 # Caching
 # -------------------------------------
-django-redis==4.9.0
-hiredis==0.2.0
+django-redis==4.10.0
+hiredis==0.3.0
 
 
 # Logging
 # -------------------------------------
-newrelic==2.106.1.88
+newrelic==4.8.0.110
 
 # Basic Auth Protection
 # -------------------------------------
