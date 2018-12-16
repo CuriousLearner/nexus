@@ -4,7 +4,7 @@ site_description: Streamline & automate the boring parts
 site_author: CuriousLearner
 repo_url: https://github.com/CuriousLearner/nexus-web
 
-pages:
+nav:
 - Home: 'index.md'
 - API:
   - 'Overview & Usages': 'api/overview.md'
