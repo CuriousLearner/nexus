@@ -3,7 +3,10 @@ import functools
 
 # Third Party Stuff
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db.models import signals
+from django.utils.six import BytesIO
+from PIL import Image
 
 
 def signals_switch():
@@ -79,3 +82,19 @@ class SettingsTestCase(object):
 def get_dict_from_list_where(my_list, key, value):
     """see: http://stackoverflow.com/a/7079297/782901"""
     return next((item for item in my_list if item[key] == value), None)
+
+
+def create_image(storage, filename, size=(100, 100), image_mode='RGB', image_format='PNG'):
+    """
+    Generate a test image, returning the filename that it was saved as.
+
+    If ``storage`` is ``None``, the BytesIO containing the image data
+    will be passed instead.
+    """
+    data = BytesIO()
+    Image.new(image_mode, size).save(data, image_format)
+    data.seek(0)
+    if not storage:
+        return data
+    image_file = ContentFile(data.read())
+    return storage.save(filename, image_file)

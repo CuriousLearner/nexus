@@ -87,7 +87,7 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
         ordering = ('-date_joined', )
 
     def __str__(self):
-        return str(self.id)
+        return '{} - {}'.format(self.email, self.get_full_name())
 
     def get_full_name(self) -> str:
         """Returns the first_name plus the last_name, with a space in between.

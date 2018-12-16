@@ -4,6 +4,19 @@
     .container hr{margin-top: 5px; }
 </style>
 
+## Dec 15, 2018
+- Add an app for `posts`. ([@realslimshanky])
+  This adds following features:
+  - Get list of all posts via `GET /api/posts`
+  - Add new post via `POST /api/posts`
+  - Get post details via `GET /api/posts/:post_id`
+  - Update a post via `PATCH /api/posts/:post_id`
+  - Delete a post via `DELETE /api/posts/:post_id`
+  - Approve a post via `POST /api/posts/:post_id/approve`
+  - Publish a post via `POST /api/posts/:post_id/publish`
+  - Upload/update an image via `POST /api/posts/:post_id/upload_image`
+  - Delete image in post via `POST /api/posts/:post_id/delete_image`
+
 ## Sep 27, 2018
 
 - Add an app for `proposals`. ([@storymode7])

@@ -6,7 +6,6 @@ see: https://docs.djangoproject.com/en/dev/ref/settings/
 import environ
 from django.utils.translation import ugettext_lazy as _
 
-
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
 APPS_DIR = ROOT_DIR.path('nexus')
 
@@ -28,6 +27,7 @@ INSTALLED_APPS = (
 
     'nexus.base',
     'nexus.users',
+    'nexus.social_media',
     'nexus.proposals',
 
     'rest_framework',  # http://www.django-rest-framework.org/
