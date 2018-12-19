@@ -4,7 +4,7 @@
 language: python
 sudo: false
 python:
-- '3.6.5'
+  - '3.6.5'
 
 addons:
   postgresql: "9.5"
@@ -23,13 +23,13 @@ install:
   - pip install -r requirements/development.txt
 
 before_script:
-- export DATABASE_URL=postgres://postgres@localhost/nexus
-- psql -c "CREATE DATABASE nexus;" -U postgres
+  - export DATABASE_URL=postgres://postgres@localhost/nexus
+  - psql -c "CREATE DATABASE nexus;" -U postgres
 
 script:
-- flake8
-- pytest --cov -v --tb=native
-- ansible-playbook -i provisioner/hosts provisioner/site.yml --syntax-check
+  - flake8
+  - pytest --cov -v --tb=native
+  - ansible-playbook -i provisioner/hosts provisioner/site.yml --syntax-check
 
 notifications:
   email:
