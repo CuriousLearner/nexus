@@ -43,8 +43,6 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         if not instance.is_approved:
             return response.BadRequest({'error_message': 'Post has not been approved yet'})
         if not instance.is_posted:
-            if instance.posted_at == 'twitter':
-                task_to_post_to_twitter.apply_async((instance.id,), eta=timezone.now())
             data = {'is_posted': True, 'posted_time': timezone.now()}
             serializer = self.get_serializer(instance, data, partial=True)
             serializer.is_valid(raise_exception=True)
