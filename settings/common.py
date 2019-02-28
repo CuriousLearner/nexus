@@ -485,3 +485,10 @@ SITE_INFO = {
     'RELEASE_VERSION': RELEASE_VERSION,
     'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] != ''
 }
+
+TWITTER_OAUTH = {
+    'consumer_key': env('TWITTER_CONSUMER_KEY', default='FakeTwitterConsumerKey'),
+    'consumer_secret': env('TWITTER_CONSUMER_SECRET', default='FakeTwitterConsumerSecret'),
+    'access_key': env('TWITTER_ACCESS_KEY', default='FakeTwitterAccessKey'),
+    'access_secret': env('TWITTER_ACCESS_SECRET', default='FakeTwitterAccessSecret'),
+}
