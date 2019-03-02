@@ -2,8 +2,12 @@
 
 see: https://docs.djangoproject.com/en/dev/ref/settings/
 """
+# Standard Library
+import os
+
 # Third Party Stuff
 import environ
+from dotenv import load_dotenv
 from django.utils.translation import ugettext_lazy as _
 
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
@@ -483,5 +487,12 @@ RAVEN_CONFIG = {
 
 SITE_INFO = {
     'RELEASE_VERSION': RELEASE_VERSION,
-    'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] is not ''
+    'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] != ''
 }
+
+# SOCIAL MEDIA CONFIGURATION
+# -----------------------------------------------------------------------------
+MAX_POSTS_AT_ONCE = 5
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
+FB_USER_ACCESS_TOKEN = os.getenv('FB_USER_ACCESS_TOKEN')
+FB_PAGE_ID = os.getenv('FB_PAGE_ID')
