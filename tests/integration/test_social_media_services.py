@@ -5,17 +5,18 @@ import json
 import pytest
 import tweepy
 from unittest import mock
+from django.urls import reverse
+from django.utils import timezone
+from django.core.files.uploadedfile import SimpleUploadedFile
+
 
 # nexus Stuff
 from tests import utils as u
-from django.urls import reverse
-from django.utils import timezone
 from tests import factories as f
 from nexus.social_media import services
 from nexus.social_media.models import Post
 from settings.development import TWITTER_OAUTH
 from nexus.base.exceptions import WrongArguments
-from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 pytestmark = pytest.mark.django_db

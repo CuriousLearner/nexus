@@ -23,12 +23,12 @@ def test_calling_twitter_celery_task(client):
         'posted_at': 'twitter',
         'scheduled_time': '2018-10-09T18:30:00Z'
     }
+
     response = client.json.post(url, json.dumps(post))
     post_id = response.data['id']
-
     post_instance = Post.objects.get(pk=post_id)
 
     with mock.patch('nexus.social_media.api.task_to_post_to_twitter.delay') as mock_delay:
         url = reverse('posts-approve', kwargs={'pk': post_id})
-        response = client.post(url)
+        client.post(url)
         assert mock_delay.assert_called_once_with(post_instance.id) is None
