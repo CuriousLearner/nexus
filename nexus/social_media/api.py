@@ -31,7 +31,7 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             serializer.is_valid(raise_exception=True)
             serializer.save()
             if instance.posted_at == 'twitter':
-                task_to_post_to_twitter.apply_async((instance.id,), eta=instance.scheduled_time)
+                task_to_post_to_twitter.delay(instance.id)
             return response.Ok(serializer.data)
         else:
             serializer = self.get_serializer(instance)
