@@ -9,7 +9,7 @@ from nexus.social_media import services
 def task_to_post_to_twitter(post_id):
     """Celery task to post on twitter.
 
-    :params post_id: uuid of the post instance to be posted
+    :param post_id: UUID of the post instance to be posted
 
     """
     services.post_to_twitter(post_id)

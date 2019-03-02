@@ -9,11 +9,13 @@ from settings.development import TWITTER_OAUTH
 
 
 def get_twitter_api_object(TWITTER_OAUTH):
-    """Function to generate and return a twitter api object.
+    """Function to generate a twitter api object.
 
-    :param TWITTER_OAUTH: a dictionary having essential twitter oauth token viz.
-    consumer_key, consumer_secret, access_key, access_secret
-    :returns: Twitter API object
+    :param TWITTER_OAUTH: A dictionary having essential twitter oauth token viz.
+    consumer_key, consumer_secret, access_key, access_secret.
+
+    :returns: On success, twitter API object.
+              On failure, False.
 
     """
     auth = tweepy.OAuthHandler(TWITTER_OAUTH['consumer_key'], TWITTER_OAUTH['consumer_secret'])
@@ -23,7 +25,11 @@ def get_twitter_api_object(TWITTER_OAUTH):
 
 
 def update_post_object(post):
-    """Update post object after the post is posted"""
+    """Update post instance after the post is posted.
+
+    :param post: Post model instance
+
+    """
     post.posted_time = timezone.now()
     post.is_posted = True
     post.save()
@@ -32,9 +38,9 @@ def update_post_object(post):
 def post_to_twitter(post_id):
     """Function to post on twitter.
 
-    :params post_id: uuid of the post instance to be posted
-    :returns: None
-    :raises WrongArguments: exception for providing invalid arguments
+    :param post_id: UUID of the post instance to be posted
+
+    :raises WrongArguments: Exception for providing invalid arguments
 
     """
     post = Post.objects.get(pk=post_id)
