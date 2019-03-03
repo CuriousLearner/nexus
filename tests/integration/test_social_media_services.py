@@ -13,10 +13,11 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 # nexus Stuff
 from tests import utils as u
 from tests import factories as f
+from nexus.social_media import tasks
 from nexus.social_media import services
 from nexus.social_media.models import Post
 from settings.development import TWITTER_OAUTH
-from nexus.base.exceptions import WrongArguments
+from nexus.base import exceptions as exc
 
 
 pytestmark = pytest.mark.django_db
@@ -61,6 +62,13 @@ def test_get_twitter_api_object(client):
                     TWITTER_OAUTH['access_key'], TWITTER_OAUTH['access_secret']) is None
                 assert mock_api.assert_called_once_with(mock_oauthhandler) is None
 
+                mock_api.side_effect = tweepy.error.TweepError('TweepError: Invalid twitter oauth tokens.')
+                try:
+                    services.get_twitter_api_object(TWITTER_OAUTH)
+                    assert False is True
+                except exc.WrongArguments:
+                    assert True is True
+
 
 def test_post_to_twitter(client):
     user = f.create_user(email='test@example.com', password='test')
@@ -78,17 +86,12 @@ def test_post_to_twitter(client):
 
     with mock.patch('nexus.social_media.services.get_twitter_api_object') as mock_api:
 
-        mock_api.return_value = False
-        try:
-            services.post_to_twitter(post_id)
-            assert True is False
-        except WrongArguments:
-            assert mock_api.assert_called_once_with(TWITTER_OAUTH) is None
-
         mock_api.return_value = tweepy.api
+
         # Post only with text
         with mock.patch('nexus.social_media.services.tweepy.api.update_status') as mock_update_status:
             services.post_to_twitter(post_id)
+            assert mock_api.assert_called_once_with(TWITTER_OAUTH) is None
             assert mock_update_status.assert_called_once_with(status=post['text']) is None
 
         # Post with text and image
@@ -111,3 +114,40 @@ def test_post_to_twitter(client):
         with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
             services.post_to_twitter(post_id)
             assert mock_update_with_media.assert_called_once_with(filename=image_file, file=post_instance.image) is None
+
+            # Raising a TweepError
+            mock_update_with_media.side_effect = tweepy.error.TweepError('TweepError: Unable to post to twitter')
+            try:
+                services.post_to_twitter(post_id)
+                assert True is False
+            except exc.BadRequest:
+                assert True is True
+
+
+@mock.patch('nexus.social_media.services.post_to_twitter')
+def test_publish_posts(mock_post_to_twitter, client):
+    core_organizer = f.create_user(is_core_organizer=True)
+    client.login(user=core_organizer)
+
+    url = reverse('posts-list')
+    post = {
+        'text': 'Announcement!',
+        'posted_at': 'twitter',
+        'scheduled_time': '2018-10-09T18:30:00Z'
+    }
+
+    response = client.json.post(url, json.dumps(post))
+    post_id = response.data['id']
+    post_instance = Post.objects.get(pk=post_id)
+
+    url = reverse('posts-approve', kwargs={'pk': post_id})
+    client.post(url)
+
+    services.publish_posts()
+    assert mock_post_to_twitter.assert_called_once_with(post_instance.id) is None
+
+
+@mock.patch('nexus.social_media.tasks.publish_posts')
+def test_calling_queue_posts(mock_publish_posts):
+    tasks.queue_posts()
+    assert mock_publish_posts.assert_called_once_with() is None
