@@ -11,7 +11,7 @@ from settings.development import TWITTER_OAUTH
 def update_post_object(post):
     """Update post instance after the post is published.
 
-    :param post: Post model instance
+    :param post: Post model instance.
 
     """
     post.posted_time = timezone.now()
@@ -22,12 +22,12 @@ def update_post_object(post):
 def get_twitter_api_object(TWITTER_OAUTH):
     """Function to generate a twitter api object.
 
-    :param TWITTER_OAUTH: A dictionary having essential twitter oauth token viz.
+    :param TWITTER_OAUTH: A dictionary having essential twitter oauth tokens viz.
     consumer_key, consumer_secret, access_key, access_secret.
 
     :returns: twitter API object.
 
-    :raises WrongArguments: Exception, when invalid twitter token are provided.
+    :raises WrongArguments: Exception, when invalid twitter oauth token(s) are provided.
 
     """
     try:
@@ -36,15 +36,15 @@ def get_twitter_api_object(TWITTER_OAUTH):
         twitter_api = tweepy.API(auth)
         return twitter_api
     except tweepy.error.TweepError:
-        raise exc.WrongArguments("Invalid Twitter Oauth Token(s).")
+        raise exc.WrongArguments("TweepError: Invalid Twitter OAuth Token(s).")
 
 
 def post_to_twitter(post_id):
     """Function to post on twitter.
 
-    :param post_id: UUID of the post instance to be posted
+    :param post_id: UUID of the post instance to be posted.
 
-    :raises BadRequest: Exception, when unable to post to twitter.
+    :raises BadRequest: Exception, when unable to post to twitter using tweepy.
 
     """
     post = Post.objects.get(pk=post_id)
@@ -62,7 +62,7 @@ def post_to_twitter(post_id):
         update_post_object(post)
 
     except tweepy.error.TweepError:
-        raise exc.BadRequest("TweepError: Tweeter post couldn't published!")
+        raise exc.BadRequest("TweepError: Unable to publish post on twitter.")
 
 
 def publish_posts():

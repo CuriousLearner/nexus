@@ -15,9 +15,9 @@ from tests import utils as u
 from tests import factories as f
 from nexus.social_media import tasks
 from nexus.social_media import services
+from nexus.base import exceptions as exc
 from nexus.social_media.models import Post
 from settings.development import TWITTER_OAUTH
-from nexus.base import exceptions as exc
 
 
 pytestmark = pytest.mark.django_db
@@ -46,7 +46,7 @@ def test_update_post_object(client):
     assert post_instance.posted_time.date() == timezone.now().date()
 
 
-def test_get_twitter_api_object(client):
+def test_get_twitter_api_object():
     with mock.patch('nexus.social_media.services.tweepy.OAuthHandler') as mock_oauthhandler:
         mock_oauthhandler.return_value = tweepy.OAuthHandler
 
@@ -62,7 +62,7 @@ def test_get_twitter_api_object(client):
                     TWITTER_OAUTH['access_key'], TWITTER_OAUTH['access_secret']) is None
                 assert mock_api.assert_called_once_with(mock_oauthhandler) is None
 
-                mock_api.side_effect = tweepy.error.TweepError('TweepError: Invalid twitter oauth tokens.')
+                mock_api.side_effect = tweepy.error.TweepError('TweepError: Invalid Twitter OAuth Token(s).')
                 try:
                     services.get_twitter_api_object(TWITTER_OAUTH)
                     assert False is True
@@ -84,14 +84,14 @@ def test_post_to_twitter(client):
     response = client.json.post(url, json.dumps(post))
     post_id = response.data['id']
 
-    with mock.patch('nexus.social_media.services.get_twitter_api_object') as mock_api:
+    with mock.patch('nexus.social_media.services.get_twitter_api_object') as mock_get_twitter_api_object:
 
-        mock_api.return_value = tweepy.api
+        mock_get_twitter_api_object.return_value = tweepy.api
 
         # Post only with text
         with mock.patch('nexus.social_media.services.tweepy.api.update_status') as mock_update_status:
             services.post_to_twitter(post_id)
-            assert mock_api.assert_called_once_with(TWITTER_OAUTH) is None
+            assert mock_get_twitter_api_object.assert_called_once_with(TWITTER_OAUTH) is None
             assert mock_update_status.assert_called_once_with(status=post['text']) is None
 
         # Post with text and image
