@@ -1,15 +1,9 @@
-# Third Party Stuff
-from celery.decorators import task
-
 # nexus Stuff
-from nexus.social_media import services
+from nexus.celery import app
+from nexus.social_media.services import publish_posts
 
 
-@task()
-def task_to_post_to_twitter(post_id):
-    """Celery task to post on twitter.
-
-    :param post_id: UUID of the post instance to be posted
-
-    """
-    services.post_to_twitter(post_id)
+@app.task(name='queue_posts')
+def queue_posts():
+    """Celery task to call services to publish posts on social media."""
+    publish_posts()
