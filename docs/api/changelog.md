@@ -4,6 +4,10 @@
     .container hr{margin-top: 5px; }
 </style>
 
+## Mar 6, 2019
+
+- Add services to publish social media post on twitter ([@GeekyShacklebolt])
+
 ## Dec 15, 2018
 - Add an app for `posts`. ([@realslimshanky])
   This adds following features:
