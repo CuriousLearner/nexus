@@ -1,76 +1,49 @@
-# Standard Stuff
+# Standard Library
 import json
+from unittest import mock
 
 # Third Party Stuff
 import pytest
 import tweepy
-from unittest import mock
-from django.urls import reverse
-from django.utils import timezone
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
-
+from django.urls import reverse
+from tests import factories as f
+from tests import utils as u
 
 # nexus Stuff
-from tests import utils as u
-from tests import factories as f
-from nexus.social_media import tasks
-from nexus.social_media import services
 from nexus.base import exceptions as exc
+from nexus.social_media import services, tasks
 from nexus.social_media.models import Post
-from settings.development import TWITTER_OAUTH
-
 
 pytestmark = pytest.mark.django_db
 
 
-def test_update_post_object(client):
-    user = f.create_user(email='test@example.com', password='test')
-    client.login(user=user)
+@mock.patch('nexus.social_media.services.tweepy.API')
+@mock.patch('nexus.social_media.services.tweepy.OAuthHandler.set_access_token')
+@mock.patch('nexus.social_media.services.tweepy.OAuthHandler')
+def test_get_twitter_api_object(mock_oauthhandler, mock_set_access_token, mock_api):
+    mock_oauthhandler.return_value = tweepy.OAuthHandler
+    services.get_twitter_api_object(settings.TWITTER_OAUTH)
 
-    url = reverse('posts-list')
-    post = {
-        'text': 'Announcement!',
-        'posted_at': 'twitter',
-        'scheduled_time': '2018-10-09T18:30:00Z'
-    }
+    mock_oauthhandler.assert_called_once_with(
+        settings.TWITTER_OAUTH['consumer_key'], settings.TWITTER_OAUTH['consumer_secret']
+    )
+    mock_set_access_token.assert_called_once_with(
+        settings.TWITTER_OAUTH['access_key'], settings.TWITTER_OAUTH['access_secret']
+    )
+    mock_api.assert_called_once_with(mock_oauthhandler)
 
-    response = client.json.post(url, json.dumps(post))
-    post_instance = Post.objects.get(pk=response.data['id'])
-
-    assert post_instance.is_posted is False
-    assert post_instance.posted_time is None
-
-    services.update_post_object(post_instance)
-
-    assert post_instance.is_posted is True
-    assert post_instance.posted_time.date() == timezone.now().date()
-
-
-def test_get_twitter_api_object():
-    with mock.patch('nexus.social_media.services.tweepy.OAuthHandler') as mock_oauthhandler:
-        mock_oauthhandler.return_value = tweepy.OAuthHandler
-
-        with mock.patch('nexus.social_media.services.tweepy.OAuthHandler.set_access_token') as mock_set_access_token:
-
-            with mock.patch('nexus.social_media.services.tweepy.API') as mock_api:
-
-                services.get_twitter_api_object(TWITTER_OAUTH)
-
-                assert mock_oauthhandler.assert_called_once_with(
-                    TWITTER_OAUTH['consumer_key'], TWITTER_OAUTH['consumer_secret']) is None
-                assert mock_set_access_token.assert_called_once_with(
-                    TWITTER_OAUTH['access_key'], TWITTER_OAUTH['access_secret']) is None
-                assert mock_api.assert_called_once_with(mock_oauthhandler) is None
-
-                mock_api.side_effect = tweepy.error.TweepError('TweepError: Invalid Twitter OAuth Token(s).')
-                try:
-                    services.get_twitter_api_object(TWITTER_OAUTH)
-                    assert False is True
-                except exc.WrongArguments:
-                    assert True is True
+    mock_api.side_effect = tweepy.error.TweepError('TweepError: Invalid Twitter OAuth Token(s).')
+    try:
+        services.get_twitter_api_object(settings.TWITTER_OAUTH)
+        assert False is True
+    except exc.WrongArguments:
+        assert True is True
 
 
-def test_post_to_twitter(client):
+@mock.patch('nexus.social_media.services.get_twitter_api_object')
+def test_post_to_twitter(mock_get_twitter_api_object, client):
     user = f.create_user(email='test@example.com', password='test')
     client.login(user=user)
 
@@ -84,44 +57,43 @@ def test_post_to_twitter(client):
     response = client.json.post(url, json.dumps(post))
     post_id = response.data['id']
 
-    with mock.patch('nexus.social_media.services.get_twitter_api_object') as mock_get_twitter_api_object:
+    mock_get_twitter_api_object.return_value = tweepy.api
 
-        mock_get_twitter_api_object.return_value = tweepy.api
+    # Post only with text
+    with mock.patch('nexus.social_media.services.tweepy.api.update_status') as mock_update_status:
+        services.post_to_twitter(post_id)
+        mock_get_twitter_api_object.assert_called_once_with(settings.TWITTER_OAUTH)
+        mock_update_status.assert_called_once_with(status=post['text'])
 
-        # Post only with text
-        with mock.patch('nexus.social_media.services.tweepy.api.update_status') as mock_update_status:
+    # Post with text and image
+    image = u.create_image(None, 'avatar.png')
+    image = SimpleUploadedFile('front.png', image.getvalue())
+    url = reverse('posts-upload-image', kwargs={'pk': post_id})
+    client.post(url, {'image': image}, format='multipart')
+
+    post_instance = Post.objects.get(pk=post_id)
+    image_file = post_instance.image.file.name
+
+    with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
+        services.post_to_twitter(post_id)
+        mock_update_with_media.assert_called_once_with(
+            filename=image_file, status=post['text'], file=post_instance.image
+        )
+
+    # Post only with image
+    post_instance.text = None
+    post_instance.save()
+    with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
+        services.post_to_twitter(post_id)
+        mock_update_with_media.assert_called_once_with(filename=image_file, file=post_instance.image)
+
+        # Raising a TweepError
+        mock_update_with_media.side_effect = tweepy.error.TweepError('TweepError: Unable to post to twitter')
+        try:
             services.post_to_twitter(post_id)
-            assert mock_get_twitter_api_object.assert_called_once_with(TWITTER_OAUTH) is None
-            assert mock_update_status.assert_called_once_with(status=post['text']) is None
-
-        # Post with text and image
-        image = u.create_image(None, 'avatar.png')
-        image = SimpleUploadedFile('front.png', image.getvalue())
-        url = reverse('posts-upload-image', kwargs={'pk': post_id})
-        client.post(url, {'image': image}, format='multipart')
-
-        post_instance = Post.objects.get(pk=post_id)
-        image_file = post_instance.image.file.name
-
-        with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
-            services.post_to_twitter(post_id)
-            assert mock_update_with_media.assert_called_once_with(
-                filename=image_file, status=post['text'], file=post_instance.image) is None
-
-        # Post only with image
-        post_instance.text = None
-        post_instance.save()
-        with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
-            services.post_to_twitter(post_id)
-            assert mock_update_with_media.assert_called_once_with(filename=image_file, file=post_instance.image) is None
-
-            # Raising a TweepError
-            mock_update_with_media.side_effect = tweepy.error.TweepError('TweepError: Unable to post to twitter')
-            try:
-                services.post_to_twitter(post_id)
-                assert True is False
-            except exc.BadRequest:
-                assert True is True
+            assert True is False
+        except exc.BadRequest:
+            assert True is True
 
 
 @mock.patch('nexus.social_media.services.post_to_twitter')
@@ -143,11 +115,11 @@ def test_publish_posts(mock_post_to_twitter, client):
     url = reverse('posts-approve', kwargs={'pk': post_id})
     client.post(url)
 
-    services.publish_posts()
-    assert mock_post_to_twitter.assert_called_once_with(post_instance.id) is None
+    services.service_to_publish_posts()
+    mock_post_to_twitter.assert_called_once_with(post_instance.id)
 
 
-@mock.patch('nexus.social_media.tasks.publish_posts')
-def test_calling_queue_posts(mock_publish_posts):
-    tasks.queue_posts()
-    assert mock_publish_posts.assert_called_once_with() is None
+@mock.patch('nexus.social_media.tasks.service_to_publish_posts')
+def test_calling_queue_posts(mock_service_publish_posts):
+    tasks.task_to_publish_posts()
+    mock_service_publish_posts.assert_called_once_with()

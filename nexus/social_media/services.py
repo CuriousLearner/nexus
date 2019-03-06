@@ -1,11 +1,11 @@
 # Third Party Stuff
 import tweepy
+from django.conf import settings
 from django.utils import timezone
 
 # nexus Stuff
 from nexus.base import exceptions as exc
 from nexus.social_media.models import Post
-from settings.development import TWITTER_OAUTH
 
 
 def update_post_object(post):
@@ -48,7 +48,7 @@ def post_to_twitter(post_id):
 
     """
     post = Post.objects.get(pk=post_id)
-    twitter_api = get_twitter_api_object(TWITTER_OAUTH)
+    twitter_api = get_twitter_api_object(settings.TWITTER_OAUTH)
 
     try:
         if post.image:
@@ -65,7 +65,7 @@ def post_to_twitter(post_id):
         raise exc.BadRequest("TweepError: Unable to publish post on twitter.")
 
 
-def publish_posts():
+def service_to_publish_posts():
     """Function to publish social media posts."""
     posts = Post.objects.filter(
         is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()

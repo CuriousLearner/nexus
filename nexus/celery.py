@@ -6,7 +6,7 @@ import raven
 from celery import Celery
 from django.conf import settings
 from dotenv import load_dotenv
-from raven.contrib.celery import register_signal, register_logger_signal
+from raven.contrib.celery import register_logger_signal, register_signal
 
 # Set the default Django settings module for the 'celery' program.
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
@@ -42,8 +42,8 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
-    'queue-posts': {
-        'task': 'queue_posts',
+    'task-to-publish-posts': {
+        'task': 'task_to_publish_posts',
         'schedule': BEAT_MINUTES['social_media_posts'] * 60,
     },
 }
