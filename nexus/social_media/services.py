@@ -53,10 +53,7 @@ def post_to_twitter(post_id):
     try:
         if post.image:
             filename = post.image.file.name
-            if post.text:
-                twitter_api.update_with_media(filename=filename, status=post.text, file=post.image)
-            else:
-                twitter_api.update_with_media(filename=filename, file=post.image)
+            twitter_api.update_with_media(filename=filename, status=post.text, file=post.image)
         elif post.text:
             twitter_api.update_status(status=post.text)
         update_post_object(post)
@@ -65,7 +62,7 @@ def post_to_twitter(post_id):
         raise exc.BadRequest("TweepError: Unable to publish post on twitter.")
 
 
-def service_to_publish_posts():
+def publish_posts_service():
     """Function to publish social media posts."""
     posts = Post.objects.filter(
         is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()

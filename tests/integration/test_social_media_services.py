@@ -59,13 +59,13 @@ def test_post_to_twitter(mock_get_twitter_api_object, client):
 
     mock_get_twitter_api_object.return_value = tweepy.api
 
-    # Post only with text
+    # Check post only with text
     with mock.patch('nexus.social_media.services.tweepy.api.update_status') as mock_update_status:
         services.post_to_twitter(post_id)
         mock_get_twitter_api_object.assert_called_once_with(settings.TWITTER_OAUTH)
         mock_update_status.assert_called_once_with(status=post['text'])
 
-    # Post with text and image
+    # Check post with image
     image = u.create_image(None, 'avatar.png')
     image = SimpleUploadedFile('front.png', image.getvalue())
     url = reverse('posts-upload-image', kwargs={'pk': post_id})
@@ -80,13 +80,6 @@ def test_post_to_twitter(mock_get_twitter_api_object, client):
             filename=image_file, status=post['text'], file=post_instance.image
         )
 
-    # Post only with image
-    post_instance.text = None
-    post_instance.save()
-    with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
-        services.post_to_twitter(post_id)
-        mock_update_with_media.assert_called_once_with(filename=image_file, file=post_instance.image)
-
         # Raising a TweepError
         mock_update_with_media.side_effect = tweepy.error.TweepError('TweepError: Unable to post to twitter')
         try:
@@ -97,7 +90,7 @@ def test_post_to_twitter(mock_get_twitter_api_object, client):
 
 
 @mock.patch('nexus.social_media.services.post_to_twitter')
-def test_publish_posts(mock_post_to_twitter, client):
+def test_publish_posts_service(mock_post_to_twitter, client):
     core_organizer = f.create_user(is_core_organizer=True)
     client.login(user=core_organizer)
 
@@ -115,11 +108,11 @@ def test_publish_posts(mock_post_to_twitter, client):
     url = reverse('posts-approve', kwargs={'pk': post_id})
     client.post(url)
 
-    services.service_to_publish_posts()
+    services.publish_posts_service()
     mock_post_to_twitter.assert_called_once_with(post_instance.id)
 
 
-@mock.patch('nexus.social_media.tasks.service_to_publish_posts')
-def test_calling_queue_posts(mock_service_publish_posts):
-    tasks.task_to_publish_posts()
-    mock_service_publish_posts.assert_called_once_with()
+@mock.patch('nexus.social_media.tasks.publish_posts_service')
+def test_calling_publish_posts_task(mock_publish_posts_service):
+    tasks.publish_posts_task()
+    assert mock_publish_posts_service.call_count == 1
