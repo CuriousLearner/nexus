@@ -5,7 +5,10 @@ import random
 
 # Third Party Stuff
 from django.core.files.base import File
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django_dynamic_fixture.fixture_algorithms.sequential_fixture import SequentialDataFixture
+# Nexus Stuff
+from tests.utils import create_image
 
 
 class PatchedSequentialDataFixture(SequentialDataFixture):
@@ -27,3 +30,8 @@ class PatchedSequentialDataFixture(SequentialDataFixture):
     def filefield_config(self, field, key):
         f = File('/tmp/a')
         return f
+
+    def versatileimagefield_config(self, field, key):
+        image = create_image(None, 'image.png')
+        image = SimpleUploadedFile('file.png', image.getvalue())
+        return image
