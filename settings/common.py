@@ -2,12 +2,9 @@
 
 see: https://docs.djangoproject.com/en/dev/ref/settings/
 """
-# Standard Library
-import os
 
 # Third Party Stuff
 import environ
-from dotenv import load_dotenv
 from django.utils.translation import ugettext_lazy as _
 
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
@@ -492,7 +489,7 @@ SITE_INFO = {
 
 # SOCIAL MEDIA CONFIGURATION
 # -----------------------------------------------------------------------------
+LIMIT_POSTS = False
 MAX_POSTS_AT_ONCE = 5
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
-FB_USER_ACCESS_TOKEN = os.getenv('FB_USER_ACCESS_TOKEN')
-FB_PAGE_ID = os.getenv('FB_PAGE_ID')
+FB_USER_ACCESS_TOKEN = env('FB_USER_ACCESS_TOKEN', default='NO USER ACCESS TOKEN')
+FB_PAGE_ID = env('FB_PAGE_ID', default='NO PAGE ID')
