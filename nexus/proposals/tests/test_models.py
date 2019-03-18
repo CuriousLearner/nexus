@@ -29,12 +29,12 @@ class TestProposalModel(TestCase):
         assert proposal.speaker == self.user
         assert proposal.title == 'Test Proposal'
         assert proposal.kind == self.proposalkind
-        assert str(proposal.level) == 'beginner'
+        assert proposal.level == Proposal.LEVELS_CHOICES.BEGINNER
         assert proposal.duration == '00:30:00'
         assert proposal.abstract == 'Proposal abstract'
         assert proposal.description == 'Proposal description'
         assert proposal.accepted_at is None
-        assert proposal.status == 'submitted'
+        assert proposal.status == Proposal.STATUS_CHOICES.SUBMITTED
         assert proposal.submitted_at is not None
         assert str(proposal) == str(proposal.title)
 
