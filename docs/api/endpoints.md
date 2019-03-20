@@ -372,6 +372,9 @@ Status: 201 Created
 POST /api/proposals/:id/accept
 ```
 
+**Request**
+No-Content
+
 **Response**
 Status: 200 OK
 ```json
@@ -421,6 +424,9 @@ Status: 200 OK
 ```
 POST /api/proposals/:id/retract (requires authentication and authorization)
 ```
+
+**Request**
+No-Content
 
 **Response**
 Status: 200 OK
@@ -562,6 +568,9 @@ POST /api/posts/:post_id/approve (requires authentication)
 
 __NOTE__: Only an Admin or a Moderator can approve a post.
 
+**Request**
+No-Content
+
 **Response**
 Status: 200 OK
 ```json
@@ -592,6 +601,9 @@ __NOTE__
 - Error out in case of normal user tries to unapprove a post.
 - Error out in case of trying to unapprove a post that has not been approved yet.
 - Error out in case of trying to unapprove a post that has already been published.
+
+**Request**
+No-Content
 
 **Response**
 Status: 200 OK
