@@ -32,6 +32,6 @@ class PatchedSequentialDataFixture(SequentialDataFixture):
         return f
 
     def versatileimagefield_config(self, field, key):
-        image = create_image(None, 'image.png')
-        image = SimpleUploadedFile('file.png', image.getvalue())
+        image = create_image(storage=None, filename='image.png')
+        image = SimpleUploadedFile(name='file.png', content=image.getvalue())
         return image

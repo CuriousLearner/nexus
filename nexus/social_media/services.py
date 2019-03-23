@@ -33,4 +33,6 @@ def post_to_facebook(post_id):
         else:
             page_graph.put_photo(image=post.image.file.open('rb'))
     elif post.text:
-        page_graph.put_object(settings.FB_PAGE_ID, 'feed',  message=post.text)
+        page_graph.put_object(
+            parent_object=settings.FB_PAGE_ID, connection_name='feed',  message=post.text
+        )

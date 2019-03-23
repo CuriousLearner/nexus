@@ -21,14 +21,16 @@ def test_post_published(mock_put_object, mock_put_photo, mock_page_graph):
 
     post = f.create_post(image=None)
     post_to_facebook(post.id)
-    mock_put_object.assert_called_with(ANY, 'feed', message=post.text)
+    mock_put_object.assert_called_with(
+        parent_object=ANY, connection_name='feed', message=post.text
+    )
 
     post = f.create_post(text=None)
-    post_to_facebook(post.id)
+    post_to_facebook(post_id=post.id)
     mock_put_photo.assert_called_with(image=ANY)
 
     post = f.create_post()
-    post_to_facebook(post.id)
+    post_to_facebook(post_id=post.id)
     mock_put_photo.assert_called_with(image=ANY, message=post.text)
 
 
