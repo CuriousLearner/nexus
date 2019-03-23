@@ -12,7 +12,7 @@ from nexus.social_media.services import post_to_facebook
 
 
 @app.task(name='queue_posts')
-def queue_posts():
+def publish_posts():
     if settings.LIMIT_POSTS is True and int(settings.LIMIT_POSTS) > 0:
         posts = Post.objects.filter(
             is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()

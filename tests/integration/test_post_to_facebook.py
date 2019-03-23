@@ -8,7 +8,7 @@ from tests import factories as f
 
 # nexus Stuff
 from nexus.social_media.services import post_to_facebook
-from nexus.social_media.tasks import queue_posts
+from nexus.social_media.tasks import publish_posts
 
 pytestmark = pytest.mark.django_db
 
@@ -36,13 +36,13 @@ def test_post_published(mock_put_object, mock_put_photo, mock_page_graph):
 
 @patch('nexus.social_media.tasks.settings')
 @patch('nexus.social_media.tasks.post_to_facebook.delay')
-def test_queue_posts_task(mock_delay, mock_settings):
+def test_publish_posts_task(mock_delay, mock_settings):
     mock_settings.MAX_POSTS_AT_ONCE = 2
     mock_settings.LIMIT_POSTS = False
 
     # Create an approved post with current time as scheduled time
     post = f.create_post(posted_at='fb', is_approved=True)
-    queue_posts()
+    publish_posts()
     mock_delay.assert_called_once_with(post.id)
     post.refresh_from_db()
     assert post.is_posted is True
@@ -51,5 +51,5 @@ def test_queue_posts_task(mock_delay, mock_settings):
     mock_settings.LIMIT_POSTS = True
     mock_delay.reset_mock()
     f.create_post(posted_at='fb', is_approved=True, n=3)
-    queue_posts()
+    publish_posts()
     assert mock_delay.call_count == 2
