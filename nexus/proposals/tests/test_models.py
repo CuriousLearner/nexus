@@ -1,5 +1,3 @@
-# Standard Stuff
-
 # Third Party Stuff
 from django.test import TestCase
 from tests import factories as f
