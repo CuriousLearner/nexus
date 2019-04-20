@@ -1,5 +1,6 @@
 # Standard Library
 import os
+from datetime import timedelta
 
 # Third Party Stuff
 import raven
@@ -37,4 +38,9 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
-app.conf.beat_schedule = {}
+app.conf.beat_schedule = {
+    'publish-posts': {
+        'task': 'publish_posts',
+        'schedule': timedelta(minutes=1),
+    },
+}

@@ -485,3 +485,8 @@ SITE_INFO = {
     'RELEASE_VERSION': RELEASE_VERSION,
     'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] != ''
 }
+
+LINKEDIN_AUTH = {
+    'access_token': env('LINKEDIN_ACCESS_TOKEN', default='FakeAccessToken'),
+    'organization_id': env('LINKEDIN_ORGANIZATION_ID', default='FakeOrganizationId'),
+}
