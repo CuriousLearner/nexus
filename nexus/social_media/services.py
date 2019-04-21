@@ -18,6 +18,42 @@ def update_post_object(post):
     post.save()
 
 
+def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
+    post_data_assets = {
+        "registerUploadRequest": {
+            "recipes": [
+                "urn:li:digitalmediaRecipe:feedshare-image"
+            ],
+            "owner": author,
+            "serviceRelationships": [
+                {
+                    "relationshipType": "OWNER",
+                    "identifier": "urn:li:userGeneratedContent"
+                }
+            ]
+        }
+    }
+
+    api_url_assets = f"{api_url_base}assets?action=registerUpload"
+
+    response_assets = requests.post(api_url_assets, json=post_data_assets,
+                                    headers=headers)
+    if response_assets.status_code == status.HTTP_200_OK:
+        json_response_assets = response_assets.json()
+        uploadUrl = json_response_assets.get('value')\
+                                        .get('uploadMechanism')\
+                                        .get('com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest')\
+                                        .get('uploadUrl')
+
+        asset = json_response_assets.get('value').get('asset')
+        with open(post.image.file.name, 'rb') as f:
+            response_upload_image = requests.post(uploadUrl, data=f.read(),
+                                                  headers={'Authorization': f"Bearer {linkedin['access_token']}"})
+        return (response_upload_image, asset)
+    else:
+        return (response_assets, None)
+
+
 def post_to_linkedin(post_id):
     """Function to post on linkedin
     :param post_id: UUID of the post instance to be posted.
@@ -33,8 +69,6 @@ def post_to_linkedin(post_id):
     api_url_base = 'https://api.linkedin.com/v2/'
 
     api_url_ugc = f"{api_url_base}ugcPosts"
-
-    api_url_assets = f'{api_url_base}assets?action=registerUpload'
 
     post = Post.objects.get(pk=post_id)
 
@@ -55,57 +89,32 @@ def post_to_linkedin(post_id):
     }
 
     if post.image:
-        post_data_assets = {
-            "registerUploadRequest": {
-                "recipes": [
-                    "urn:li:digitalmediaRecipe:feedshare-image"
-                ],
-                "owner": author,
-                "serviceRelationships": [
-                    {
-                        "relationshipType": "OWNER",
-                        "identifier": "urn:li:userGeneratedContent"
-                    }
-                ]
-            }
-        }
+        response_upload_image, asset = upload_image_to_linkedin(author,
+                                                                headers,
+                                                                post,
+                                                                api_url_base,
+                                                                linkedin)
 
-        response_assets = requests.post(api_url_assets, json=post_data_assets,
-                                        headers=headers)
-        if response_assets.status_code == status.HTTP_200_OK:
-            json_response_assets = response_assets.json()
-            uploadUrl = json_response_assets.get('value')\
-                                            .get('uploadMechanism')\
-                                            .get('com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest')\
-                                            .get('uploadUrl')
-
-            asset = json_response_assets.get('value').get('asset')
-            with open(post.image.file.name, 'rb') as f:
-                response_upload_file = requests.post(uploadUrl, data=f.read(),
-                                                     headers={'Authorization': f"Bearer {linkedin['access_token']}"})
-
-            if response_upload_file.status_code == status.HTTP_201_CREATED:
-                shareContent = post_data.get('specificContent')\
-                                        .get('com.linkedin.ugc.ShareContent')
-                image_media = [{
-                    "status": "READY",
-                    "description": {
-                        "text": ""
-                    },
-                    "media": asset,
-                    "title": {
-                        "text": ""
-                    }
-                }]
-                shareContent.update(shareMediaCategory='IMAGE',
-                                    media=image_media)
-                image_response = requests.post(api_url_ugc, headers=headers,
-                                               json=post_data)
-                return image_response
-            else:
-                return response_upload_file
+        if response_upload_image.status_code == status.HTTP_201_CREATED:
+            shareContent = post_data.get('specificContent')\
+                                    .get('com.linkedin.ugc.ShareContent')
+            image_media = [{
+                "status": "READY",
+                "description": {
+                    "text": ""
+                },
+                "media": asset,
+                "title": {
+                    "text": ""
+                }
+            }]
+            shareContent.update(shareMediaCategory='IMAGE',
+                                media=image_media)
+            image_response = requests.post(api_url_ugc, headers=headers,
+                                           json=post_data)
+            return image_response
         else:
-            return response_assets
+            return response_upload_image
     elif post.text:
         response = requests.post(api_url_ugc, headers=headers, json=post_data)
         return response
