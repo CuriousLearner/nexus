@@ -19,6 +19,14 @@ def update_post_object(post):
 
 
 def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
+    """Upload image to linkedin for given post.
+    :param author: Owner of the post to be used for response POST data.
+    :param headers: HTTP headers required for successful HTTP request.
+    :param post: Post model instance.
+    :param api_url_base: Base url for LinkedIn API.
+    :param linkedin: LINKEDIN_AUTH object taken from settings.
+    :returns: A valid HTTP response.
+    """
     post_data_assets = {
         "registerUploadRequest": {
             "recipes": [
