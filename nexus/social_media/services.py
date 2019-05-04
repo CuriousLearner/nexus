@@ -9,23 +9,21 @@ from nexus.base import exceptions as exc
 from nexus.social_media.models import Post
 
 
-def update_post_object(post):
-    """Update post instance after the post is published.
-    :param post: Post model instance.
-    """
-    post.posted_time = timezone.now()
-    post.is_posted = True
-    post.save()
-
-
 def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
     """Upload image to linkedin for given post.
+
     :param author: Owner of the post to be used for response POST data.
+
     :param headers: HTTP headers required for successful HTTP request.
+
     :param post: Post model instance.
+
     :param api_url_base: Base url for LinkedIn API.
+
     :param linkedin: LINKEDIN_AUTH object taken from settings.
+
     :returns: A valid HTTP response.
+
     """
     post_data_assets = {
         "registerUploadRequest": {
@@ -54,9 +52,8 @@ def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
                                         .get('uploadUrl')
 
         asset = json_response_assets.get('value').get('asset')
-        with open(post.image.file.name, 'rb') as f:
-            response_upload_image = requests.post(uploadUrl, data=f.read(),
-                                                  headers={'Authorization': f"Bearer {linkedin['access_token']}"})
+        response_upload_image = requests.post(uploadUrl, data=post.image.file.read(),
+                                              headers={'Authorization': f"Bearer {linkedin['access_token']}"})
         return (response_upload_image, asset)
     else:
         return (response_assets, None)
@@ -64,8 +61,11 @@ def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
 
 def post_to_linkedin(post_id):
     """Function to post on linkedin
+
     :param post_id: UUID of the post instance to be posted.
+
     :returns: A valid HTTP response
+
     """
     linkedin = settings.LINKEDIN_AUTH
     author = f"urn:li:organization:{linkedin['organization_id']}"
@@ -128,19 +128,22 @@ def post_to_linkedin(post_id):
         return response
 
 
-def appropriate_response_action(response, post):
+def appropriate_response_action(response):
     """Function to perform appropriate action based on the response given.
+
     :param response: A valid HTTP response to perform suitable action.
-    :param post: Post instance which is to be updated when a succesfull response is provided.
+
     :raises WrongArguments: Exception raised when either a 400 or 404 response is provided.
+
     :raises NotAuthenticated: Exception raised when a 401 response is provided.
+
     :raises PermissionDenied: Exception raised when a 403 response is provided.
+
     :raises NotSupported: Exception raised when a 405 response is provided.
+
     """
     status_code = response.status_code
-    if status_code == status.HTTP_201_CREATED:
-        update_post_object(post)
-    elif status_code != status.HTTP_201_CREATED:
+    if status_code != status.HTTP_201_CREATED:
         json_response = response.json()
         error = f"LinkedIn error: {json_response['message']}"
         if status_code == status.HTTP_400_BAD_REQUEST:
@@ -161,6 +164,10 @@ def publish_post_service():
         is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()
     )
     for post in posts:
+        post.posted_time = timezone.now()
+        post.is_posted = True
+        post.save()
+    for post in posts:
         if post.posted_at == 'linkedin':
             response = post_to_linkedin(post.id)
-            appropriate_response_action(response, post)
+            appropriate_response_action(response)

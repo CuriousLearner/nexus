@@ -486,6 +486,10 @@ SITE_INFO = {
     'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] != ''
 }
 
+
+# SOCIAL MEDIA CONFIGURATIONS
+# --------------------------------------------------------------------
+
 LINKEDIN_AUTH = {
     'access_token': env('LINKEDIN_ACCESS_TOKEN', default='FakeAccessToken'),
     'organization_id': env('LINKEDIN_ORGANIZATION_ID', default='FakeOrganizationId'),

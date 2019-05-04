@@ -7,7 +7,7 @@ import raven
 from celery import Celery
 from django.conf import settings
 from dotenv import load_dotenv
-from raven.contrib.celery import register_signal, register_logger_signal
+from raven.contrib.celery import register_logger_signal, register_signal
 
 # Set the default Django settings module for the 'celery' program.
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
@@ -40,7 +40,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
     'publish-posts': {
-        'task': 'publish_posts',
-        'schedule': timedelta(minutes=1),
+        'task': 'publish_posts_task',
+        'schedule': timedelta(minutes=10),
     },
 }
