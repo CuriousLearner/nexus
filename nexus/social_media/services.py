@@ -4,7 +4,6 @@ from django.conf import settings
 
 # nexus Stuff
 from nexus.base import exceptions
-from nexus.celery import app
 # Nexus Stuff
 from nexus.social_media.models import Post
 
@@ -23,7 +22,6 @@ def get_fb_page_graph():
     return page_graph
 
 
-@app.task(name="post_to_facebook")
 def post_to_facebook(post_id):
     post = Post.objects.get(pk=post_id)
     page_graph = get_fb_page_graph()
