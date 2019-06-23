@@ -13,9 +13,7 @@ from nexus.social_media.services import post_to_facebook
 
 @app.task(name='publish_posts_to_social_media')
 def publish_posts_to_social_media():
-    if settings.LIMIT_POSTS is True and \
-       isinstance(settings.MAX_POSTS_AT_ONCE, int) and \
-       int(settings.MAX_POSTS_AT_ONCE) > 0:
+    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
         posts = Post.objects.filter(
             is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
         )[:int(settings.MAX_POSTS_AT_ONCE)]

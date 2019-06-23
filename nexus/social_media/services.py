@@ -10,11 +10,11 @@ from nexus.social_media.models import Post
 
 def get_fb_page_graph():
     graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
-    accounts = graph.get_object('me/accounts')['data']
+    pages = graph.get_object('me/accounts')['data']
     page_access_token = None
-    for account in accounts:
-        if account['id'] == settings.FB_PAGE_ID:
-            page_access_token = account['access_token']
+    for page in pages:
+        if page['id'] == settings.FB_PAGE_ID:
+            page_access_token = page['access_token']
             break
     if page_access_token is None:
         raise exceptions.WrongArguments("Facebook Page access token could not be found")
