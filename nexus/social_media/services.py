@@ -12,12 +12,10 @@ def get_fb_page_graph():
     graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
     pages = graph.get_object('me/accounts')['data']
     page_access_token = None
-    for page in pages:
-        if page['id'] == settings.FB_PAGE_ID:
-            page_access_token = page['access_token']
-            break
-    if page_access_token is None:
+    page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    if not page_list:
         raise exceptions.WrongArguments("Facebook Page access token could not be found")
+    page_access_token = page_list[0]['access_token']
     page_graph = facebook.GraphAPI(page_access_token)
     return page_graph
 

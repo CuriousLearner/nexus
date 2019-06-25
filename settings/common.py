@@ -5,6 +5,7 @@ see: https://docs.djangoproject.com/en/dev/ref/settings/
 
 # Third Party Stuff
 import environ
+from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
@@ -494,4 +495,4 @@ MAX_POSTS_AT_ONCE = 5
 FB_USER_ACCESS_TOKEN = env('FB_USER_ACCESS_TOKEN', default='NO USER ACCESS TOKEN')
 FB_PAGE_ID = env('FB_PAGE_ID', default='NO PAGE ID')
 if not isinstance(MAX_POSTS_AT_ONCE, int):
-    raise Exception('MAX_POSTS_AT_ONCE should be an int')
+    raise exceptions.ImproperlyConfigured('MAX_POSTS_AT_ONCE should be an int')

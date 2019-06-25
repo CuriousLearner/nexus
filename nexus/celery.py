@@ -40,7 +40,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
     'queue-posts': {
-        'task': 'queue_posts',
+        'task': 'publish_posts_to_social_media',
         'schedule': timedelta(minutes=10),
     },
 }
