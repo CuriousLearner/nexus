@@ -31,3 +31,7 @@ def create_proposal(**kwargs):
 
 def create_proposal_kind(**kwargs):
     return G(apps.get_model('proposals.ProposalKind'), **kwargs)
+
+
+def create_post(**kwargs):
+    return G(apps.get_model('social_media.Post'), **kwargs)

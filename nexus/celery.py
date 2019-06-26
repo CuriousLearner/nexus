@@ -1,12 +1,13 @@
 # Standard Library
 import os
+from datetime import timedelta
 
 # Third Party Stuff
 import raven
 from celery import Celery
 from django.conf import settings
 from dotenv import load_dotenv
-from raven.contrib.celery import register_signal, register_logger_signal
+from raven.contrib.celery import register_logger_signal, register_signal
 
 # Set the default Django settings module for the 'celery' program.
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
@@ -37,4 +38,9 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
-app.conf.beat_schedule = {}
+app.conf.beat_schedule = {
+    'queue-posts': {
+        'task': 'publish_posts_to_social_media',
+        'schedule': timedelta(minutes=10),
+    },
+}
