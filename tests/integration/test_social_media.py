@@ -8,6 +8,9 @@ from django.urls import reverse
 from tests import factories as f
 from tests import utils as u
 
+# nexus Stuff
+from nexus.social_media.models import Post
+
 pytestmark = pytest.mark.django_db
 
 
@@ -133,9 +136,9 @@ def test_post_approved_api(client):
     assert response.data['is_approved'] is True
 
 
-def test_post_published_api(client):
-    user = f.create_user(email='test@example.com', password='test')
-    client.login(user=user)
+def test_unapproving_post_not_allowed_to_non_core_organizer(client):
+    non_core_organizer = f.create_user(email='test@example.com', password='test')
+    client.login(user=non_core_organizer)
 
     url = reverse('posts-list')
     post = {
@@ -147,38 +150,94 @@ def test_post_published_api(client):
     assert response.status_code == 201
     post_id = response.data['id']
 
-    # Check that a normal user is not able to publish the post
-    non_core_organizer = f.create_user(email='non_core@example.com', password='test')
-    client.login(user=non_core_organizer)
+    # Approve the post by core_organizer
+    core_organizer = f.create_user(is_core_organizer=True)
+    client.login(user=core_organizer)
     url = reverse('posts-approve', kwargs={'pk': post_id})
     response = client.post(url)
-    assert response.status_code == 403
+    assert response.status_code == 200
+    assert response.data['is_approved'] is True
 
+    # Unapprove the post by a non_core_organizer
+    client.login(user=non_core_organizer)
+    url = reverse('posts-unapprove', kwargs={'pk': post_id})
+    response = client.post(url)
+    assert response.status_code == 403
+    assert response.data['error_type'] == 'PermissionDenied'
+    assert response.data['errors'][0]['message'] == 'You do not have permission to perform this action.'
+
+
+def test_unapproving_post_allowed_to_core_organizer(client):
     core_organizer = f.create_user(is_core_organizer=True)
     client.login(user=core_organizer)
 
-    # Posted status before approval
-    url = reverse('posts-publish', kwargs={'pk': post_id})
-    response = client.post(url)
-    assert response.status_code == 400
+    url = reverse('posts-list')
+    post = {
+        'text': 'Announcement!',
+        'posted_at': 'fb',
+        'scheduled_time': '2018-10-09T18:30:00Z'
+    }
+    response = client.json.post(url, json.dumps(post))
+    assert response.status_code == 201
+    post_id = response.data['id']
 
+    # Approve the post
     url = reverse('posts-approve', kwargs={'pk': post_id})
     response = client.post(url)
     assert response.status_code == 200
 
-    # Posted status after approval
-    url = reverse('posts-publish', kwargs={'pk': post_id})
+    # Unapprove the post
+    url = reverse('posts-unapprove', kwargs={'pk': post_id})
     response = client.post(url)
     assert response.status_code == 200
-    assert response.data['is_posted'] is True
-    assert response.data['posted_time'] is not None
 
-    # Posted status if already posted
-    url = reverse('posts-publish', kwargs={'pk': post_id})
+
+def test_unapproving_post_throws_error_if_already_unapproved(client):
+    core_organizer = f.create_user(is_core_organizer=True)
+    client.login(user=core_organizer)
+
+    url = reverse('posts-list')
+    post = {
+        'text': 'Announcement!',
+        'posted_at': 'fb',
+        'scheduled_time': '2018-10-09T18:30:00Z'
+    }
+    response = client.json.post(url, json.dumps(post))
+    assert response.status_code == 201
+    post_id = response.data['id']
+
+    # Unapprove the post without approving
+    url = reverse('posts-unapprove', kwargs={'pk': post_id})
+    response = client.post(url)
+    assert response.status_code == 400
+    assert response.data['error_message'] == 'Post has not been approved yet'
+
+
+def test_unapproving_post_throws_error_if_already_published(client):
+    core_organizer = f.create_user(is_core_organizer=True)
+    client.login(user=core_organizer)
+
+    url = reverse('posts-list')
+    post = {
+        'text': 'Announcement!',
+        'posted_at': 'fb',
+        'scheduled_time': '2018-10-09T18:30:00Z'
+    }
+    response = client.json.post(url, json.dumps(post))
+    assert response.status_code == 201
+    post_id = response.data['id']
+
+    # Approve the post
+    url = reverse('posts-approve', kwargs={'pk': post_id})
     response = client.post(url)
     assert response.status_code == 200
-    assert response.data['is_posted'] is True
-    assert response.data['posted_time'] is not None
+
+    Post.objects.filter(pk=post_id).update(is_posted=True)
+
+    url = reverse('posts-unapprove', kwargs={'pk': post_id})
+    response = client.post(url)
+    assert response.status_code == 400
+    assert response.data['error_message'] == 'Can not unapprove, post has already been published'
 
 
 def test_staff_post_edit(client):

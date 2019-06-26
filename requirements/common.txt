@@ -63,3 +63,4 @@ phonenumbers==8.10.2
 django-phonenumber-field==2.1.0
 Markdown==2.6.11
 tweepy==3.7.0
+facebook-sdk==3.1.0

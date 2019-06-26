@@ -1,10 +1,11 @@
 # Third Party Stuff
+import facebook
 import tweepy
 from django.conf import settings
 from django.utils import timezone
 
 # nexus Stuff
-from nexus.base import exceptions as exc
+from nexus.base import exceptions
 from nexus.social_media.models import Post
 
 
@@ -36,7 +37,7 @@ def get_twitter_api_object(TWITTER_OAUTH):
         twitter_api = tweepy.API(auth)
         return twitter_api
     except tweepy.error.TweepError:
-        raise exc.WrongArguments("TweepError: Invalid Twitter OAuth Token(s).")
+        raise exceptions.WrongArguments("TweepError: Invalid Twitter OAuth Token(s).")
 
 
 def post_to_twitter(post_id):
@@ -59,7 +60,7 @@ def post_to_twitter(post_id):
         update_post_object(post)
 
     except tweepy.error.TweepError:
-        raise exc.BadRequest("TweepError: Unable to publish post on twitter.")
+        raise exceptions.BadRequest("TweepError: Unable to publish post on twitter.")
 
 
 def publish_posts_service():
@@ -72,3 +73,29 @@ def publish_posts_service():
             post_to_twitter(post.id)
         # if post.posted_at == 'fb':
         #     post_to_facebook(post.id)
+
+
+def get_fb_page_graph():
+    graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
+    pages = graph.get_object('me/accounts')['data']
+    page_access_token = None
+    page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    if not page_list:
+        raise exceptions.WrongArguments("Facebook Page access token could not be found")
+    page_access_token = page_list[0]['access_token']
+    page_graph = facebook.GraphAPI(page_access_token)
+    return page_graph
+
+
+def post_to_facebook(post_id):
+    post = Post.objects.get(pk=post_id)
+    page_graph = get_fb_page_graph()
+    if post.image:
+        if post.text:
+            page_graph.put_photo(image=post.image.file.open('rb'), message=post.text)
+        else:
+            page_graph.put_photo(image=post.image.file.open('rb'))
+    elif post.text:
+        page_graph.put_object(
+            parent_object=settings.FB_PAGE_ID, connection_name='feed', message=post.text
+        )

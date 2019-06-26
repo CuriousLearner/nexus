@@ -1,5 +1,6 @@
 # Standard Library
 import os
+from datetime import timedelta
 
 # Third Party Stuff
 import raven
@@ -42,8 +43,8 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
-    'publish-posts-task': {
-        'task': 'publish_posts_task',
-        'schedule': CELERY_BEAT_MINUTES['publish_posts_task'] * 60,
+    'queue-posts': {
+        'task': 'publish_posts_to_social_media',
+        'schedule': timedelta(minutes=10),
     },
 }

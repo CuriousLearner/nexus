@@ -8,6 +8,11 @@
 
 - Add services to publish social media post on twitter ([@GeekyShacklebolt])
 
+## Mar 5, 2019
+
+- Remove endpoint: publish a post via `POST /api/posts/:post_id/publish` ([@GeekyShacklebolt])
+- Add endpoint: unapprove a post via `POST /api/posts/:post_id/unapprove` ([@GeekyShacklebolt])
+
 ## Dec 15, 2018
 - Add an app for `posts`. ([@realslimshanky])
   This adds following features:
