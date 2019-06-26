@@ -491,8 +491,9 @@ SITE_INFO = {
 # SOCIAL MEDIA CONFIGURATION
 # -----------------------------------------------------------------------------
 LIMIT_POSTS = False
-MAX_POSTS_AT_ONCE = 5
+try:
+    MAX_POSTS_AT_ONCE = int(env('MAX_POSTS_AT_ONCE', default=5))
+except ValueError:
+    raise exceptions.ImproperlyConfigured('MAX_POSTS_AT_ONCE should be an int')
 FB_USER_ACCESS_TOKEN = env('FB_USER_ACCESS_TOKEN', default='NO USER ACCESS TOKEN')
 FB_PAGE_ID = env('FB_PAGE_ID', default='NO PAGE ID')
-if not isinstance(MAX_POSTS_AT_ONCE, int):
-    raise exceptions.ImproperlyConfigured('MAX_POSTS_AT_ONCE should be an int')
