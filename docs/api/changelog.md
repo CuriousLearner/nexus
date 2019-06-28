@@ -4,9 +4,13 @@
     .container hr{margin-top: 5px; }
 </style>
 
-## Mar 6, 2019
+## Jun 29, 2019
 
-- Add services to publish social media post on twitter ([@GeekyShacklebolt])
+- Add feature to publish social media post on twitter ([@GeekyShacklebolt])
+
+## Jun 26, 2019
+
+- Add feature to publish social media post on facebook ([@storymode7])
 
 ## Mar 5, 2019
 
