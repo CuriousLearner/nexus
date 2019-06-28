@@ -13,7 +13,7 @@ from tests import utils as u
 
 # nexus Stuff
 from nexus.base import exceptions as exc
-from nexus.social_media import services, tasks
+from nexus.social_media import services
 from nexus.social_media.models import Post
 
 pytestmark = pytest.mark.django_db
@@ -43,7 +43,7 @@ def test_get_twitter_api_object(mock_oauthhandler, mock_set_access_token, mock_a
 
 
 @mock.patch('nexus.social_media.services.get_twitter_api_object')
-def test_post_to_twitter(mock_get_twitter_api_object, client):
+def test_publish_posts_to_twitter_service(mock_get_twitter_api_object, client):
     user = f.create_user(email='test@example.com', password='test')
     client.login(user=user)
 
@@ -61,7 +61,7 @@ def test_post_to_twitter(mock_get_twitter_api_object, client):
 
     # Check post only with text
     with mock.patch('nexus.social_media.services.tweepy.api.update_status') as mock_update_status:
-        services.post_to_twitter(post_id)
+        services.publish_posts_to_twitter(post_id)
         mock_get_twitter_api_object.assert_called_once_with(settings.TWITTER_OAUTH)
         mock_update_status.assert_called_once_with(status=post['text'])
 
@@ -75,7 +75,7 @@ def test_post_to_twitter(mock_get_twitter_api_object, client):
     image_file = post_instance.image.file.name
 
     with mock.patch('nexus.social_media.services.tweepy.api.update_with_media') as mock_update_with_media:
-        services.post_to_twitter(post_id)
+        services.publish_posts_to_twitter(post_id)
         mock_update_with_media.assert_called_once_with(
             filename=image_file, status=post['text'], file=post_instance.image
         )
@@ -83,14 +83,14 @@ def test_post_to_twitter(mock_get_twitter_api_object, client):
         # Raising a TweepError
         mock_update_with_media.side_effect = tweepy.error.TweepError('TweepError: Unable to post to twitter')
         try:
-            services.post_to_twitter(post_id)
+            services.publish_posts_to_twitter(post_id)
             assert True is False
         except exc.BadRequest:
             assert True is True
 
 
-@mock.patch('nexus.social_media.services.post_to_twitter')
-def test_publish_posts_service(mock_post_to_twitter, client):
+@mock.patch('nexus.social_media.services.publish_posts_to_twitter')
+def test_publish_posts_to_social_media_service(mock_publish_posts_to_twitter, client):
     core_organizer = f.create_user(is_core_organizer=True)
     client.login(user=core_organizer)
 
@@ -108,11 +108,5 @@ def test_publish_posts_service(mock_post_to_twitter, client):
     url = reverse('posts-approve', kwargs={'pk': post_id})
     client.post(url)
 
-    services.publish_posts_service()
-    mock_post_to_twitter.assert_called_once_with(post_instance.id)
-
-
-@mock.patch('nexus.social_media.tasks.publish_posts_service')
-def test_calling_publish_posts_task(mock_publish_posts_service):
-    tasks.publish_posts_task()
-    assert mock_publish_posts_service.call_count == 1
+    services.publish_posts_to_social_media()
+    mock_publish_posts_to_twitter.assert_called_once_with(post_instance.id)
