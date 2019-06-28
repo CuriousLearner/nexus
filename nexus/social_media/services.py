@@ -1,3 +1,6 @@
+# Standard Library
+from datetime import datetime
+
 # Third Party Stuff
 import facebook
 import tweepy
@@ -6,18 +9,8 @@ from django.utils import timezone
 
 # nexus Stuff
 from nexus.base import exceptions
+from nexus.social_media import tasks
 from nexus.social_media.models import Post
-
-
-def update_post_object(post):
-    """Update post instance after the post is published.
-
-    :param post: Post model instance.
-
-    """
-    post.posted_time = timezone.now()
-    post.is_posted = True
-    post.save()
 
 
 def get_twitter_api_object(TWITTER_OAUTH):
@@ -40,7 +33,7 @@ def get_twitter_api_object(TWITTER_OAUTH):
         raise exceptions.WrongArguments("TweepError: Invalid Twitter OAuth Token(s).")
 
 
-def post_to_twitter(post_id):
+def publish_posts_to_twitter(post_id):
     """Function to post on twitter.
 
     :param post_id: UUID of the post instance to be posted.
@@ -57,22 +50,9 @@ def post_to_twitter(post_id):
             twitter_api.update_with_media(filename=filename, status=post.text, file=post.image)
         elif post.text:
             twitter_api.update_status(status=post.text)
-        update_post_object(post)
 
     except tweepy.error.TweepError:
         raise exceptions.BadRequest("TweepError: Unable to publish post on twitter.")
-
-
-def publish_posts_service():
-    """Function to publish social media posts."""
-    posts = Post.objects.filter(
-        is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()
-    )
-    for post in posts:
-        if post.posted_at == 'twitter':
-            post_to_twitter(post.id)
-        # if post.posted_at == 'fb':
-        #     post_to_facebook(post.id)
 
 
 def get_fb_page_graph():
@@ -87,7 +67,7 @@ def get_fb_page_graph():
     return page_graph
 
 
-def post_to_facebook(post_id):
+def publish_posts_to_facebook(post_id):
     post = Post.objects.get(pk=post_id)
     page_graph = get_fb_page_graph()
     if post.image:
@@ -99,3 +79,29 @@ def post_to_facebook(post_id):
         page_graph.put_object(
             parent_object=settings.FB_PAGE_ID, connection_name='feed', message=post.text
         )
+
+
+def publish_posts_to_social_media():
+    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
+        posts = Post.objects.filter(
+            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
+        )[:int(settings.MAX_POSTS_AT_ONCE)]
+    else:
+        posts = Post.objects.filter(
+            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
+        )
+
+    post_platform = {}
+    for post in posts:
+        post_platform.update({post.id: post.posted_at})
+
+    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
+        Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
+    else:
+        posts.update(is_posted=True)
+
+    for post_id in post_platform:
+        if post_platform[post_id] == 'fb':
+            tasks.publish_posts_to_facebook_task(post_id)
+        if post_platform[post_id] == 'twitter':
+            tasks.publish_posts_to_twitter_task(post_id)
