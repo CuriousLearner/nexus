@@ -12,10 +12,6 @@ from raven.contrib.celery import register_logger_signal, register_signal
 # Set the default Django settings module for the 'celery' program.
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings.development')
-# Time period in minutes before next celery beat
-CELERY_BEAT_MINUTES = {
-    'publish_posts_task': 30,
-}
 
 
 class CeleryCustomised(Celery):
@@ -44,7 +40,7 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.beat_schedule = {
     'queue-posts': {
-        'task': 'publish_posts_to_social_media',
+        'task': 'publish_posts_to_social_media_task',
         'schedule': timedelta(minutes=10),
     },
 }

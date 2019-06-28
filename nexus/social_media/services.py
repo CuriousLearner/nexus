@@ -29,8 +29,8 @@ def get_twitter_api_object(TWITTER_OAUTH):
         auth.set_access_token(TWITTER_OAUTH['access_key'], TWITTER_OAUTH['access_secret'])
         twitter_api = tweepy.API(auth)
         return twitter_api
-    except tweepy.error.TweepError:
-        raise exceptions.WrongArguments("TweepError: Invalid Twitter OAuth Token(s).")
+    except tweepy.error.TweepError as exc:
+        raise exceptions.WrongArguments("TweepError: Invalid Twitter OAuth Token(s). Reason: " + str(exc))
 
 
 def publish_posts_to_twitter(post_id):
@@ -51,8 +51,8 @@ def publish_posts_to_twitter(post_id):
         elif post.text:
             twitter_api.update_status(status=post.text)
 
-    except tweepy.error.TweepError:
-        raise exceptions.BadRequest("TweepError: Unable to publish post on twitter.")
+    except tweepy.error.TweepError as exc:
+        raise exceptions.BadRequest("TweepError: Unable to publish post on twitter. Reason: " + str(exc))
 
 
 def get_fb_page_graph():
@@ -91,6 +91,7 @@ def publish_posts_to_social_media():
             is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
         )
 
+    # Before bulk update, saving the IDs of posts along with there publishing platforms.
     post_platform = {}
     for post in posts:
         post_platform.update({post.id: post.posted_at})
@@ -98,10 +99,10 @@ def publish_posts_to_social_media():
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
         Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
     else:
-        posts.update(is_posted=True)
+        posts.update(is_posted=True, posted_time=timezone.now())
 
     for post_id in post_platform:
         if post_platform[post_id] == 'fb':
             tasks.publish_posts_to_facebook_task(post_id)
-        if post_platform[post_id] == 'twitter':
+        elif post_platform[post_id] == 'twitter':
             tasks.publish_posts_to_twitter_task(post_id)
