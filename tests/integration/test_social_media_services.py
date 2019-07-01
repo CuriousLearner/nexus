@@ -28,9 +28,7 @@ def base_data(client):
         'posted_at': 'linkedin',
         'scheduled_time': '2018-10-09T18:30:00Z'
     }
-
-    api_url_base = 'https://api.linkedin.com/v2/'
-    api_url_ugc = f"{api_url_base}ugcPosts"
+    api_url_ugc = f"{settings.LINKEDIN_API_URL_BASE}ugcPosts"
     linkedin = settings.LINKEDIN_AUTH
     author = f"urn:li:organization:{linkedin['organization_id']}"
     headers = {'X-Restli-Protocol-Version': '2.0.0',
@@ -61,7 +59,6 @@ def base_data(client):
     response = client.json.post(url, json.dumps(post))
 
     return (post,
-            api_url_base,
             api_url_ugc,
             linkedin,
             author,
@@ -73,7 +70,7 @@ def base_data(client):
 
 @pytest.fixture
 def base_data_for_image(base_data, client):
-    post, api_url_base, api_url_ugc, linkedin, author, headers, post_data, response, client = base_data
+    post, api_url_ugc, linkedin, author, headers, post_data, response, client = base_data
     post_id = response.data['id']
     image = u.create_image(None, 'avatar.png')
     image = SimpleUploadedFile('front.png', image.getvalue())
@@ -85,7 +82,7 @@ def base_data_for_image(base_data, client):
 
 @mock.patch('nexus.social_media.services.requests.post')
 def test_post_to_linkedin_without_image(mock_post, base_data):
-    post, api_url_base, api_url_ugc, linkedin, author, headers, post_data, response, client = base_data
+    post, api_url_ugc, linkedin, author, headers, post_data, response, client = base_data
     assert response.status_code == status.HTTP_201_CREATED
 
     expected_keys = {'text', 'posted_at', 'scheduled_time'}
@@ -106,7 +103,7 @@ def test_post_to_linkedin_without_image(mock_post, base_data):
 @mock.patch('nexus.social_media.services.upload_image_to_linkedin')
 def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
                                      mock_post, base_data_for_image):
-    post, api_url_base, api_url_ugc, linkedin, author, headers, post_data, response = base_data_for_image
+    post, api_url_ugc, linkedin, author, headers, post_data, response = base_data_for_image
 
     post_id = response.data['id']
     post_instance = Post.objects.get(pk=post_id)
@@ -121,7 +118,6 @@ def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
     mock_upload_image_to_linkedin.assert_called_once_with(author,
                                                           headers,
                                                           post_instance,
-                                                          api_url_base,
                                                           linkedin,)
     mock_post.assert_not_called()
     assert isinstance(unsuccessful_response, requests.Response)
@@ -150,7 +146,6 @@ def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
     mock_upload_image_to_linkedin.assert_called_once_with(author,
                                                           headers,
                                                           post_instance,
-                                                          api_url_base,
                                                           linkedin,)
     mock_post.assert_called_once_with(api_url_ugc, headers=headers,
                                       json=post_data)
@@ -161,7 +156,7 @@ def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
 @mock.patch('nexus.social_media.services.requests.Response.json')
 def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
 
-    post, api_url_base, api_url_ugc, linkedin, author, headers, post_data, response = base_data_for_image
+    post, api_url_ugc, linkedin, author, headers, post_data, response = base_data_for_image
 
     post_id = response.data['id']
     post_instance = Post.objects.get(pk=post_id)
@@ -181,14 +176,13 @@ def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
         }
     }
 
-    api_url_assets = f"{api_url_base}assets?action=registerUpload"
+    api_url_assets = f"{settings.LINKEDIN_API_URL_BASE}assets?action=registerUpload"
     mock_post.return_value = requests.Response()
 
     # When status code is not 200
     response_upload_image = services.upload_image_to_linkedin(author,
                                                               headers,
                                                               post_instance,
-                                                              api_url_base,
                                                               linkedin,)
     mock_post.assert_called_once_with(api_url_assets, json=post_data_assets,
                                       headers=headers)
@@ -198,7 +192,7 @@ def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
     assert isinstance(response_upload_image[1], type(None))
 
     # When status code is 200
-    uploadUrl = mock.Mock()
+    upload_url = mock.Mock()
     asset = mock.Mock()
     mock_post.return_value.status_code = status.HTTP_200_OK
     mock_json.return_value = {
@@ -206,7 +200,7 @@ def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
             "uploadMechanism": {
                 "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest": {
                     "headers": {},
-                    "uploadUrl": uploadUrl,
+                    "uploadUrl": upload_url,
                 }
             },
             "mediaArtifact": mock.Mock(),
@@ -217,7 +211,6 @@ def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
     response_upload_image = services.upload_image_to_linkedin(author,
                                                               headers,
                                                               post_instance,
-                                                              api_url_base,
                                                               linkedin,)
     # bring back the file pointer to starting postion as it's already read once
     # when the above call is made. So that reading it again in assertion
@@ -226,7 +219,7 @@ def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
     assert mock_post.call_count == 2
     mock_post.assert_has_calls([
         mock.call(api_url_assets, json=post_data_assets, headers=headers),
-        mock.call(uploadUrl, data=post_instance.image.file.read(),
+        mock.call(upload_url, data=post_instance.image.file.read(),
                   headers={'Authorization': f"Bearer {linkedin['access_token']}"})
     ])
     assert isinstance(response_upload_image, tuple)
@@ -307,7 +300,8 @@ def test_publish_post_service(mock_post_to_linkedin,
     assert post_instance.posted_time == current_time
     assert post_instance.is_posted
     mock_post_to_linkedin.assert_called_once_with(post_instance.id)
-    mock_appropriate_response_action.assert_called_once_with(mock_post_to_linkedin.return_value)
+    mock_appropriate_response_action.assert_called_once_with(
+        mock_post_to_linkedin.return_value)
 
 
 @mock.patch('nexus.social_media.tasks.publish_post_service')

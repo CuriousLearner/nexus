@@ -9,7 +9,7 @@ from nexus.base import exceptions as exc
 from nexus.social_media.models import Post
 
 
-def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
+def upload_image_to_linkedin(author, headers, post, linkedin):
     """Upload image to linkedin for given post.
 
     :param author: Owner of the post to be used for response POST data.
@@ -17,8 +17,6 @@ def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
     :param headers: HTTP headers required for successful HTTP request.
 
     :param post: Post model instance.
-
-    :param api_url_base: Base url for LinkedIn API.
 
     :param linkedin: LINKEDIN_AUTH object taken from settings.
 
@@ -40,19 +38,20 @@ def upload_image_to_linkedin(author, headers, post, api_url_base, linkedin):
         }
     }
 
-    api_url_assets = f"{api_url_base}assets?action=registerUpload"
+    api_url_assets = f"{settings.LINKEDIN_API_URL_BASE}assets?action=registerUpload"
 
     response_assets = requests.post(api_url_assets, json=post_data_assets,
                                     headers=headers)
     if response_assets.status_code == status.HTTP_200_OK:
         json_response_assets = response_assets.json()
-        uploadUrl = json_response_assets.get('value')\
-                                        .get('uploadMechanism')\
-                                        .get('com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest')\
-                                        .get('uploadUrl')
+        upload_url = json_response_assets.get('value')\
+                                         .get('uploadMechanism')\
+                                         .get('com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest')\
+                                         .get('uploadUrl')
 
         asset = json_response_assets.get('value').get('asset')
-        response_upload_image = requests.post(uploadUrl, data=post.image.file.read(),
+        response_upload_image = requests.post(upload_url,
+                                              data=post.image.file.read(),
                                               headers={'Authorization': f"Bearer {linkedin['access_token']}"})
         return (response_upload_image, asset)
     else:
@@ -74,9 +73,7 @@ def post_to_linkedin(post_id):
                'Content-Type': 'application/json',
                'Authorization': f"Bearer {linkedin['access_token']}"}
 
-    api_url_base = 'https://api.linkedin.com/v2/'
-
-    api_url_ugc = f"{api_url_base}ugcPosts"
+    api_url_ugc = f"{settings.LINKEDIN_API_URL_BASE}ugcPosts"
 
     post = Post.objects.get(pk=post_id)
 
@@ -100,7 +97,6 @@ def post_to_linkedin(post_id):
         response_upload_image, asset = upload_image_to_linkedin(author,
                                                                 headers,
                                                                 post,
-                                                                api_url_base,
                                                                 linkedin)
 
         if response_upload_image.status_code == status.HTTP_201_CREATED:

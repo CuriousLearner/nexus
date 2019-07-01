@@ -494,3 +494,4 @@ LINKEDIN_AUTH = {
     'access_token': env('LINKEDIN_ACCESS_TOKEN', default='FakeAccessToken'),
     'organization_id': env('LINKEDIN_ORGANIZATION_ID', default='FakeOrganizationId'),
 }
+LINKEDIN_API_URL_BASE = 'https://api.linkedin.com/v2/'
