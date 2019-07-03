@@ -41,12 +41,12 @@ def test_get_twitter_api_object(mock_oauthhandler, mock_set_access_token, mock_a
 @mock.patch('nexus.social_media.services.tweepy.api.update_with_media')
 @mock.patch('nexus.social_media.services.tweepy.api.update_status')
 @mock.patch('nexus.social_media.services.get_twitter_api_object')
-def test_publish_posts_to_twitter_service(mock_get_twitter_api_object, mock_update_status, mock_update_with_media):
+def test_publish_on_twitter_service(mock_get_twitter_api_object, mock_update_status, mock_update_with_media):
     mock_get_twitter_api_object.return_value = tweepy.api
 
     # Check post only with text
     post = f.create_post(image=None)
-    services.publish_posts_to_twitter(post.id)
+    services.publish_on_twitter(post.id)
     mock_get_twitter_api_object.assert_called_once_with(settings.TWITTER_OAUTH)
     mock_update_status.assert_called_once_with(status=post.text)
 
@@ -56,7 +56,7 @@ def test_publish_posts_to_twitter_service(mock_get_twitter_api_object, mock_upda
     image_file = post_instance.image.file.name
 
     mock_get_twitter_api_object.reset_mock()
-    services.publish_posts_to_twitter(post.id)
+    services.publish_on_twitter(post.id)
     mock_get_twitter_api_object.assert_called_once_with(settings.TWITTER_OAUTH)
     mock_update_with_media.assert_called_once_with(
         filename=image_file, status=post.text, file=post_instance.image
@@ -65,23 +65,23 @@ def test_publish_posts_to_twitter_service(mock_get_twitter_api_object, mock_upda
     # Raising a TweepError
     mock_update_with_media.side_effect = tweepy.error.TweepError('From twitter API.')
     with pytest.raises(exceptions.BadRequest) as exc:
-        services.publish_posts_to_twitter(post.id)
+        services.publish_on_twitter(post.id)
     assert exc.value.args[0] == 'TweepError: Unable to publish post on twitter. Reason: ' + 'From twitter API.'
 
 
-@mock.patch('nexus.social_media.services.tasks.publish_posts_to_twitter_task.s')
-def test_publish_posts_to_social_media_service_for_twitter(mock_publish_posts_to_twitter_task):
+@mock.patch('nexus.social_media.services.tasks.publish_on_twitter_task.s')
+def test_publish_on_social_media_service(mock_publish_on_twitter_task):
     post = f.create_post(is_approved=True, posted_at='twitter', posted_time=None)
     assert post.is_posted is False
-    services.publish_posts_to_social_media()
+    services.publish_on_social_media()
     post.refresh_from_db()
     assert post.is_posted is True
     assert post.posted_time is not None
-    mock_publish_posts_to_twitter_task.assert_called_once_with(post.id)
+    mock_publish_on_twitter_task.assert_called_once_with(post.id)
 
 
-@mock.patch('nexus.social_media.tasks.services.publish_posts_to_twitter')
-def test_publish_posts_to_twitter_task(mock_publish_posts_to_twitter):
+@mock.patch('nexus.social_media.tasks.services.publish_on_twitter')
+def test_publish_on_twitter_task(mock_publish_on_twitter):
     post = f.create_post()
-    tasks.publish_posts_to_twitter_task(post.id)
-    mock_publish_posts_to_twitter.assert_called_once_with(post.id)
+    tasks.publish_on_twitter_task(post.id)
+    mock_publish_on_twitter.assert_called_once_with(post.id)

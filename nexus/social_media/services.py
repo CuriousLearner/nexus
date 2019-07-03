@@ -33,7 +33,7 @@ def get_twitter_api_object(TWITTER_OAUTH):
         raise exceptions.WrongArguments("TweepError: Invalid Twitter OAuth Token(s). Reason: " + str(exc))
 
 
-def publish_posts_to_twitter(post_id):
+def publish_on_twitter(post_id):
     """Function to post on twitter.
 
     :param post_id: UUID of the post instance to be posted.
@@ -67,7 +67,7 @@ def get_fb_page_graph():
     return page_graph
 
 
-def publish_posts_to_facebook(post_id):
+def publish_on_facebook(post_id):
     post = Post.objects.get(pk=post_id)
     page_graph = get_fb_page_graph()
     if post.image:
@@ -81,7 +81,7 @@ def publish_posts_to_facebook(post_id):
         )
 
 
-def publish_posts_to_social_media():
+def publish_on_social_media():
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
         posts = Post.objects.filter(
             is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
@@ -103,6 +103,6 @@ def publish_posts_to_social_media():
 
     for post_id in post_platform:
         if post_platform[post_id] == 'fb':
-            tasks.publish_posts_to_facebook_task.s(post_id).apply_async()
+            tasks.publish_on_facebook_task.s(post_id).apply_async()
         elif post_platform[post_id] == 'twitter':
-            tasks.publish_posts_to_twitter_task.s(post_id).apply_async()
+            tasks.publish_on_twitter_task.s(post_id).apply_async()
