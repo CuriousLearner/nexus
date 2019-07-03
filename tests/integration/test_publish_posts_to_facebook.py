@@ -8,7 +8,7 @@ from tests import factories as f
 
 # nexus Stuff
 from nexus.social_media.services import publish_posts_to_facebook
-from nexus.social_media.tasks import publish_posts_to_social_media_task
+from nexus.social_media.tasks import publish_posts_to_social_media_task, publish_posts_to_facebook_task
 
 pytestmark = pytest.mark.django_db
 
@@ -35,21 +35,28 @@ def test_publish_posts_to_facebook_service(mock_put_object, mock_put_photo, mock
 
 
 @patch('nexus.social_media.services.settings')
-@patch('nexus.social_media.tasks.services.publish_posts_to_facebook')
-def test_publishing_limited_posts(mock_publish_posts_to_facebook, mock_settings):
+@patch('nexus.social_media.tasks.services.tasks.publish_posts_to_facebook_task.s')
+def test_publishing_limited_posts(mock_publish_posts_to_facebook_task, mock_settings):
     mock_settings.MAX_POSTS_AT_ONCE = 2
     mock_settings.LIMIT_POSTS = False
 
     # Create an approved post with current time as scheduled time
     post = f.create_post(posted_at='fb', is_approved=True)
     publish_posts_to_social_media_task()
-    mock_publish_posts_to_facebook.assert_called_once_with(post.id)
+    mock_publish_posts_to_facebook_task.assert_called_once_with(post.id)
     post.refresh_from_db()
     assert post.is_posted is True
     assert post.posted_time is not None
 
     mock_settings.LIMIT_POSTS = True
-    mock_publish_posts_to_facebook.reset_mock()
+    mock_publish_posts_to_facebook_task.reset_mock()
     f.create_post(posted_at='fb', is_approved=True, n=3)
     publish_posts_to_social_media_task()
-    assert mock_publish_posts_to_facebook.call_count == 2
+    assert mock_publish_posts_to_facebook_task.call_count == 2
+
+
+@patch('nexus.social_media.tasks.services.publish_posts_to_facebook')
+def test_publish_posts_to_facebook_task(mock_publish_posts_to_facebook):
+    post = f.create_post()
+    publish_posts_to_facebook_task(post.id)
+    mock_publish_posts_to_facebook.assert_called_once_with(post.id)

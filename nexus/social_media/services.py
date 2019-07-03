@@ -103,6 +103,6 @@ def publish_posts_to_social_media():
 
     for post_id in post_platform:
         if post_platform[post_id] == 'fb':
-            tasks.publish_posts_to_facebook_task(post_id)
+            tasks.publish_posts_to_facebook_task.s(post_id).apply_async()
         elif post_platform[post_id] == 'twitter':
-            tasks.publish_posts_to_twitter_task(post_id)
+            tasks.publish_posts_to_twitter_task.s(post_id).apply_async()

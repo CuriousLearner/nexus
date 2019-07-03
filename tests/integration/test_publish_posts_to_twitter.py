@@ -10,6 +10,7 @@ from tests import factories as f
 # nexus Stuff
 from nexus.base import exceptions
 from nexus.social_media import services
+from nexus.social_media import tasks
 from nexus.social_media.models import Post
 
 pytestmark = pytest.mark.django_db
@@ -68,12 +69,19 @@ def test_publish_posts_to_twitter_service(mock_get_twitter_api_object, mock_upda
     assert exc.value.args[0] == 'TweepError: Unable to publish post on twitter. Reason: ' + 'From twitter API.'
 
 
-@mock.patch('nexus.social_media.services.publish_posts_to_twitter')
-def test_publish_posts_to_social_media_service_for_twitter(mock_publish_posts_to_twitter):
+@mock.patch('nexus.social_media.services.tasks.publish_posts_to_twitter_task.s')
+def test_publish_posts_to_social_media_service_for_twitter(mock_publish_posts_to_twitter_task):
     post = f.create_post(is_approved=True, posted_at='twitter', posted_time=None)
     assert post.is_posted is False
     services.publish_posts_to_social_media()
     post.refresh_from_db()
     assert post.is_posted is True
     assert post.posted_time is not None
+    mock_publish_posts_to_twitter_task.assert_called_once_with(post.id)
+
+
+@mock.patch('nexus.social_media.tasks.services.publish_posts_to_twitter')
+def test_publish_posts_to_twitter_task(mock_publish_posts_to_twitter):
+    post = f.create_post()
+    tasks.publish_posts_to_twitter_task(post.id)
     mock_publish_posts_to_twitter.assert_called_once_with(post.id)
