@@ -1,17 +1,12 @@
 # Standard Library
-import json
 from unittest import mock
 
 # Third Party Stuff
 import pytest
 import requests
 from django.conf import settings
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.urls import reverse
-from django.utils import timezone
 from rest_framework import status
 from tests import factories as f
-from tests import utils as u
 
 # nexus Stuff
 from nexus.base import exceptions as exc
@@ -23,11 +18,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def base_data(client):
-    post = {
-        'text': 'Announcement!',
-        'posted_at': 'linkedin',
-        'scheduled_time': '2018-10-09T18:30:00Z'
-    }
+    post = f.create_post(image=None)
     api_url_ugc = f"{settings.LINKEDIN_API_URL_BASE}ugcPosts"
     linkedin = settings.LINKEDIN_AUTH
     author = f"urn:li:organization:{linkedin['organization_id']}"
@@ -41,7 +32,7 @@ def base_data(client):
         "specificContent": {
             "com.linkedin.ugc.ShareContent": {
                 "shareCommentary": {
-                    "text": post.get('text')
+                    "text": post.text
                 },
                 "shareMediaCategory": "NONE"
             },
@@ -51,49 +42,24 @@ def base_data(client):
         },
     }
 
-    user = f.create_user(email='test@example.com', password='test')
-    client.login(user=user)
-
-    url = reverse('posts-list')
-
-    response = client.json.post(url, json.dumps(post))
-
     return (post,
             api_url_ugc,
             linkedin,
             author,
             headers,
-            post_data,
-            response,
-            client,)
-
-
-@pytest.fixture
-def base_data_for_image(base_data, client):
-    post, api_url_ugc, linkedin, author, headers, post_data, response, client = base_data
-    post_id = response.data['id']
-    image = u.create_image(None, 'avatar.png')
-    image = SimpleUploadedFile('front.png', image.getvalue())
-    url = reverse('posts-upload-image', kwargs={'pk': post_id})
-    client.post(url, {'image': image}, format='multipart')
-    # removes client from the base_data tuple and return the remaining element
-    return tuple(x for x in base_data if x != client)
+            post_data,)
 
 
 @mock.patch('nexus.social_media.services.requests.post')
-def test_post_to_linkedin_without_image(mock_post, base_data):
-    post, api_url_ugc, linkedin, author, headers, post_data, response, client = base_data
-    assert response.status_code == status.HTTP_201_CREATED
+def test_publish_on_linkedin_without_image(mock_post, base_data):
+    post, api_url_ugc, linkedin, author, headers, post_data = base_data
 
-    expected_keys = {'text', 'posted_at', 'scheduled_time'}
-    assert expected_keys.issubset(response.data.keys())
-
-    post_id = response.data['id']
+    post_id = post.id
 
     mock_post.return_value = requests.Response()
 
     # check post only with text
-    response = services.post_to_linkedin(post_id)
+    response = services.publish_on_linkedin(post_id)
     mock_post.assert_called_once_with(api_url_ugc, headers=headers,
                                       json=post_data)
     assert isinstance(response, requests.Response)
@@ -101,11 +67,16 @@ def test_post_to_linkedin_without_image(mock_post, base_data):
 
 @mock.patch('nexus.social_media.services.requests.post')
 @mock.patch('nexus.social_media.services.upload_image_to_linkedin')
-def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
-                                     mock_post, base_data_for_image):
-    post, api_url_ugc, linkedin, author, headers, post_data, response = base_data_for_image
+def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin,
+                                        mock_post, base_data):
+    post, api_url_ugc, linkedin, author, headers, post_data = base_data
+    post = f.create_post()
+    post_data_text = post_data.get('specificContent')\
+                              .get('com.linkedin.ugc.ShareContent')\
+                              .get('shareCommentary')
+    post_data_text['text'] = post.text
 
-    post_id = response.data['id']
+    post_id = post.id
     post_instance = Post.objects.get(pk=post_id)
     mock_post.return_value = requests.Response()
     response_upload_image = requests.Response()
@@ -114,7 +85,7 @@ def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
     mock_upload_image_to_linkedin.return_value = (response_upload_image, asset)
 
     # if response_upload_image doesn't have a 201 status code
-    unsuccessful_response = services.post_to_linkedin(post_id)
+    unsuccessful_response = services.publish_on_linkedin(post_id)
     mock_upload_image_to_linkedin.assert_called_once_with(author,
                                                           headers,
                                                           post_instance,
@@ -142,7 +113,7 @@ def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
                         media=image_media)
 
     mock_upload_image_to_linkedin.reset_mock()
-    response_image = services.post_to_linkedin(post_id)
+    response_image = services.publish_on_linkedin(post_id)
     mock_upload_image_to_linkedin.assert_called_once_with(author,
                                                           headers,
                                                           post_instance,
@@ -154,11 +125,12 @@ def test_post_to_linkedin_with_image(mock_upload_image_to_linkedin,
 
 @mock.patch('nexus.social_media.services.requests.post')
 @mock.patch('nexus.social_media.services.requests.Response.json')
-def test_upload_image_to_linkedin(mock_json, mock_post, base_data_for_image):
+def test_upload_image_to_linkedin(mock_json, mock_post, base_data):
 
-    post, api_url_ugc, linkedin, author, headers, post_data, response = base_data_for_image
+    post, api_url_ugc, linkedin, author, headers, post_data = base_data
 
-    post_id = response.data['id']
+    post = f.create_post()
+    post_id = post.id
     post_instance = Post.objects.get(pk=post_id)
 
     post_data_assets = {
@@ -262,49 +234,24 @@ def test_appropriate_response_action(mock_response):
     assert error in str(excinfo.value)
 
 
-@mock.patch('nexus.social_media.services.timezone')
-@mock.patch('nexus.social_media.services.appropriate_response_action')
-@mock.patch('nexus.social_media.services.post_to_linkedin')
-def test_publish_post_service(mock_post_to_linkedin,
-                              mock_appropriate_response_action,
-                              mock_timezone,
-                              client):
-    core_organizer = f.create_user(is_core_organizer=True)
-    client.login(user=core_organizer)
-
-    url = reverse('posts-list')
-    post = {
-        'text': 'Announcement!',
-        'posted_at': 'linkedin',
-        'scheduled_time': '2018-10-09T18:30:00Z'
-    }
-
-    response = client.json.post(url, json.dumps(post))
-    post_id = response.data['id']
-
-    url = reverse('posts-approve', kwargs={'pk': post_id})
-    client.post(url)
-
-    post_instance = Post.objects.get(pk=post_id)
-    assert post_instance.is_approved
-
-    current_time = timezone.now()
-
-    mock_post_to_linkedin.return_value = requests.Response()
-    mock_timezone.now.return_value = current_time
-
-    services.publish_post_service()
-
-    post_instance = Post.objects.get(pk=post_id)
-
-    assert post_instance.posted_time == current_time
-    assert post_instance.is_posted
-    mock_post_to_linkedin.assert_called_once_with(post_instance.id)
-    mock_appropriate_response_action.assert_called_once_with(
-        mock_post_to_linkedin.return_value)
+@mock.patch('nexus.social_media.tasks.services.appropriate_response_action')
+@mock.patch('nexus.social_media.tasks.services.publish_on_linkedin')
+def test_publish_on_linkedin_task(mock_publish_on_linkedin,
+                                  mock_appropriate_response_action):
+    post = f.create_post()
+    tasks.publish_on_linkedin_task(post.id)
+    # mock_publish_on_linkedin.return_value = requests.Response()
+    mock_publish_on_linkedin.assert_called_once_with(post.id)
+    mock_appropriate_response_action.assert_called_once()
 
 
-@mock.patch('nexus.social_media.tasks.publish_post_service')
-def test_publish_post_task(mock_publish_post_service):
-    tasks.publish_posts_to_social_media()
-    mock_publish_post_service.assert_called_once()
+@mock.patch('nexus.social_media.services.tasks.publish_on_linkedin_task.s')
+def test_publish_on_social_media_service(mock_publish_on_linkedin_task):
+    post = f.create_post(is_approved=True, posted_at='linkedin',
+                         posted_time=None)
+    assert post.is_posted is False
+    services.publish_on_social_media()
+    post.refresh_from_db()
+    assert post.is_posted is True
+    assert post.posted_time is not None
+    mock_publish_on_linkedin_task.assert_called_once_with(post.id)

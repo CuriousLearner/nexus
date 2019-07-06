@@ -1,3 +1,6 @@
+# Standard Library
+from datetime import datetime
+
 # Third Party Stuff
 import requests
 from django.conf import settings
@@ -6,6 +9,7 @@ from rest_framework import status
 import facebook
 
 # nexus Stuff
+from nexus.social_media import tasks
 from nexus.base import exceptions as exc
 from nexus.social_media.models import Post
 
@@ -59,7 +63,7 @@ def upload_image_to_linkedin(author, headers, post, linkedin):
         return (response_assets, None)
 
 
-def post_to_linkedin(post_id):
+def publish_on_linkedin(post_id):
     """Function to post on linkedin
 
     :param post_id: UUID of the post instance to be posted.
@@ -155,21 +159,6 @@ def appropriate_response_action(response):
             raise exc.NotSupported(error)
 
 
-def publish_post_service():
-    """Function to publish social media post"""
-    posts = Post.objects.filter(
-        is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()
-    )
-    for post in posts:
-        post.posted_time = timezone.now()
-        post.is_posted = True
-        post.save()
-    for post in posts:
-        if post.posted_at == 'linkedin':
-            response = post_to_linkedin(post.id)
-            appropriate_response_action(response)
-
-
 def get_fb_page_graph():
     graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
     pages = graph.get_object('me/accounts')['data']
@@ -182,7 +171,7 @@ def get_fb_page_graph():
     return page_graph
 
 
-def post_to_facebook(post_id):
+def publish_on_facebook(post_id):
     post = Post.objects.get(pk=post_id)
     page_graph = get_fb_page_graph()
     if post.image:
@@ -192,5 +181,32 @@ def post_to_facebook(post_id):
             page_graph.put_photo(image=post.image.file.open('rb'))
     elif post.text:
         page_graph.put_object(
-            parent_object=settings.FB_PAGE_ID, connection_name='feed',  message=post.text
+            parent_object=settings.FB_PAGE_ID, connection_name='feed', message=post.text
         )
+
+
+def publish_on_social_media():
+    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
+        posts = Post.objects.filter(
+            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
+        )[:int(settings.MAX_POSTS_AT_ONCE)]
+    else:
+        posts = Post.objects.filter(
+            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
+        )
+
+    # Before bulk update, saving the IDs of posts along with there publishing platforms.
+    post_platform = {}
+    for post in posts:
+        post_platform.update({post.id: post.posted_at})
+
+    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
+        Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
+    else:
+        posts.update(is_posted=True, posted_time=timezone.now())
+
+    for post_id in post_platform:
+        if post_platform[post_id] == 'fb':
+            tasks.publish_on_facebook_task.s(post_id).apply_async()
+        elif post_platform[post_id] == 'linkedin':
+            tasks.publish_on_linkedin_task.s(post_id).apply_async()
