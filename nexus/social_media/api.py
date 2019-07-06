@@ -17,7 +17,7 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     permission_classes = (IsAuthenticated, permissions.IsAdminOrAuthorOfPost)
 
     def get_serializer_class(self):
-        if self.action in ('approve', 'publish'):
+        if self.action in ('approve', 'unapprove'):
             return serializers.AdminPostSerializer
         return serializers.PostSerializer
 
@@ -35,19 +35,18 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             return response.Ok(serializer.data)
 
     @action(methods=['POST'], detail=True, permission_classes=[permissions.IsCoreOrganizer])
-    def publish(self, request, pk=None):
+    def unapprove(self, request, pk=None):
         instance = self.get_object()
         if not instance.is_approved:
             return response.BadRequest({'error_message': 'Post has not been approved yet'})
-        if not instance.is_posted:
-            data = {'is_posted': True, 'posted_time': timezone.now()}
+        elif not instance.is_posted:
+            data = {'is_approved': False, 'approval_time': None}
             serializer = self.get_serializer(instance, data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return response.Ok(serializer.data)
         else:
-            serializer = self.get_serializer(instance)
-            return response.Ok(serializer.data)
+            return response.BadRequest({'error_message': 'Can not unapprove, post has already been published'})
 
     @action(methods=['POST'], detail=True)
     @parser_classes((FormParser, MultiPartParser))

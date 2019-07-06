@@ -372,6 +372,9 @@ Status: 201 Created
 POST /api/proposals/:id/accept
 ```
 
+**Request**
+No-Content
+
 **Response**
 Status: 200 OK
 ```json
@@ -421,6 +424,9 @@ Status: 200 OK
 ```
 POST /api/proposals/:id/retract (requires authentication and authorization)
 ```
+
+**Request**
+No-Content
 
 **Response**
 Status: 200 OK
@@ -562,6 +568,9 @@ POST /api/posts/:post_id/approve (requires authentication)
 
 __NOTE__: Only an Admin or a Moderator can approve a post.
 
+**Request**
+No-Content
+
 **Response**
 Status: 200 OK
 ```json
@@ -576,6 +585,40 @@ Status: 200 OK
     "image": "http://xyz.com/url/to/uploaded_image.jpg",
     "is_approved": true,
     "approved_time": "2018-09-05T15:20:00Z",
+    "is_posted": false,
+    "posted_time": null
+}
+```
+
+## Unpproving a post
+
+```
+POST /api/posts/:post_id/unapprove (requires authentication)
+```
+
+__NOTE__
+- Only an Admin or a Moderator can unapprove a post that is approved but not published.
+- Error out in case of normal user tries to unapprove a post.
+- Error out in case of trying to unapprove a post that has not been approved yet.
+- Error out in case of trying to unapprove a post that has already been published.
+
+**Request**
+No-Content
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "posted_by": "01ade2ff-ab21-231f-a12b3c4d5e79",
+    "posted_on": "twitter",
+    "created_at": "2018-08-01T17:30:42Z",
+    "modified_at": "2018-09-03T14:23:01Z",
+    "scheduled_time": "2018-10-01T11:00:00Z",
+    "text": "anything that user has to write",
+    "image": "http://xyz.com/url/to/uploaded_image.jpg",
+    "is_approved": false,
+    "approved_time": null,
     "is_posted": false,
     "posted_time": null
 }

@@ -3,6 +3,7 @@ import requests
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import status
+import facebook
 
 # nexus Stuff
 from nexus.base import exceptions as exc
@@ -167,3 +168,29 @@ def publish_post_service():
         if post.posted_at == 'linkedin':
             response = post_to_linkedin(post.id)
             appropriate_response_action(response)
+
+
+def get_fb_page_graph():
+    graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
+    pages = graph.get_object('me/accounts')['data']
+    page_access_token = None
+    page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    if not page_list:
+        raise exc.WrongArguments("Facebook Page access token could not be found")
+    page_access_token = page_list[0]['access_token']
+    page_graph = facebook.GraphAPI(page_access_token)
+    return page_graph
+
+
+def post_to_facebook(post_id):
+    post = Post.objects.get(pk=post_id)
+    page_graph = get_fb_page_graph()
+    if post.image:
+        if post.text:
+            page_graph.put_photo(image=post.image.file.open('rb'), message=post.text)
+        else:
+            page_graph.put_photo(image=post.image.file.open('rb'))
+    elif post.text:
+        page_graph.put_object(
+            parent_object=settings.FB_PAGE_ID, connection_name='feed',  message=post.text
+        )

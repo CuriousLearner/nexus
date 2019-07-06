@@ -2,8 +2,10 @@
 
 see: https://docs.djangoproject.com/en/dev/ref/settings/
 """
+
 # Third Party Stuff
 import environ
+from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
@@ -495,3 +497,11 @@ LINKEDIN_AUTH = {
     'organization_id': env('LINKEDIN_ORGANIZATION_ID', default='FakeOrganizationId'),
 }
 LINKEDIN_API_URL_BASE = 'https://api.linkedin.com/v2/'
+
+LIMIT_POSTS = False
+try:
+    MAX_POSTS_AT_ONCE = int(env('MAX_POSTS_AT_ONCE', default=5))
+except ValueError:
+    raise exceptions.ImproperlyConfigured('MAX_POSTS_AT_ONCE should be an int')
+FB_USER_ACCESS_TOKEN = env('FB_USER_ACCESS_TOKEN', default='NO USER ACCESS TOKEN')
+FB_PAGE_ID = env('FB_PAGE_ID', default='NO PAGE ID')
