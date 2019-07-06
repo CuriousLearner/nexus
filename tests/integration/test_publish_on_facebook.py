@@ -8,7 +8,7 @@ from tests import factories as f
 
 # nexus Stuff
 from nexus.social_media.services import publish_on_facebook
-from nexus.social_media.tasks import publish_on_social_media_task, publish_on_facebook_task
+from nexus.social_media.tasks import publish_on_facebook_task, publish_on_social_media_task
 
 pytestmark = pytest.mark.django_db
 
@@ -16,7 +16,8 @@ pytestmark = pytest.mark.django_db
 @patch('nexus.social_media.services.get_fb_page_graph')
 @patch('nexus.social_media.services.facebook.GraphAPI.put_photo')
 @patch('nexus.social_media.services.facebook.GraphAPI.put_object')
-def test_publish_on_facebook_service(mock_put_object, mock_put_photo, mock_page_graph):
+def test_publish_on_facebook_service(mock_put_object, mock_put_photo,
+                                     mock_page_graph):
     mock_page_graph.return_value = GraphAPI
 
     post = f.create_post(image=None)
@@ -36,7 +37,8 @@ def test_publish_on_facebook_service(mock_put_object, mock_put_photo, mock_page_
 
 @patch('nexus.social_media.services.settings')
 @patch('nexus.social_media.tasks.services.tasks.publish_on_facebook_task.s')
-def test_publishing_limited_posts(mock_publish_on_facebook_task, mock_settings):
+def test_publishing_limited_posts(mock_publish_on_facebook_task,
+                                  mock_settings):
     mock_settings.MAX_POSTS_AT_ONCE = 2
     mock_settings.LIMIT_POSTS = False
 

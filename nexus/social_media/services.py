@@ -2,15 +2,15 @@
 from datetime import datetime
 
 # Third Party Stuff
+import facebook
 import requests
 from django.conf import settings
 from django.utils import timezone
 from rest_framework import status
-import facebook
 
 # nexus Stuff
-from nexus.social_media import tasks
 from nexus.base import exceptions as exc
+from nexus.social_media import tasks
 from nexus.social_media.models import Post
 
 
@@ -176,23 +176,27 @@ def publish_on_facebook(post_id):
     page_graph = get_fb_page_graph()
     if post.image:
         if post.text:
-            page_graph.put_photo(image=post.image.file.open('rb'), message=post.text)
+            page_graph.put_photo(image=post.image.file.open('rb'),
+                                 message=post.text)
         else:
             page_graph.put_photo(image=post.image.file.open('rb'))
     elif post.text:
         page_graph.put_object(
-            parent_object=settings.FB_PAGE_ID, connection_name='feed', message=post.text
+            parent_object=settings.FB_PAGE_ID, connection_name='feed',
+            message=post.text
         )
 
 
 def publish_on_social_media():
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
         posts = Post.objects.filter(
-            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
+            is_approved=True, is_posted=False,
+            scheduled_time__lte=datetime.now()
         )[:int(settings.MAX_POSTS_AT_ONCE)]
     else:
         posts = Post.objects.filter(
-            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
+            is_approved=True, is_posted=False,
+            scheduled_time__lte=datetime.now()
         )
 
     # Before bulk update, saving the IDs of posts along with there publishing platforms.
@@ -201,7 +205,8 @@ def publish_on_social_media():
         post_platform.update({post.id: post.posted_at})
 
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
-        Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
+        Post.objects.filter(id__in=posts).update(is_posted=True,
+                                                 posted_time=timezone.now())
     else:
         posts.update(is_posted=True, posted_time=timezone.now())
 
