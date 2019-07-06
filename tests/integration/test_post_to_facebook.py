@@ -8,7 +8,7 @@ from tests import factories as f
 
 # nexus Stuff
 from nexus.social_media.services import post_to_facebook
-from nexus.social_media.tasks import publish_posts_to_social_media
+from nexus.social_media.tasks import publish_posts_to_social_media_new
 
 pytestmark = pytest.mark.django_db
 
@@ -42,7 +42,7 @@ def test_publish_limited_posts(mock_post_to_facebook, mock_settings):
 
     # Create an approved post with current time as scheduled time
     post = f.create_post(posted_at='fb', is_approved=True)
-    publish_posts_to_social_media()
+    publish_posts_to_social_media_new()
     mock_post_to_facebook.assert_called_once_with(post.id)
     post.refresh_from_db()
     assert post.is_posted is True
@@ -51,5 +51,5 @@ def test_publish_limited_posts(mock_post_to_facebook, mock_settings):
     mock_settings.LIMIT_POSTS = True
     mock_post_to_facebook.reset_mock()
     f.create_post(posted_at='fb', is_approved=True, n=3)
-    publish_posts_to_social_media()
+    publish_posts_to_social_media_new()
     assert mock_post_to_facebook.call_count == 2
