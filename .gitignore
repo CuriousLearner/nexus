@@ -68,7 +68,7 @@ node_modules/
 .sass-cache
 
 # Celery
-celerybeat-schedule
+celerybeat-schedule.*
 
 # Vagrant
 .vagrant
