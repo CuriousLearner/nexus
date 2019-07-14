@@ -93,7 +93,7 @@ def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin,
     mock_post.assert_not_called()
     assert isinstance(unsuccessful_response, requests.Response)
 
-    # if response_upload_image_have a 201 status code
+    # if response_upload_image have a 201 status code
     response_upload_image.status_code = status.HTTP_201_CREATED
 
     shareContent = post_data.get('specificContent')\
