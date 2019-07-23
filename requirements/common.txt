@@ -18,7 +18,7 @@ pytz==2018.7
 # -------------------------------------
 psycopg2-binary==2.7.6.1
 
-Pillow==5.0.0
+Pillow==5.4.1
 django-extensions==2.1.4
 django-uuid-upload-path==1.0.0
 django-versatileimagefield==1.10
