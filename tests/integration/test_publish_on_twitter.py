@@ -31,11 +31,11 @@ def test_get_twitter_api_object(mock_oauthhandler, mock_set_access_token, mock_a
     )
     mock_api.assert_called_once_with(mock_oauthhandler)
 
-    mock_api.side_effect = tweepy.error.TweepError('From twitter API.')
+    mock_api.side_effect = tweepy.error.TweepError('Reason from twitter')
 
     with pytest.raises(exceptions.WrongArguments) as exc:
         services.get_twitter_api_object(settings.TWITTER_OAUTH)
-    assert exc.value.args[0] == 'TweepError: Invalid Twitter OAuth Token(s). Reason: ' + 'From twitter API.'
+    assert exc.value.args[0] == 'Reason from twitter'
 
 
 @mock.patch('nexus.social_media.services.tweepy.api.update_with_media')
@@ -63,10 +63,10 @@ def test_publish_on_twitter_service(mock_get_twitter_api_object, mock_update_sta
     )
 
     # Raising a TweepError
-    mock_update_with_media.side_effect = tweepy.error.TweepError('From twitter API.')
+    mock_update_with_media.side_effect = tweepy.error.TweepError('Reason from twitter')
     with pytest.raises(exceptions.BadRequest) as exc:
         services.publish_on_twitter(post.id)
-    assert exc.value.args[0] == 'TweepError: Unable to publish post on twitter. Reason: ' + 'From twitter API.'
+    assert exc.value.args[0] == 'Reason from twitter'
 
 
 @mock.patch('nexus.social_media.services.tasks.publish_on_twitter_task.delay')
