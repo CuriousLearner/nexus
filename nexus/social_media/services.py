@@ -14,7 +14,7 @@ from nexus.social_media.models import Post
 
 
 def get_twitter_api_object(TWITTER_OAUTH):
-    """Function to generate a twitter api object.
+    """Function to generate a twitter API object.
 
     :param TWITTER_OAUTH: A dictionary having essential twitter oauth tokens viz.
     consumer_key, consumer_secret, access_key, access_secret.
@@ -103,6 +103,6 @@ def publish_on_social_media():
 
     for post_id in post_platform:
         if post_platform[post_id] == 'fb':
-            tasks.publish_on_facebook_task.s(post_id).apply_async()
+            tasks.publish_on_facebook_task.delay(post_id)
         elif post_platform[post_id] == 'twitter':
-            tasks.publish_on_twitter_task.s(post_id).apply_async()
+            tasks.publish_on_twitter_task.delay(post_id)

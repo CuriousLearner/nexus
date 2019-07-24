@@ -69,7 +69,7 @@ def test_publish_on_twitter_service(mock_get_twitter_api_object, mock_update_sta
     assert exc.value.args[0] == 'TweepError: Unable to publish post on twitter. Reason: ' + 'From twitter API.'
 
 
-@mock.patch('nexus.social_media.services.tasks.publish_on_twitter_task.s')
+@mock.patch('nexus.social_media.services.tasks.publish_on_twitter_task.delay')
 def test_publish_on_social_media_service(mock_publish_on_twitter_task):
     post = f.create_post(is_approved=True, posted_at='twitter', posted_time=None)
     assert post.is_posted is False

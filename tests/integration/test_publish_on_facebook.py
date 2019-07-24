@@ -35,7 +35,7 @@ def test_publish_on_facebook_service(mock_put_object, mock_put_photo, mock_page_
 
 
 @patch('nexus.social_media.services.settings')
-@patch('nexus.social_media.tasks.services.tasks.publish_on_facebook_task.s')
+@patch('nexus.social_media.tasks.services.tasks.publish_on_facebook_task.delay')
 def test_publishing_limited_posts(mock_publish_on_facebook_task, mock_settings):
     mock_settings.MAX_POSTS_AT_ONCE = 2
     mock_settings.LIMIT_POSTS = False
