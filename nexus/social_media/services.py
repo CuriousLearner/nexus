@@ -204,14 +204,10 @@ def publish_on_social_media():
     for post in posts:
         post_platform.update({post.id: post.posted_at})
 
-    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
-        Post.objects.filter(id__in=posts).update(is_posted=True,
-                                                 posted_time=timezone.now())
-    else:
-        posts.update(is_posted=True, posted_time=timezone.now())
+    Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
 
     for post_id in post_platform:
         if post_platform[post_id] == 'fb':
-            tasks.publish_on_facebook_task.s(post_id).apply_async()
+            tasks.publish_on_facebook_task.delay(post_id)
         elif post_platform[post_id] == 'linkedin':
-            tasks.publish_on_linkedin_task.s(post_id).apply_async()
+            tasks.publish_on_linkedin_task.delay(post_id)

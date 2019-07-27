@@ -67,8 +67,7 @@ def test_publish_on_linkedin_without_image(mock_post, base_data):
 
 @mock.patch('nexus.social_media.services.requests.post')
 @mock.patch('nexus.social_media.services.upload_image_to_linkedin')
-def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin,
-                                        mock_post, base_data):
+def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin, mock_post, base_data):
     post, api_url_ugc, linkedin, author, headers, post_data = base_data
     post = f.create_post()
     post_data_text = post_data.get('specificContent')\
@@ -109,8 +108,7 @@ def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin,
         }
     }]
 
-    shareContent.update(shareMediaCategory='IMAGE',
-                        media=image_media)
+    shareContent.update(shareMediaCategory='IMAGE', media=image_media)
 
     mock_upload_image_to_linkedin.reset_mock()
     response_image = services.publish_on_linkedin(post_id)
@@ -236,8 +234,7 @@ def test_appropriate_response_action(mock_response):
 
 @mock.patch('nexus.social_media.tasks.services.appropriate_response_action')
 @mock.patch('nexus.social_media.tasks.services.publish_on_linkedin')
-def test_publish_on_linkedin_task(mock_publish_on_linkedin,
-                                  mock_appropriate_response_action):
+def test_publish_on_linkedin_task(mock_publish_on_linkedin, mock_appropriate_response_action):
     post = f.create_post()
     tasks.publish_on_linkedin_task(post.id)
     # mock_publish_on_linkedin.return_value = requests.Response()
@@ -245,7 +242,7 @@ def test_publish_on_linkedin_task(mock_publish_on_linkedin,
     mock_appropriate_response_action.assert_called_once()
 
 
-@mock.patch('nexus.social_media.services.tasks.publish_on_linkedin_task.s')
+@mock.patch('nexus.social_media.services.tasks.publish_on_linkedin_task.delay')
 def test_publish_on_social_media_service(mock_publish_on_linkedin_task):
     post = f.create_post(is_approved=True, posted_at='linkedin',
                          posted_time=None)
