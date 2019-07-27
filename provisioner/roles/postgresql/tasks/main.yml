@@ -1,21 +1,22 @@
 ---
-- name: Update apt-cache if not already ran
-  shell: apt update
-  become: yes
-  when: apt_updated is not defined
-
-- name: install postgres packages for Ubuntu
-  apt:
-    pkg: "{{ item }}"
+- name: Add an Apt signing key to validate packages from PostgreSQL Repo
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
     state: present
-  with_items:
-    - postgresql
-    - postgresql-contrib
-    - python-psycopg2
 
-- name: install postgis packages for Ubuntu
+- name: Add to PostgreSQL.list
+  apt_repository:
+    repo: deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main
+    state: present
+
+- name: Install postgresql packages
   apt:
-    pkg: "postgis"
+    pkg: ['postgresql-11', 'postgresql-contrib', 'python-psycopg2']
+    state: present
+
+- name: Install postgis packages
+  apt:
+    pkg: "postgis-2.5"
     state: present
   when: pg_gis
 
@@ -52,6 +53,7 @@
     password: "{{ pg_password }}"
     role_attr_flags: "CREATEDB,SUPERUSER"
     state: present
+    encrypted: yes
 
 - name: ensure postgres is running
   service: name=postgresql state=started enabled=yes
