@@ -7,6 +7,7 @@
   tags: ['always']
 
 - debug: msg="Git SHA-1 before={{ gitresult.before }} after={{ gitresult.after }}"
+  when: vm == 0
   tags: ['always']
 
 - name: ensure python virtualenv exist
