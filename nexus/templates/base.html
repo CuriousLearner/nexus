@@ -1,4 +1,4 @@
-{% load compress %}{% load raven %}
+{% load raven %}
 {% load static i18n %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE }}">
@@ -16,9 +16,7 @@
 
     {% block css %}
     <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
-    {% compress css %}
     <link href="{% static 'css/main.scss' %}"  type="text/x-scss" rel="stylesheet">
-    {% endcompress %}
     {% endblock css %}
     {% block head_extras %}{% endblock %}
   </head>
@@ -48,9 +46,7 @@
       <!-- Your stuff: Third-party javascript libraries go here -->
 
       <!-- place project specific Javascript in this file -->
-      {% compress js %}
       <script src="{% static 'js/main.js' %}"></script>
-      {% endcompress %}
 
       {% if debug %}
         <!--Livereloading support -->

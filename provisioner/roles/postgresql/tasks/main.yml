@@ -16,7 +16,7 @@
 
 - name: Install postgis packages
   apt:
-    pkg: "postgis-2.5"
+    pkg: "postgresql-11-postgis-2.5"
     state: present
   when: pg_gis
 

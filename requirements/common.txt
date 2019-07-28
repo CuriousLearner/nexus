@@ -31,9 +31,7 @@ django-rest-swagger==2.2.0
 
 # Static files
 # -------------------------------------
-django-compressor==2.3
 django-libsass==0.7
-django-compressor-autoprefixer==0.1.0
 
 # LOGGING
 # -------------------------------------

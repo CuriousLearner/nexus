@@ -5,6 +5,7 @@ see: https://docs.djangoproject.com/en/dev/ref/settings/
 
 # Third Party Stuff
 import environ
+from corsheaders.defaults import default_headers
 from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 
@@ -38,7 +39,6 @@ INSTALLED_APPS = (
     'corsheaders',   # https://github.com/ottoyiu/django-cors-headers/
     'phonenumber_field',  # https://github.com/stefanfoulis/django-phonenumber-field
 
-    'compressor',
     'raven.contrib.django.raven_compat',
     'mail_templated',  # https://github.com/artemrizhov/django-mail-templated
 )
@@ -172,6 +172,7 @@ MIDDLEWARE = [
     'log_request_id.middleware.RequestIDMiddleware',  # For generating/adding Request id for all the logs
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -263,7 +264,7 @@ DATABASES = {
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
-
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 # TEMPLATE CONFIGURATION
 # -----------------------------------------------------------------------------
@@ -321,23 +322,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
 )
-
-# Django Compressor Configuration
-COMPRESS_FILTERS = {
-    'css': [
-        'django_compressor_autoprefixer.AutoprefixerFilter',
-        'compressor.filters.cssmin.CSSMinFilter'
-    ]
-}
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
-
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = env.bool('COMPRESS_OFFLINE', default=False)
 
 # MEDIA CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -364,6 +349,13 @@ X_FRAME_OPTIONS = 'DENY'
 
 # django-log-request-id - Sending request id in response
 REQUEST_ID_RESPONSE_HEADER = 'REQUEST_ID'
+
+# CORS
+# --------------------------------------------------------------------------
+CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST', default=[])
+CORS_ALLOW_HEADERS = default_headers + (
+    'access-control-allow-origin',
+)
 
 # DJANGO CELERY CONFIGURATION
 # -----------------------------------------------------------------------------
