@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Fabric file for managing this project.
 
 See: http://www.fabfile.org/
@@ -28,7 +29,7 @@ env.docs_dir = join(HERE, 'docs')
 env.static_dir = join(env.apps_dir, 'static')
 env.virtualenv_dir = join(HERE, 'venv')
 env.requirements_file = join(HERE, 'requirements/development.txt')
-env.shell = "/bin/bash -l -i -c"
+env.shell = '/bin/bash -l -i -c'
 
 env.use_ssh_config = True
 env.dotenv_path = join(HERE, '.env')

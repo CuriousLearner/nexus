@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Production Configurations
 
 Adds sensible default for running app in production.
@@ -12,10 +13,8 @@ from email.utils import getaddresses
 # Third Party Stuff
 from django.utils import six
 
-
 from .common import *  # noqa F405
-from .common import (DATABASES, INSTALLED_APPS, MIDDLEWARE,
-                     REST_FRAMEWORK, TEMPLATES, env)
+from .common import DATABASES, INSTALLED_APPS, MIDDLEWARE, REST_FRAMEWORK, TEMPLATES, env
 
 # SITE CONFIGURATION
 # Ensure these are set in the `.env` file manually.
@@ -72,7 +71,7 @@ if SITE_SCHEME == 'https':
 
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
-ENABLE_MEDIA_UPLOAD_TO_S3 = env.bool("ENABLE_MEDIA_UPLOAD_TO_S3", default=False)
+ENABLE_MEDIA_UPLOAD_TO_S3 = env.bool('ENABLE_MEDIA_UPLOAD_TO_S3', default=False)
 if ENABLE_MEDIA_UPLOAD_TO_S3:
     # Uploaded Media Files
     # ------------------------

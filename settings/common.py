@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Django settings for nexus project.
 
 see: https://docs.djangoproject.com/en/dev/ref/settings/
@@ -121,10 +122,10 @@ SWAGGER_SETTINGS = {
             'type': 'basic'
         },
         # For UserTokenAuthentication
-        "api_key": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
+        'api_key': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
         },
     },
 }
@@ -132,9 +133,9 @@ SWAGGER_SETTINGS = {
 # DJANGO_SITES
 # ------------------------------------------------------------------------------
 # see: http://django-sites.readthedocs.org
-SITE_SCHEME = env("SITE_SCHEME", default='http')
-SITE_DOMAIN = env("SITE_DOMAIN", default='localhost:8000')
-SITE_NAME = env("SITE_NAME", default='nexus')
+SITE_SCHEME = env('SITE_SCHEME', default='http')
+SITE_DOMAIN = env('SITE_DOMAIN', default='localhost:8000')
+SITE_NAME = env('SITE_NAME', default='nexus')
 
 # This is used in-case of the frontend is deployed at a different url than this django app.
 FRONTEND_SITE_SCHEME = env('FRONTEND_SITE_SCHEME', default='https')
@@ -335,8 +336,8 @@ MEDIA_ROOT = str(ROOT_DIR.path('.media'))
 # URL that handles the media served from MEDIA_ROOT.
 # Examples: 'http://example.com/media/', 'http://media.example.com/'
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = env("MEDIA_URL",
-                default="{}://{}/media/".format(SITE_SCHEME, SITE_DOMAIN))
+MEDIA_URL = env('MEDIA_URL',
+                default='{}://{}/media/'.format(SITE_SCHEME, SITE_DOMAIN))
 
 #  SECURITY
 # -----------------------------------------------------------------------------
@@ -360,7 +361,7 @@ CORS_ALLOW_HEADERS = default_headers + (
 # DJANGO CELERY CONFIGURATION
 # -----------------------------------------------------------------------------
 # see: http://celery.readthedocs.org/en/latest/userguide/tasks.html#task-states
-CELERY_BROKER_URL = env('REDIS_URL', default="redis://localhost:6379/0")
+CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
