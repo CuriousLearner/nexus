@@ -17,7 +17,8 @@ repos:
     - id: fix-encoding-pragma
 
 - repo: git://github.com/CuriousLearner/pre-commit-python-sorter
-  sha: 5294cde9d51cff119af537e987c30c320e9fbe2f
+  rev: 5294cde9d51cff119af537e987c30c320e9fbe2f
   hooks:
     - id: python-import-sorter
       args: ['--silent-overwrite']
+      exclude: settings/testing.py
