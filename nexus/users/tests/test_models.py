@@ -10,7 +10,7 @@ class UserModelTestCase(TestCase):
     def test_create_user(self):
         u = User.objects.create_user(
             email='f@f.com', password='abc', first_name="F", last_name='B',
-            gender='others', tshirt_size='large', phone_number='+910123456789'
+            gender='others', tshirt_size='large', phone_number='+919876543210'
         )
         assert u.is_active is True
         assert u.is_staff is False
@@ -23,7 +23,7 @@ class UserModelTestCase(TestCase):
         assert u.tshirt_size == User.TSHIRT_SIZE_CHOICES.LARGE
         assert u.is_core_organizer is False
         assert u.is_volunteer is False
-        assert u.phone_number == '+910123456789'
+        assert u.phone_number == '+919876543210'
 
     def test_create_super_user(self):
         u = User.objects.create_superuser(email='f@f.com', password='abc')
