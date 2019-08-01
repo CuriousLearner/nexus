@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Production Configurations
 
 Adds sensible default for running app in production.
@@ -12,10 +13,8 @@ from email.utils import getaddresses
 # Third Party Stuff
 from django.utils import six
 
-
 from .common import *  # noqa F405
-from .common import (DATABASES, INSTALLED_APPS, MIDDLEWARE,
-                     REST_FRAMEWORK, TEMPLATES, env)
+from .common import DATABASES, INSTALLED_APPS, MIDDLEWARE, REST_FRAMEWORK, TEMPLATES, env
 
 # SITE CONFIGURATION
 # Ensure these are set in the `.env` file manually.
@@ -37,7 +36,7 @@ ADMINS = getaddresses([env('DJANGO_ADMINS')])
 # notifications and other various emails.
 MANAGERS = ADMINS
 
-# cors
+# CORS
 # --------------------------------------------------------------------------
 CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST')
 
@@ -59,7 +58,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 #  SECURITY
 # -----------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
-# Raises ImproperlyConfigured exception if DJANO_SECRET_KEY not in os.environ
+# Raises ImproperlyConfigured exception if DJANGO_SECRET_KEY not in os.environ
 SECRET_KEY = env('DJANGO_SECRET_KEY')
 
 if SITE_SCHEME == 'https':
@@ -72,7 +71,7 @@ if SITE_SCHEME == 'https':
 
 # STORAGE CONFIGURATION
 # ------------------------------------------------------------------------------
-ENABLE_MEDIA_UPLOAD_TO_S3 = env.bool("ENABLE_MEDIA_UPLOAD_TO_S3", default=False)
+ENABLE_MEDIA_UPLOAD_TO_S3 = env.bool('ENABLE_MEDIA_UPLOAD_TO_S3', default=False)
 if ENABLE_MEDIA_UPLOAD_TO_S3:
     # Uploaded Media Files
     # ------------------------
@@ -102,14 +101,9 @@ if ENABLE_MEDIA_UPLOAD_TO_S3:
     MEDIA_URL = env('MEDIA_URL',
                     default='https://s3.amazonaws.com/%s/' % AWS_STORAGE_BUCKET_NAME)
 
-# Static Assests
+# Static Assets
 # ------------------------
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-
-# Compress static files offline
-# http://django-compressor.readthedocs.org/en/latest/settings/#django.conf.settings.COMPRESS_OFFLINE
-COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
-COMPRESS_OFFLINE = True
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -123,7 +117,7 @@ EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 # ------------------------------------------------------------------------------
 # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
 DATABASES['default'].update(env.db('DATABASE_URL'))  # Should not override all db settings
-
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 # CACHING
 # ------------------------------------------------------------------------------

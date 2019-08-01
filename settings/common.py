@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Django settings for nexus project.
 
 see: https://docs.djangoproject.com/en/dev/ref/settings/
@@ -5,6 +6,7 @@ see: https://docs.djangoproject.com/en/dev/ref/settings/
 
 # Third Party Stuff
 import environ
+from corsheaders.defaults import default_headers
 from django.core import exceptions
 from django.utils.translation import ugettext_lazy as _
 
@@ -38,7 +40,6 @@ INSTALLED_APPS = (
     'corsheaders',   # https://github.com/ottoyiu/django-cors-headers/
     'phonenumber_field',  # https://github.com/stefanfoulis/django-phonenumber-field
 
-    'compressor',
     'raven.contrib.django.raven_compat',
     'mail_templated',  # https://github.com/artemrizhov/django-mail-templated
 )
@@ -121,10 +122,10 @@ SWAGGER_SETTINGS = {
             'type': 'basic'
         },
         # For UserTokenAuthentication
-        "api_key": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
+        'api_key': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
         },
     },
 }
@@ -132,9 +133,9 @@ SWAGGER_SETTINGS = {
 # DJANGO_SITES
 # ------------------------------------------------------------------------------
 # see: http://django-sites.readthedocs.org
-SITE_SCHEME = env("SITE_SCHEME", default='http')
-SITE_DOMAIN = env("SITE_DOMAIN", default='localhost:8000')
-SITE_NAME = env("SITE_NAME", default='nexus')
+SITE_SCHEME = env('SITE_SCHEME', default='http')
+SITE_DOMAIN = env('SITE_DOMAIN', default='localhost:8000')
+SITE_NAME = env('SITE_NAME', default='nexus')
 
 # This is used in-case of the frontend is deployed at a different url than this django app.
 FRONTEND_SITE_SCHEME = env('FRONTEND_SITE_SCHEME', default='https')
@@ -172,6 +173,7 @@ MIDDLEWARE = [
     'log_request_id.middleware.RequestIDMiddleware',  # For generating/adding Request id for all the logs
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -263,7 +265,7 @@ DATABASES = {
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
-
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 # TEMPLATE CONFIGURATION
 # -----------------------------------------------------------------------------
@@ -321,23 +323,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
 )
-
-# Django Compressor Configuration
-COMPRESS_FILTERS = {
-    'css': [
-        'django_compressor_autoprefixer.AutoprefixerFilter',
-        'compressor.filters.cssmin.CSSMinFilter'
-    ]
-}
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
-
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = env.bool('COMPRESS_OFFLINE', default=False)
 
 # MEDIA CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -350,8 +336,8 @@ MEDIA_ROOT = str(ROOT_DIR.path('.media'))
 # URL that handles the media served from MEDIA_ROOT.
 # Examples: 'http://example.com/media/', 'http://media.example.com/'
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#media-url
-MEDIA_URL = env("MEDIA_URL",
-                default="{}://{}/media/".format(SITE_SCHEME, SITE_DOMAIN))
+MEDIA_URL = env('MEDIA_URL',
+                default='{}://{}/media/'.format(SITE_SCHEME, SITE_DOMAIN))
 
 #  SECURITY
 # -----------------------------------------------------------------------------
@@ -365,10 +351,17 @@ X_FRAME_OPTIONS = 'DENY'
 # django-log-request-id - Sending request id in response
 REQUEST_ID_RESPONSE_HEADER = 'REQUEST_ID'
 
+# CORS
+# --------------------------------------------------------------------------
+CORS_ORIGIN_WHITELIST = env.list('CORS_ORIGIN_WHITELIST', default=[])
+CORS_ALLOW_HEADERS = default_headers + (
+    'access-control-allow-origin',
+)
+
 # DJANGO CELERY CONFIGURATION
 # -----------------------------------------------------------------------------
 # see: http://celery.readthedocs.org/en/latest/userguide/tasks.html#task-states
-CELERY_BROKER_URL = env('REDIS_URL', default="redis://localhost:6379/0")
+CELERY_BROKER_URL = env('REDIS_URL', default='redis://localhost:6379/0')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

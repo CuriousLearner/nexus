@@ -3,16 +3,17 @@
 
 See: http://www.fabfile.org/
 """
-from __future__ import absolute_import, unicode_literals, with_statement
 
 # Standard Library
+import os
 from contextlib import contextmanager as _contextmanager
 from functools import partial
 from os.path import dirname, isdir, join
 
 # Third Party Stuff
-from fabric.api import local as fabric_local, env
 from fabric import api as fab
+from fabric.api import env
+from fabric.api import local as fabric_local
 
 local = partial(fabric_local, shell='/bin/bash')
 
@@ -25,6 +26,7 @@ HERE = dirname(__file__)
 env.project_name = 'nexus'
 env.apps_dir = join(HERE, env.project_name)
 env.docs_dir = join(HERE, 'docs')
+env.static_dir = join(env.apps_dir, 'static')
 env.virtualenv_dir = join(HERE, 'venv')
 env.requirements_file = join(HERE, 'requirements/development.txt')
 env.shell = '/bin/bash -l -i -c'
@@ -38,8 +40,10 @@ def init(vagrant=False):
     """Prepare a local machine for development."""
 
     install_requirements()
-    local('createdb %(project_name)s' % env)  # create postgres database
-    manage('migrate')
+    add_pre_commit()
+    if not os.getenv('CI', 'False').lower() == 'true':
+        local('createdb %(project_name)s' % env)  # create postgres database
+        manage('migrate')
 
 
 def install_requirements(file=env.requirements_file):
@@ -48,6 +52,13 @@ def install_requirements(file=env.requirements_file):
     # activate virtualenv and install
     with virtualenv():
         local('pip install -r %s' % file)
+
+
+def add_pre_commit():
+    verify_virtualenv()
+    # activate virtualenv and install pre-commit hooks
+    with virtualenv():
+        local('pre-commit install')
 
 
 def serve_docs(options=''):
@@ -210,4 +221,4 @@ def verify_virtualenv():
         local('sudo pip install virtualenv')
 
     if not isdir(env.virtualenv_dir):
-        local('virtualenv %(virtualenv_dir)s -p $(which python3)' % env)
+        local('virtualenv %(virtualenv_dir)s -p $(which python3.6)' % env)
