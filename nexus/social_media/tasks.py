@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # nexus Stuff
 from nexus.celery import app
 from nexus.social_media import services
