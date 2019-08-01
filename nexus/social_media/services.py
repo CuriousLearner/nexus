@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Third Party Stuff
 import facebook
 from django.conf import settings
@@ -12,9 +13,12 @@ def get_fb_page_graph():
     graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
     pages = graph.get_object('me/accounts')['data']
     page_access_token = None
-    page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    try:
+        page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    except KeyError:
+        raise exceptions.WrongArguments('No ID associated with FB_USER_ACCESS_TOKEN.')
     if not page_list:
-        raise exceptions.WrongArguments("Facebook Page access token could not be found")
+        raise exceptions.WrongArguments('No matching ID in account data. Incorrect FB_PAGE_ID')
     page_access_token = page_list[0]['access_token']
     page_graph = facebook.GraphAPI(page_access_token)
     return page_graph

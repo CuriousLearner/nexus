@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Standard Library
 from unittest.mock import ANY, patch
 
@@ -7,31 +8,56 @@ from facebook import GraphAPI
 from tests import factories as f
 
 # nexus Stuff
-from nexus.social_media.services import post_to_facebook
+from nexus.base import exceptions
+from nexus.social_media.services import get_fb_page_graph, post_to_facebook
 from nexus.social_media.tasks import publish_posts_to_social_media
 
 pytestmark = pytest.mark.django_db
 
 
-@patch('nexus.social_media.services.get_fb_page_graph')
-@patch('nexus.social_media.services.facebook.GraphAPI.put_photo')
-@patch('nexus.social_media.services.facebook.GraphAPI.put_object')
-def test_post_to_facebook_service(mock_put_object, mock_put_photo, mock_page_graph):
-    mock_page_graph.return_value = GraphAPI
+@patch('nexus.social_media.services.settings')
+@patch('nexus.social_media.services.facebook.GraphAPI', autospec=True)
+def test_get_fb_page_graph(mock_graph_api, mock_settings):
+    mock_settings.FB_USER_ACCESS_TOKEN = 'token123'
+    mock_settings.FB_PAGE_ID = '012345'
+    accounts_data = {'data': [{'access_token': 'pagetoken123'}]}
+    mock_graph_api.return_value.get_object.return_value = accounts_data
 
+    # Data not containing ID key
+    with pytest.raises(exceptions.WrongArguments) as exc:
+        get_fb_page_graph()
+    assert 'No ID' in str(exc.value)
+    mock_graph_api.assert_called_with('token123')
+
+    # Data not containing matching ID
+    accounts_data['data'][0]['id'] = '000000'
+    with pytest.raises(exceptions.WrongArguments) as exc:
+        get_fb_page_graph()
+    assert 'No matching ID' in str(exc.value)
+
+    # Data containing matching ID
+    accounts_data['data'][0]['id'] = '012345'
+    get_fb_page_graph()
+    mock_graph_api.assert_called_with('pagetoken123')
+
+
+@patch('nexus.social_media.services.get_fb_page_graph', autospec=GraphAPI)
+def test_post_to_facebook_service(mock_page_graph):
     post = f.create_post(image=None)
     post_to_facebook(post.id)
-    mock_put_object.assert_called_with(
+    mock_page_graph.return_value.put_object.assert_called_with(
         parent_object=ANY, connection_name='feed', message=post.text
     )
 
     post = f.create_post(text=None)
     post_to_facebook(post_id=post.id)
-    mock_put_photo.assert_called_with(image=ANY)
+    mock_page_graph.return_value.put_photo.assert_called_with(image=ANY)
 
     post = f.create_post()
     post_to_facebook(post_id=post.id)
-    mock_put_photo.assert_called_with(image=ANY, message=post.text)
+    mock_page_graph.return_value.put_photo.assert_called_with(
+        image=ANY, message=post.text
+    )
 
 
 @patch('nexus.social_media.tasks.settings')
