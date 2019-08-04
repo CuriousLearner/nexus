@@ -19,7 +19,7 @@ base_ubuntu:
       - python3.6-dev
       - python-setuptools
       - python-virtualenv
-      - python-pip
+      - python3-pip
       - sysstat
       - vim
       - fail2ban
@@ -30,6 +30,4 @@ base_ubuntu:
       - liblcms2-dev
       - postgresql-client
       - libpq-dev
-      - postgis
       - ca-certificates
-
