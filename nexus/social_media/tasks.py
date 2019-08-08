@@ -22,3 +22,10 @@ def publish_on_facebook_task(post_id):
 def publish_on_linkedin_task(post_id):
     response = services.publish_on_linkedin(post_id)
     services.appropriate_response_action(response)
+
+
+@app.task(name='publish_on_twitter_task',
+          autoretry_for=(Exception, ),
+          retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
+def publish_on_twitter_task(post_id):
+    services.publish_on_twitter(post_id)

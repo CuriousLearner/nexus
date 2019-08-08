@@ -498,3 +498,10 @@ LINKEDIN_AUTH = {
     'organization_id': env('LINKEDIN_ORGANIZATION_ID', default='FakeOrganizationId'),
 }
 LINKEDIN_API_URL_BASE = 'https://api.linkedin.com/v2/'
+
+TWITTER_OAUTH = {
+    'consumer_key': env('TWITTER_CONSUMER_KEY', default='FakeTwitterConsumerKey'),
+    'consumer_secret': env('TWITTER_CONSUMER_SECRET', default='FakeTwitterConsumerSecret'),
+    'access_key': env('TWITTER_ACCESS_KEY', default='FakeTwitterAccessKey'),
+    'access_secret': env('TWITTER_ACCESS_SECRET', default='FakeTwitterAccessSecret'),
+}

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Standard Library
 import os
 from datetime import timedelta

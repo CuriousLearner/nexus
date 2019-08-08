@@ -4,9 +4,13 @@
     .container hr{margin-top: 5px; }
 </style>
 
-## July 7, 2019
+## Aug 9, 2019
 
 - Add feature to publish social media post on linkedin ([@gutsytechster])
+
+## Aug 8, 2019
+
+- Add feature to publish social media post on twitter ([@GeekyShacklebolt])
 
 ## Jun 26, 2019
 
