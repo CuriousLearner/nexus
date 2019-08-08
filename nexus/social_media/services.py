@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Standard Library
 from datetime import datetime
 
@@ -61,7 +62,7 @@ def get_fb_page_graph():
     page_access_token = None
     page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
     if not page_list:
-        raise exceptions.WrongArguments("Facebook Page access token could not be found")
+        raise exceptions.WrongArguments('Facebook Page access token could not be found')
     page_access_token = page_list[0]['access_token']
     page_graph = facebook.GraphAPI(page_access_token)
     return page_graph
@@ -82,25 +83,19 @@ def publish_on_facebook(post_id):
 
 
 def publish_on_social_media():
+    posts = Post.objects.filter(is_approved=True, is_posted=False, scheduled_time__lte=datetime.now())
+
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
-        posts = Post.objects.filter(
-            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
-        )[:int(settings.MAX_POSTS_AT_ONCE)]
-    else:
-        posts = Post.objects.filter(
-            is_approved=True, is_posted=False, scheduled_time__lte=datetime.now()
-        )
+        posts = posts[:int(settings.MAX_POSTS_AT_ONCE)]
 
     # Before performing the bulk update, here we are saving the IDs of posts along with there publishing platforms.
     # Because this queryset "posts" will get empty, after running the update query.
-    post_platform = {}
-    for post in posts:
-        post_platform.update({post.id: post.posted_at})
+    post_id_and_platform = list(posts.values('id', 'posted_at'))
 
     Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
 
-    for post_id in post_platform:
-        if post_platform[post_id] == 'fb':
-            tasks.publish_on_facebook_task.delay(post_id)
-        elif post_platform[post_id] == 'twitter':
-            tasks.publish_on_twitter_task.delay(post_id)
+    for post in post_id_and_platform:
+        if post['posted_at'] == 'fb':
+            tasks.publish_on_facebook_task.delay(post['id'])
+        elif post['posted_at'] == 'twitter':
+            tasks.publish_on_twitter_task.delay(post['id'])
