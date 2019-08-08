@@ -4,7 +4,7 @@
     .container hr{margin-top: 5px; }
 </style>
 
-## Jun 29, 2019
+## Aug 8, 2019
 
 - Add feature to publish social media post on twitter ([@GeekyShacklebolt])
 
