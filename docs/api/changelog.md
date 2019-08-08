@@ -4,6 +4,14 @@
     .container hr{margin-top: 5px; }
 </style>
 
+## Aug 8, 2019
+
+- Add feature to publish social media post on twitter ([@GeekyShacklebolt])
+
+## Jun 26, 2019
+
+- Add feature to publish social media post on facebook ([@storymode7])
+
 ## Mar 5, 2019
 
 - Remove endpoint: publish a post via `POST /api/posts/:post_id/publish` ([@GeekyShacklebolt])
