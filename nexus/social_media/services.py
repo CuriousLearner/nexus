@@ -144,6 +144,8 @@ def appropriate_response_action(response):
 
     :raises NotSupported: Exception raised when a 405 response is provided.
 
+    :raises RequestValidationError: Exception raised when an unexpected response is provided.
+
     """
     status_code = response.status_code
     if status_code != status.HTTP_201_CREATED:
