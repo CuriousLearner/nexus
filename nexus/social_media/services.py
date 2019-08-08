@@ -14,7 +14,7 @@ from nexus.social_media import tasks
 from nexus.social_media.models import Post
 
 
-def upload_image_to_linkedin(author, headers, post, linkedin):
+def upload_image_to_linkedin(author, headers, post, linkedin_auth):
     """Upload image to linkedin for given post.
 
     :param author: Owner of the post to be used for response POST data.
@@ -49,18 +49,23 @@ def upload_image_to_linkedin(author, headers, post, linkedin):
                                     headers=headers)
     if response_assets.status_code == status.HTTP_200_OK:
         json_response_assets = response_assets.json()
-        upload_url = json_response_assets.get('value')\
-                                         .get('uploadMechanism')\
-                                         .get('com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest')\
-                                         .get('uploadUrl')
 
-        asset = json_response_assets.get('value').get('asset')
+        value = json_response_assets.get('value')
+        upload_mechanism = value.get('uploadMechanism')
+        upload_http_request = upload_mechanism.get('com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest')
+        upload_url = upload_http_request.get('uploadUrl')
+
+        asset = value.get('asset')
+
         response_upload_image = requests.post(upload_url,
                                               data=post.image.file.read(),
-                                              headers={'Authorization': f"Bearer {linkedin['access_token']}"})
-        return (response_upload_image, asset)
+                                              headers={'Authorization': f"Bearer {linkedin_auth['access_token']}"})
+        if response_upload_image.status_code == status.HTTP_201_CREATED:
+            return asset
+        else:
+            appropriate_response_action(response_upload_image)
     else:
-        return (response_assets, None)
+        appropriate_response_action(response_assets)
 
 
 def publish_on_linkedin(post_id):
@@ -71,12 +76,12 @@ def publish_on_linkedin(post_id):
     :returns: A valid HTTP response
 
     """
-    linkedin = settings.LINKEDIN_AUTH
-    author = f"urn:li:organization:{linkedin['organization_id']}"
+    linkedin_auth = settings.LINKEDIN_AUTH
+    author = f"urn:li:organization:{linkedin_auth['organization_id']}"
 
     headers = {'X-Restli-Protocol-Version': '2.0.0',
                'Content-Type': 'application/json',
-               'Authorization': f"Bearer {linkedin['access_token']}"}
+               'Authorization': f"Bearer {linkedin_auth['access_token']}"}
 
     api_url_ugc = f"{settings.LINKEDIN_API_URL_BASE}ugcPosts"
 
@@ -99,31 +104,26 @@ def publish_on_linkedin(post_id):
     }
 
     if post.image:
-        response_upload_image, asset = upload_image_to_linkedin(author,
-                                                                headers,
-                                                                post,
-                                                                linkedin)
+        asset = upload_image_to_linkedin(author, headers, post, linkedin_auth)
 
-        if response_upload_image.status_code == status.HTTP_201_CREATED:
-            shareContent = post_data.get('specificContent')\
-                                    .get('com.linkedin.ugc.ShareContent')
-            image_media = [{
-                "status": "READY",
-                "description": {
-                    "text": ""
-                },
-                "media": asset,
-                "title": {
-                    "text": ""
-                }
-            }]
-            shareContent.update(shareMediaCategory='IMAGE',
-                                media=image_media)
-            image_response = requests.post(api_url_ugc, headers=headers,
-                                           json=post_data)
-            return image_response
-        else:
-            return response_upload_image
+        specific_content = post_data.get('specificContent')
+        share_content = specific_content.get('com.linkedin.ugc.ShareContent')
+
+        image_media = [{
+            "status": "READY",
+            "description": {
+                "text": ""
+            },
+            "media": asset,
+            "title": {
+                "text": ""
+            }
+        }]
+        share_content.update(shareMediaCategory='IMAGE',
+                             media=image_media)
+        image_response = requests.post(api_url_ugc, headers=headers,
+                                       json=post_data)
+        return image_response
     elif post.text:
         response = requests.post(api_url_ugc, headers=headers, json=post_data)
         return response
@@ -157,6 +157,8 @@ def appropriate_response_action(response):
             raise exc.WrongArguments(error)
         elif status_code == status.HTTP_405_METHOD_NOT_ALLOWED:
             raise exc.NotSupported(error)
+        else:
+            raise exc.RequestValidationError(error)
 
 
 def get_fb_page_graph():
