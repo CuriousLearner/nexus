@@ -2,6 +2,7 @@ nexus
 ==============================
 
 ![](https://travis-ci.org/CuriousLearner/nexus.svg?branch=master)
+[![codecov](https://codecov.io/gh/CuriousLearner/nexus/branch/master/graph/badge.svg)](https://codecov.io/gh/CuriousLearner/nexus)
 
 __Version:__ 0.0.0
 

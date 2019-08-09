@@ -52,6 +52,10 @@ script:
   - pytest --cov -v --tb=native
   - ansible-playbook -i provisioner/hosts provisioner/site.yml --syntax-check
 
+after_script:
+  - pip install codecov
+  - codecov
+
 notifications:
   email:
     on_success: change  # [always|never|change]
