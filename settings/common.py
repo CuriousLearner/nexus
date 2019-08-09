@@ -490,3 +490,10 @@ except ValueError:
     raise exceptions.ImproperlyConfigured('MAX_POSTS_AT_ONCE should be an int')
 FB_USER_ACCESS_TOKEN = env('FB_USER_ACCESS_TOKEN', default='NO USER ACCESS TOKEN')
 FB_PAGE_ID = env('FB_PAGE_ID', default='NO PAGE ID')
+
+TWITTER_OAUTH = {
+    'consumer_key': env('TWITTER_CONSUMER_KEY', default='FakeTwitterConsumerKey'),
+    'consumer_secret': env('TWITTER_CONSUMER_SECRET', default='FakeTwitterConsumerSecret'),
+    'access_key': env('TWITTER_ACCESS_KEY', default='FakeTwitterAccessKey'),
+    'access_secret': env('TWITTER_ACCESS_SECRET', default='FakeTwitterAccessSecret'),
+}

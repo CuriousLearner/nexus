@@ -1,28 +1,23 @@
-# Third Party Stuff
-from django.conf import settings
-from django.utils import timezone
-
+# -*- coding: utf-8 -*-
 # nexus Stuff
 from nexus.celery import app
-# Nexus Stuff
-from nexus.social_media.models import Post
-from nexus.social_media.services import post_to_facebook
+from nexus.social_media import services
 
 
-@app.task(name='publish_posts_to_social_media')
-def publish_posts_to_social_media():
-    if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
-        posts = Post.objects.filter(
-            is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()
-        )[:int(settings.MAX_POSTS_AT_ONCE)]
-    else:
-        posts = Post.objects.filter(
-            is_approved=True, is_posted=False, scheduled_time__lte=timezone.now()
-        )
+@app.task(name='publish_on_social_media_task')
+def publish_on_social_media_task():
+    services.publish_on_social_media()
 
-    for post in posts:
-        if post.posted_at == 'fb':
-            post_to_facebook(post.id)
-        post.is_posted = True
-        post.posted_time = timezone.now()
-        post.save()
+
+@app.task(name='publish_on_facebook_task',
+          autoretry_for=(Exception, ),
+          retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
+def publish_on_facebook_task(post_id):
+    services.publish_on_facebook(post_id)
+
+
+@app.task(name='publish_on_twitter_task',
+          autoretry_for=(Exception, ),
+          retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
+def publish_on_twitter_task(post_id):
+    services.publish_on_twitter(post_id)
