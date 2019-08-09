@@ -152,7 +152,7 @@ def check_and_raise_error_from_linkedin_response(response):
 
     """
     status_code = response.status_code
-    if status_code != status.HTTP_201_CREATED:
+    if (status_code != status.HTTP_201_CREATED) or (status_code != status.HTTP_200_OK):
         json_response = response.json()
         error = f"LinkedIn error: {json_response['message']}"
         if status_code == status.HTTP_400_BAD_REQUEST:
