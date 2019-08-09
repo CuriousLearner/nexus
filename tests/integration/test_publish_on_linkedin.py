@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Standard Library
 from unittest import mock
 
@@ -21,7 +22,7 @@ def base_data(client):
     post = f.create_post(image=None)
 
     # LinkedIn UGC(User Generated Content) API endpoint
-    api_url_ugc = f"{settings.LINKEDIN_API_URL_BASE}ugcPosts"
+    api_url_ugc = f'{settings.LINKEDIN_API_URL_BASE}ugcPosts'
     linkedin_auth = settings.LINKEDIN_AUTH
     author = f"urn:li:organization:{linkedin_auth['organization_id']}"
     headers = {'X-Restli-Protocol-Version': '2.0.0',
@@ -29,18 +30,18 @@ def base_data(client):
                'Authorization': f"Bearer {linkedin_auth['access_token']}"}
 
     post_data = {
-        "author": author,
-        "lifecycleState": "PUBLISHED",
-        "specificContent": {
-            "com.linkedin.ugc.ShareContent": {
-                "shareCommentary": {
-                    "text": post.text
+        'author': author,
+        'lifecycleState': 'PUBLISHED',
+        'specificContent': {
+            'com.linkedin.ugc.ShareContent': {
+                'shareCommentary': {
+                    'text': post.text
                 },
-                "shareMediaCategory": "NONE"
+                'shareMediaCategory': 'NONE'
             },
         },
-        "visibility": {
-            "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC"
+        'visibility': {
+            'com.linkedin.ugc.MemberNetworkVisibility': 'PUBLIC'
         },
     }
 
@@ -61,7 +62,6 @@ def test_publish_on_linkedin_without_image(mock_post, base_data):
 
     mock_post.return_value = requests.Response()
 
-    # check post only with text
     response = services.publish_on_linkedin(post_id)
     mock_post.assert_called_once_with(api_url_ugc, headers=headers,
                                       json=post_data)
@@ -90,13 +90,13 @@ def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin, mock_post
     share_content = specific_content.get('com.linkedin.ugc.ShareContent')
 
     image_media = [{
-        "status": "READY",
-        "description": {
-            "text": ""
+        'status': 'READY',
+        'description': {
+            'text': ''
         },
-        "media": asset,
-        "title": {
-            "text": ""
+        'media': asset,
+        'title': {
+            'text': ''
         }
     }]
 
@@ -113,10 +113,10 @@ def test_publish_on_linkedin_with_image(mock_upload_image_to_linkedin, mock_post
     assert isinstance(response_image, requests.Response)
 
 
-@mock.patch('nexus.social_media.services.appropriate_response_action')
+@mock.patch('nexus.social_media.services.check_and_raise_error_from_linkedin_response')
 @mock.patch('nexus.social_media.services.requests.post')
 @mock.patch('nexus.social_media.services.requests.Response.json')
-def test_upload_image_to_linkedin(mock_json, mock_post, mock_appropriate_response_action, base_data):
+def test_upload_image_to_linkedin(mock_json, mock_post, mock_check_and_raise_error_from_linkedin_response, base_data):
 
     post, api_url_ugc, linkedin_auth, author, headers, post_data = base_data
 
@@ -125,21 +125,21 @@ def test_upload_image_to_linkedin(mock_json, mock_post, mock_appropriate_respons
     post_instance = Post.objects.get(pk=post_id)
 
     post_data_assets = {
-        "registerUploadRequest": {
-            "recipes": [
-                "urn:li:digitalmediaRecipe:feedshare-image"
+        'registerUploadRequest': {
+            'recipes': [
+                'urn:li:digitalmediaRecipe:feedshare-image'
             ],
-            "owner": author,
-            "serviceRelationships": [
+            'owner': author,
+            'serviceRelationships': [
                 {
-                    "relationshipType": "OWNER",
-                    "identifier": "urn:li:userGeneratedContent"
+                    'relationshipType': 'OWNER',
+                    'identifier': 'urn:li:userGeneratedContent'
                 }
             ]
         }
     }
 
-    api_url_assets = f"{settings.LINKEDIN_API_URL_BASE}assets?action=registerUpload"
+    api_url_assets = f'{settings.LINKEDIN_API_URL_BASE}assets?action=registerUpload'
 
     mock_post.return_value = requests.Response()
 
@@ -151,29 +151,28 @@ def test_upload_image_to_linkedin(mock_json, mock_post, mock_appropriate_respons
                                       )
     mock_post.assert_called_once_with(api_url_assets, json=post_data_assets,
                                       headers=headers)
-    mock_appropriate_response_action.assert_called_once_with(mock_post.return_value)
+    mock_check_and_raise_error_from_linkedin_response.assert_called_once_with(mock_post.return_value)
 
-    # When response_asset status code is 200
+    # When response_asset status code is 200 and response_upload_image status code is not 201
+    mock_post.return_value.status_code = status.HTTP_200_OK
     upload_url = mock.Mock()
     asset = mock.Mock()
-    mock_post.return_value.status_code = status.HTTP_200_OK
 
     mock_json.return_value = {
-        "value": {
-            "uploadMechanism": {
-                "com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest": {
-                    "headers": {},
-                    "uploadUrl": upload_url,
+        'value': {
+            'uploadMechanism': {
+                'com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest': {
+                    'headers': {},
+                    'uploadUrl': upload_url,
                 }
             },
-            "mediaArtifact": mock.Mock(),
-            "asset": asset
+            'mediaArtifact': mock.Mock(),
+            'asset': asset
         }
     }
     mock_post.reset_mock()
-    mock_appropriate_response_action.reset_mock()
+    mock_check_and_raise_error_from_linkedin_response.reset_mock()
 
-    # When response_upload_image status code is not 201
     services.upload_image_to_linkedin(author,
                                       headers,
                                       post_instance,
@@ -189,17 +188,18 @@ def test_upload_image_to_linkedin(mock_json, mock_post, mock_appropriate_respons
         mock.call(upload_url, data=post_instance.image.file.read(),
                   headers={'Authorization': f"Bearer {linkedin_auth['access_token']}"})
     ])
-    mock_appropriate_response_action.assert_called_once_with(mock_post.return_value)
+    mock_check_and_raise_error_from_linkedin_response.assert_called_once_with(mock_post.return_value)
 
-    # When response_upload_image status code is 201
+    # When response_asset status code is 200 and response_upload_image status code is 201
     return_values = [requests.Response(), requests.Response()]
     return_values[0].status_code = status.HTTP_200_OK
     return_values[1].status_code = status.HTTP_201_CREATED
     mock_post.side_effect = return_values
 
+    # Again bringing back the file pointer to starting postiion
     post_instance.image.file.seek(0)
     mock_post.reset_mock()
-    mock_appropriate_response_action.reset_mock()
+    mock_check_and_raise_error_from_linkedin_response.reset_mock()
     return_value = services.upload_image_to_linkedin(author,
                                                      headers,
                                                      post_instance,
@@ -213,56 +213,55 @@ def test_upload_image_to_linkedin(mock_json, mock_post, mock_appropriate_respons
                   headers={'Authorization': f"Bearer {linkedin_auth['access_token']}"})
     ])
     assert return_value == asset
-    mock_appropriate_response_action.assert_not_called()
+    mock_check_and_raise_error_from_linkedin_response.assert_not_called()
 
 
 @mock.patch('nexus.social_media.services.requests.Response')
-def test_appropriate_response_action(mock_response):
+def test_check_and_raise_error_from_linkedin_response(mock_response):
     mock_response.json.return_value = {
-        "message": "Error!",
-        "serviceErrorCode": mock.Mock(),
-        "status": mock.Mock()
+        'message': 'Error!',
+        'serviceErrorCode': mock.Mock(),
+        'status': mock.Mock()
     }
     error = f"LinkedIn error: {mock_response.json.return_value['message']}"
     with pytest.raises(exc.WrongArguments) as excinfo:
         mock_response.status_code = status.HTTP_400_BAD_REQUEST
-        services.appropriate_response_action(mock_response)
+        services.check_and_raise_error_from_linkedin_response(mock_response)
     assert error in str(excinfo.value)
 
     with pytest.raises(exc.WrongArguments) as excinfo:
         mock_response.status_code = status.HTTP_404_NOT_FOUND
-        services.appropriate_response_action(mock_response)
+        services.check_and_raise_error_from_linkedin_response(mock_response)
     assert error in str(excinfo.value)
 
     with pytest.raises(exc.NotAuthenticated) as excinfo:
         mock_response.status_code = status.HTTP_401_UNAUTHORIZED
-        services.appropriate_response_action(mock_response)
+        services.check_and_raise_error_from_linkedin_response(mock_response)
     assert error in str(excinfo.value)
 
     with pytest.raises(exc.PermissionDenied) as excinfo:
         mock_response.status_code = status.HTTP_403_FORBIDDEN
-        services.appropriate_response_action(mock_response)
+        services.check_and_raise_error_from_linkedin_response(mock_response)
     assert error in str(excinfo.value)
 
     with pytest.raises(exc.NotSupported) as excinfo:
         mock_response.status_code = status.HTTP_405_METHOD_NOT_ALLOWED
-        services.appropriate_response_action(mock_response)
+        services.check_and_raise_error_from_linkedin_response(mock_response)
     assert error in str(excinfo.value)
 
     with pytest.raises(exc.RequestValidationError) as excinfo:
         mock_response.status_code = status.HTTP_417_EXPECTATION_FAILED
-        services.appropriate_response_action(mock_response)
+        services.check_and_raise_error_from_linkedin_response(mock_response)
     assert error in str(excinfo.value)
 
 
-@mock.patch('nexus.social_media.tasks.services.appropriate_response_action')
+@mock.patch('nexus.social_media.tasks.services.check_and_raise_error_from_linkedin_response')
 @mock.patch('nexus.social_media.tasks.services.publish_on_linkedin')
-def test_publish_on_linkedin_task(mock_publish_on_linkedin, mock_appropriate_response_action):
+def test_publish_on_linkedin_task(mock_publish_on_linkedin, mock_check_and_raise_error_from_linkedin_response):
     post = f.create_post()
     tasks.publish_on_linkedin_task(post.id)
-    # mock_publish_on_linkedin.return_value = requests.Response()
     mock_publish_on_linkedin.assert_called_once_with(post.id)
-    mock_appropriate_response_action.assert_called_once_with(mock_publish_on_linkedin.return_value)
+    mock_check_and_raise_error_from_linkedin_response.assert_called_once_with(mock_publish_on_linkedin.return_value)
 
 
 @mock.patch('nexus.social_media.services.tasks.publish_on_linkedin_task.delay')

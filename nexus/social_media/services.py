@@ -27,7 +27,7 @@ def upload_image_to_linkedin(author, headers, post, linkedin_auth):
 
     :param linkedin_auth: LINKEDIN_AUTH object taken from settings.
 
-    :returns: value of asset
+    :returns: The value of asset provided all responses are successful.
 
     """
     post_data_assets = {
@@ -45,6 +45,7 @@ def upload_image_to_linkedin(author, headers, post, linkedin_auth):
         }
     }
 
+    # LinkedIn assets API endpoint
     api_url_assets = f'{settings.LINKEDIN_API_URL_BASE}assets?action=registerUpload'
 
     response_assets = requests.post(api_url_assets, json=post_data_assets,
@@ -65,9 +66,9 @@ def upload_image_to_linkedin(author, headers, post, linkedin_auth):
         if response_upload_image.status_code == status.HTTP_201_CREATED:
             return asset
         else:
-            appropriate_response_action(response_upload_image)
+            check_and_raise_error_from_linkedin_response(response_upload_image)
     else:
-        appropriate_response_action(response_assets)
+        check_and_raise_error_from_linkedin_response(response_assets)
 
 
 def publish_on_linkedin(post_id):
@@ -85,6 +86,7 @@ def publish_on_linkedin(post_id):
                'Content-Type': 'application/json',
                'Authorization': f"Bearer {linkedin_auth['access_token']}"}
 
+    # LinkedIn UGC(User Generated Content) API endpoint
     api_url_ugc = f'{settings.LINKEDIN_API_URL_BASE}ugcPosts'
 
     post = Post.objects.get(pk=post_id)
@@ -106,6 +108,8 @@ def publish_on_linkedin(post_id):
     }
 
     if post.image:
+
+        # asset is required to include the image in our post after successful uploading of image.
         asset = upload_image_to_linkedin(author, headers, post, linkedin_auth)
 
         specific_content = post_data.get('specificContent')
@@ -131,8 +135,8 @@ def publish_on_linkedin(post_id):
         return response
 
 
-def appropriate_response_action(response):
-    """Function to perform appropriate action based on the response given.
+def check_and_raise_error_from_linkedin_response(response):
+    """Function to perform appropriate action based on the linkedin response given.
 
     :param response: A valid HTTP response to perform suitable action.
 
@@ -181,8 +185,8 @@ def get_twitter_api_object(TWITTER_OAUTH):
         auth.set_access_token(TWITTER_OAUTH['access_key'], TWITTER_OAUTH['access_secret'])
         twitter_api = tweepy.API(auth)
         return twitter_api
-    except tweepy.error.TweepError as excinfo:
-        raise exc.WrongArguments(str(excinfo))
+    except tweepy.error.TweepError as exc_info:
+        raise exc.WrongArguments(str(exc_info))
 
 
 def publish_on_twitter(post_id):
@@ -202,8 +206,8 @@ def publish_on_twitter(post_id):
             twitter_api.update_with_media(filename=filename, status=post.text, file=post.image)
         elif post.text:
             twitter_api.update_status(status=post.text)
-    except tweepy.error.TweepError as excinfo:
-        raise exc.BadRequest(str(excinfo))
+    except tweepy.error.TweepError as exc_info:
+        raise exc.BadRequest(str(exc_info))
 
 
 def get_fb_page_graph():
