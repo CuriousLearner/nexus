@@ -105,6 +105,8 @@ def test_user_login_and_logout(client):
     ]
     assert set(expected_keys).issubset(response.data.keys())
 
+    # Actual logout happens using JWT behind the scenes
+    # Following code just tests the endpoint
     url = reverse('auth-logout')
 
     response = client.json.post(url)
