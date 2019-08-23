@@ -347,7 +347,7 @@ Status: 200 OK
 ## Create Proposal
 
 ```
-POST /api/proposal (requires authentication)
+POST /api/proposals (requires authentication)
 ```
 
 **Parameters**
@@ -356,10 +356,10 @@ Name               | Data type     | Description
 -------------------|---------------|---------------------
 id                 | UUID          | Unique ID for the proposal
 title              | text          | Title of proposal
-speaker            | UUID          | Foreign Key to `User` Model
+speaker            | UUID          | ID of a `User`
 kind               | text          | Type of proposal like `talk`, `dev sprint`, `workshop` or `lightning_talk`
 level              | text          | Level of proposal beginner, intermediate, advanced
-duration           | text          | Duration of talk, sprint, workshop or lightening talk
+duration           | text          | Duration of the `talk`, `sprint`, `workshop` or `lightning talk`
 abstract           | text          | Abstract of the proposal
 description        | text          | Description of the proposal
 submitted_at       | datetime      | Time of submission of proposal
@@ -369,7 +369,7 @@ status             | text          | Status of proposal like `retracted`, `accep
 
 __Note__:
 - For `lightning_talk`, duration will be fixed like `00:05:00`, etc. which would be configuration through settings.
-- For `lightning_talk`, `level` of proposal is like speaker's experience which can be `beginner`, `intermediate` or `advanced`.
+- For `lightning_talk`, key `level` would be treated as speaker's experience, which can be `beginner`, `intermediate` or `advanced`.
 
 **Request**
 ```json
@@ -405,7 +405,7 @@ Status: 201 Created
 ## Update proposal details
 
 ```
-PATCH /api/proposal/:id (requires authentication)
+PATCH /api/proposals/:id (requires authentication)
 ```
 
 **Request**
@@ -429,7 +429,7 @@ PATCH /api/proposal/:id (requires authentication)
 __Note__: Non-staff users are allowed to update only following fields:
     - title
     - kind
-    - speaker_experience
+    - level
     - duration
     - abstract
     - description
@@ -456,7 +456,7 @@ Status: 201 Created
 ## Accept the proposal
 
 ```
-POST /api/proposal/:id/accept (requires authentication)
+POST /api/proposals/:id/accept (requires authentication)
 ```
 
 **Response**
@@ -481,7 +481,7 @@ Status: 200 OK
 ## Get proposal details
 
 ```
-GET /api/proposal/:id (requires authentication)
+GET /api/proposals/:id (requires authentication)
 ```
 
 **Response**
@@ -506,7 +506,7 @@ Status: 200 OK
 ## Retract the proposal
 
 ```
-POST /api/proposal/:id/retract (requires authentication)
+POST /api/proposals/:id/retract (requires authentication)
 ```
 
 **Response**
@@ -528,19 +528,39 @@ Status: 200 OK
 }
 ```
 
-## Send notification to speaker
+## Send notification to individual speaker
 
 ```
-POST /api/proposal/:id/notify (requires authentication)
+POST /api/proposals/:id/notify (requires authentication)
 ```
 
 **Response**
 Status: 200 OK
 ```json
 {
-    "message": "Notification of proposal accepted will be sent to the speaker"
+    "message": "Notification of proposal accepted will be sent to the speaker."
 }
 ```
+
+__Note__:
+- Notification will be sent only if the `status` of the proposal is `accepted`.
+
+## Send notification to all the speakers
+
+```
+POST /api/proposals/notify (requires authentication)
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "message": "Notification of proposal accepted will be sent to all the speakers."
+}
+```
+
+__Note__:
+- Notification will be sent only if the `status` of the proposal is `accepted`.
 
 # Swags
 
@@ -553,21 +573,23 @@ name              | text      | true     | ''             | Name of the swag.
 description       | text      | false    | ''             | Description of the swag.
 image             | text      | false    | ''             | URL of the image of the swag.
 created_at        | datetime  | false    | _datetime_     | Time of creation.
-modified_at       | datetime  | false    | _datetime_     | Time of modification.
+modified_at       | datetime  | false    | _datetime_     | Time of last modification.
 
 __Note__:
-- _uuid_: randomly generated UUID.
-- _datetime_: date and time when swag is created.
+- _uuid_: Randomly generated Universally Unique IDentifier (UUID).
+- _datetime_: Date and time when `Swag` is created.
+
+## Create a swag
 
 ```
-POST /api/swag (requires authentication)
+POST /api/swags (requires authentication)
 ```
 
 **Request**
 ```json
 {
-    "name": "Tshirt",
-    "description": "Sponsered by ABC"
+    "name": "tshirt",
+    "description": "sponsered by someone"
 }
 ```
 
@@ -576,8 +598,8 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Tshirt",
-    "description": "Sponsered by ABC",
+    "name": "tshirt",
+    "description": "sponsered by someone",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
@@ -587,15 +609,15 @@ Status: 201 Created
 ## Update swag details
 
 ```
-PATCH /api/swag/:swag_id (requires authentication)
+PATCH /api/swags/:id (requires authentication)
 ```
 
 **Request**
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Pendrive",
-    "description": "Sponsered by XYZ",
+    "name": "pendrive",
+    "description": "sponsered by someone else",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
@@ -607,8 +629,8 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Pendrive",
-    "description": "Sponsered by XYZ",
+    "name": "pendrive",
+    "description": "sponsered by someone else",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
@@ -618,7 +640,7 @@ Status: 201 Created
 ## Get swag details
 
 ```
-GET /api/swag/:swag_id (requires authentication)
+GET /api/swags/:id (requires authentication)
 ```
 
 **Response**
@@ -626,18 +648,18 @@ Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Tshirt",
-    "description": "Sponsered by ABC",
+    "name": "tshirt",
+    "description": "sponsered by someone",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
 }
 ```
 
-## Get details of all swags
+## Get details of all the swags
 
 ```
-GET /api/swag (requires authentication)
+GET /api/swags (requires authentication)
 ```
 
 **Response**
@@ -650,8 +672,8 @@ Status: 200 OK
     "results": [
         {
             "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-            "name": "Tshirt",
-            "description": "Sponsered by ABC",
+            "name": "tshirt",
+            "description": "sponsered by someone",
             "image": null,
             "created_at": "2018-08-01T17:30:42Z",
             "modified_at": "2018-08-01T17:30:42Z"
@@ -663,7 +685,7 @@ Status: 200 OK
 ## Delete a swag
 
 ```
-DELETE /api/swag/:swag_id (requires authentication)
+DELETE /api/swags/:id (requires authentication)
 ```
 
 **Response**
@@ -672,20 +694,21 @@ Status: 204 No-Content
 ## Upload image of a swag
 
 ```
-POST /api/swag/:swag_id/upload_image (requires authentication)
+POST /api/swags/:id/upload_image (requires authentication)
 ```
 
 Image will be uploaded as multipart data as a streaming HTTP request.
 
-__NOTE__: `image` key will be used to send multipart data.
+__Note__:
+- `image` key will be used to send multipart data.
 
 **Response**
 Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Tshirt",
-    "description": "Sponsered by ABC",
+    "name": "tshirt",
+    "description": "sponsered by someone",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
@@ -695,7 +718,7 @@ Status: 201 Created
 ## Delete the image of swag
 
 ```
-DELETE /api/swag/:swag_id/delete_image (requires authentication)
+DELETE /api/swags/:id/delete_image (requires authentication)
 ```
 
 **Response**
@@ -703,36 +726,36 @@ Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "Tshirt",
-    "description": "Sponsered by ABC",
+    "name": "tshirt",
+    "description": "sponsered by someone",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
 }
 ```
 
-# User-Swag
+# User-Swag Relation
+
+`UserSwag` relation is used to keep the account of which swag(s) is/are given to a `User`.
 
 **Parameters**
 
 Name              | Data Type | Required | Default Value  | Discription
 ------------------|-----------|----------|----------------|--------------------
-id                | UUID      | false    | _uuid_         | Unique ID for each `UserSwag` model object.
-user              | UUID      | true     | ''             | Foreign key to `User` model.
-swag              | UUID      | true     | ''             | Foreign key to `Swag` model.
-is_given          | boolean   | false    | false          | designates whether the `Swag` is given to the `User`.
-given_at          | datetime  | false    | null           | Time when the `Swag` is given to the `User`.
+id                | UUID      | false    | _uuid_         | Unique ID for each `UserSwag` entry.
+user              | UUID      | true     | ''             | ID of the `User`.
+swag              | UUID      | true     | ''             | ID of the `Swag`.
 created_at        | datetime  | false    | _datetime_     | Time of creation.
 modified_at       | datetime  | false    | _datetime_     | Time of modification.
 
-__NOTE__
-- _uuid_: randomly generated UUID.
-- _datetime_: date and time when the `UserSwag` object is created.
+__Note__:
+- _uuid_: Randomly generated Universally Unique IDentifier (UUID).
+- _datetime_: Date and time when the `UserSwag` object is created.
 
-## Create new user-swag entry
+## Create a new user-swag entry
 
 ```
-POST /api/user_swag (requires authentication)
+POST /api/user_swags (requires authentication)
 ```
 
 **Request**
@@ -750,50 +773,19 @@ Status: 201 Created
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "user": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "swag": "171956bd-717f-4021-a901-c5be80fd469b",
-    "is_given": false,
-    "given_at": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
 }
 ```
 
-## Update user-swag details
+__Note__:
+- Presence of a `UserSwag` entry indicates that, the `Swag` is given to the `User`.
+- And the key `created_at` indicates the time when `Swag` is given to the `User`.
+
+## Get user-swag entry details
 
 ```
-PATCH /api/user_swag/:id (requires authentication)
-```
-
-**Request**
-```json
-{
-    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "user": "6659577a-e4e5-4442-bf67-4b4c890d440b",
-    "swag": "171956bd-717f-4021-a901-c5be80fd469b",
-    "is_given": true,
-    "given_at": "2018-08-01T20:30:42Z",
-    "created_at": "2018-08-01T17:30:42Z",
-    "modified_at": "2018-08-01T17:30:42Z"
-}
-```
-
-**Response**
-Status: 201 Created
-```json
-{
-    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "user": "6659577a-e4e5-4442-bf67-4b4c890d440b",
-    "swag": "171956bd-717f-4021-a901-c5be80fd469b",
-    "is_given": true,
-    "given_at": "2018-08-01T20:30:42Z",
-    "created_at": "2018-08-01T17:30:42Z",
-    "modified_at": "2018-08-01T17:30:42Z"
-}
-```
-
-## Get user-swag details
-
-```
-GET /api/user_swag/:id (requires authentication)
+GET /api/user_swags/:id (requires authentication)
 ```
 
 **Response**
@@ -803,17 +795,15 @@ Status: 200 OK
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "user": "6659577a-e4e5-4442-bf67-4b4c890d440b",
     "swag": "171956bd-717f-4021-a901-c5be80fd469b",
-    "is_given": true,
-    "given_at": "2018-08-01T20:30:42Z",
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
 }
 ```
 
-## Get details of all user-swag entries
+## Get details of all the user-swag entries
 
 ```
-GET /api/user_swag
+GET /api/user_swags
 ```
 
 **Response**
@@ -828,8 +818,6 @@ Status: 200 OK
             "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
             "user": "6659577a-e4e5-4442-bf67-4b4c890d440b",
             "swag": "171956bd-717f-4021-a901-c5be80fd469b",
-            "is_given": true,
-            "given_at": "2018-08-01T20:30:42Z",
             "created_at": "2018-08-01T17:30:42Z",
             "modified_at": "2018-08-01T17:30:42Z"
         }
@@ -840,7 +828,7 @@ Status: 200 OK
 ## Delete a user-swag entry
 
 ```
-DELETE /api/user_swag/:id (requires authentication)
+DELETE /api/user_swags/:id (requires authentication)
 ```
 
 **Response**
