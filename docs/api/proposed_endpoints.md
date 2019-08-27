@@ -569,8 +569,8 @@ __Note__:
 Name              | Data Type | Required | Default Value  | Discription
 ------------------|-----------|----------|----------------|--------------------
 id                | UUID      | false    | _uuid_         | Unique ID for the swag.
-name              | text      | true     | ''             | Name of the swag.
-description       | text      | false    | ''             | Description of the swag.
+item              | UUID      | true     | ''             | ID for the swag item.
+description       | text      | true     | ''             | Description of the swag.
 image             | text      | false    | ''             | URL of the image of the swag.
 created_at        | datetime  | false    | _datetime_     | Time of creation.
 modified_at       | datetime  | false    | _datetime_     | Time of last modification.
@@ -588,7 +588,7 @@ POST /api/swags (requires authentication)
 **Request**
 ```json
 {
-    "name": "tshirt",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone"
 }
 ```
@@ -598,7 +598,7 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "tshirt",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
@@ -616,7 +616,7 @@ PATCH /api/swags/:id (requires authentication)
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "pendrive",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone else",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
@@ -629,7 +629,7 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "pendrive",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone else",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
@@ -648,7 +648,7 @@ Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "tshirt",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
@@ -672,7 +672,7 @@ Status: 200 OK
     "results": [
         {
             "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-            "name": "tshirt",
+            "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
             "description": "sponsered by someone",
             "image": null,
             "created_at": "2018-08-01T17:30:42Z",
@@ -707,7 +707,7 @@ Status: 201 Created
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "tshirt",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone",
     "image": "http://xyz.com/url/of/uploaded_image.jpg",
     "created_at": "2018-08-01T17:30:42Z",
@@ -726,13 +726,127 @@ Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
-    "name": "tshirt",
+    "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone",
     "image": null,
     "created_at": "2018-08-01T17:30:42Z",
     "modified_at": "2018-08-01T17:30:42Z"
 }
 ```
+
+## Create a swag item
+
+**Parameters**
+
+Name              | Data Type | Required | Default Value  | Discription
+------------------|-----------|----------|----------------|--------------------
+id                | UUID      | false    | _uuid_         | Unique ID for the swag item.
+name              | text      | true     | null           | Name of the item.
+created_at        | datetime  | false    | _datetime_     | Time of creation.
+modified_at       | datetime  | false    | _datetime_     | Time of last modification.
+
+__Note__:
+- _uuid_: Randomly generated Universally Unique IDentifier (UUID).
+- _datetime_: Date and time when the `OtherSwag` object is created.
+
+```
+POST /api/swags/items (requires authentication)
+```
+
+**Request**
+```json
+{
+    "name": "charger"
+}
+```
+
+**Response**
+Status: 201 Created
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "name": "charger",
+    "created_at": "2018-08-01T17:30:41",
+    "modified_at": "2018-08-01T17:30:41"
+}
+```
+
+## Update the swag item
+
+```
+PATCH /api/swags/items/:id (requires authentication)
+```
+
+**Request**
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "name": "mug",
+    "created_at": "2018-08-01T17:30:41",
+    "modified_at": "2018-08-01T17:30:41"
+}
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "name": "mug",
+    "created_at": "2018-08-01T17:30:41",
+    "modified_at": "2018-08-01T17:30:41"
+}
+```
+
+## Get details of a swag item
+
+```
+GET /api/swags/items/:id (requires authentication)
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+    "name": "mug",
+    "created_at": "2018-08-01T17:30:41",
+    "modified_at": "2018-08-01T17:30:41"    
+}
+```
+
+## Get details of all the swag items
+
+```
+GET /api/swags/items (requires authentication)
+```
+
+**Response**
+Status: 200 OK
+```json
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
+            "name": "mug",
+            "created_at": "2018-08-01T17:30:41",
+            "modified_at": "2018-08-01T17:30:41"   
+        }
+    ]
+}
+```
+
+## Delete the swag item
+
+```
+DELETE /api/swags/items/:id (requires authentication)
+```
+
+**Response**
+Status: 204 No-Content
 
 # User-Swag Relation
 
@@ -746,7 +860,7 @@ id                | UUID      | false    | _uuid_         | Unique ID for each `
 user              | UUID      | true     | ''             | ID of the `User`.
 swag              | UUID      | true     | ''             | ID of the `Swag`.
 created_at        | datetime  | false    | _datetime_     | Time of creation.
-modified_at       | datetime  | false    | _datetime_     | Time of modification.
+modified_at       | datetime  | false    | _datetime_     | Time of last modification.
 
 __Note__:
 - _uuid_: Randomly generated Universally Unique IDentifier (UUID).
@@ -780,7 +894,7 @@ Status: 201 Created
 
 __Note__:
 - Presence of a `UserSwag` entry indicates that, the `Swag` is given to the `User`.
-- And the key `created_at` indicates the time when `Swag` is given to the `User`.
+- And the key `created_at` indicates the time when the `Swag` is given to the `User`.
 
 ## Get user-swag entry details
 
