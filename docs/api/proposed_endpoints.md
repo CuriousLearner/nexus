@@ -368,7 +368,7 @@ modified_at        | datetime      | Time of modification
 status             | text          | Status of proposal like `retracted`, `accepted`, `unaccepted`, `submitted`, etc.
 
 __Note__:
-- For `lightning_talk`, duration will be fixed like `00:05:00`, etc. which would be configuration through settings.
+- For `lightning_talk`, the duration will be fixed like `00:05:00`, etc. which would be configuration through settings.
 - For `lightning_talk`, key `level` would be treated as speaker's experience, which can be `beginner`, `intermediate` or `advanced`.
 
 **Request**
@@ -411,7 +411,6 @@ PATCH /api/proposals/:id (requires authentication)
 **Request**
 ```json
 {
-    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "title": "Sample title of the talk",
     "speaker": "070af5d3-03a1-4a38-9a75-5b76de8826d2",
     "kind": "talk",
@@ -435,7 +434,7 @@ __Note__: Non-staff users are allowed to update only following fields:
     - description
 
 **Response**
-Status: 201 Created
+Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
@@ -615,7 +614,6 @@ PATCH /api/swags/:id (requires authentication)
 **Request**
 ```json
 {
-    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "item": "12abcff0-bcbc-01fc-abcd-01012bc4e0b1",
     "description": "sponsered by someone else",
     "image": null,
@@ -625,7 +623,7 @@ PATCH /api/swags/:id (requires authentication)
 ```
 
 **Response**
-Status: 201 Created
+Status: 200 OK
 ```json
 {
     "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
@@ -780,7 +778,6 @@ PATCH /api/swags/items/:id (requires authentication)
 **Request**
 ```json
 {
-    "id": "0f342ac1-ac32-4bd1-3612-efa32bc3d9a0",
     "name": "mug",
     "created_at": "2018-08-01T17:30:41",
     "modified_at": "2018-08-01T17:30:41"
