@@ -481,8 +481,10 @@ SITE_INFO = {
     'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] != ''
 }
 
-# SOCIAL MEDIA CONFIGURATION
-# -----------------------------------------------------------------------------
+
+# SOCIAL MEDIA CONFIGURATIONS
+# --------------------------------------------------------------------
+
 LIMIT_POSTS = False
 try:
     MAX_POSTS_AT_ONCE = int(env('MAX_POSTS_AT_ONCE', default=5))
@@ -490,6 +492,12 @@ except ValueError:
     raise exceptions.ImproperlyConfigured('MAX_POSTS_AT_ONCE should be an int')
 FB_USER_ACCESS_TOKEN = env('FB_USER_ACCESS_TOKEN', default='NO USER ACCESS TOKEN')
 FB_PAGE_ID = env('FB_PAGE_ID', default='NO PAGE ID')
+
+LINKEDIN_AUTH = {
+    'access_token': env('LINKEDIN_ACCESS_TOKEN', default='FakeAccessToken'),
+    'organization_id': env('LINKEDIN_ORGANIZATION_ID', default='FakeOrganizationId'),
+}
+LINKEDIN_API_URL_BASE = 'https://api.linkedin.com/v2/'
 
 TWITTER_OAUTH = {
     'consumer_key': env('TWITTER_CONSUMER_KEY', default='FakeTwitterConsumerKey'),

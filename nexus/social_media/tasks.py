@@ -16,6 +16,14 @@ def publish_on_facebook_task(post_id):
     services.publish_on_facebook(post_id)
 
 
+@app.task(name='publish_on_linkedin_task',
+          autoretry_for=(Exception, ),
+          retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
+def publish_on_linkedin_task(post_id):
+    response = services.publish_on_linkedin(post_id)
+    services.check_and_raise_error_from_linkedin_response(response)
+
+
 @app.task(name='publish_on_twitter_task',
           autoretry_for=(Exception, ),
           retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
