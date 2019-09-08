@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-# Standard Library
-from datetime import datetime
-
 # Third Party Stuff
 import facebook
 import requests
@@ -214,9 +211,12 @@ def get_fb_page_graph():
     graph = facebook.GraphAPI(settings.FB_USER_ACCESS_TOKEN)
     pages = graph.get_object('me/accounts')['data']
     page_access_token = None
-    page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    try:
+        page_list = list(filter(lambda page: page['id'] == settings.FB_PAGE_ID, pages))
+    except KeyError:
+        raise exc.WrongArguments('No ID associated with FB_USER_ACCESS_TOKEN.')
     if not page_list:
-        raise exc.WrongArguments('Facebook Page access token could not be found')
+        raise exc.WrongArguments('No matching ID in account data. Incorrect FB_PAGE_ID')
     page_access_token = page_list[0]['access_token']
     page_graph = facebook.GraphAPI(page_access_token)
     return page_graph
@@ -238,7 +238,7 @@ def publish_on_facebook(post_id):
 
 
 def publish_on_social_media():
-    posts = Post.objects.filter(is_approved=True, is_posted=False, scheduled_time__lte=datetime.now())
+    posts = Post.objects.filter(is_approved=True, is_posted=False, scheduled_time__lte=timezone.now())
 
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
         posts = posts[:int(settings.MAX_POSTS_AT_ONCE)]

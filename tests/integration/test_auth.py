@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Standard Library
 import json
 
@@ -88,7 +89,7 @@ def test_user_registration_for_already_registered_email(client):
     assert response.data['errors'][0]['field'] == 'email'
 
 
-def test_user_login(client):
+def test_user_login_and_logout(client):
     url = reverse('auth-login')
     u = f.create_user(email='test@example.com', password='test')
 
@@ -103,6 +104,15 @@ def test_user_login(client):
         'is_core_organizer', 'is_volunteer', 'date_joined', 'is_active', 'is_staff', 'is_superuser', 'auth_token'
     ]
     assert set(expected_keys).issubset(response.data.keys())
+
+    # This is not a real logout. JWT remains consistent.
+    # Following code just tests the endpoint
+    url = reverse('auth-logout')
+
+    response = client.json.post(url)
+    assert response.status_code == 200
+    assert 'success' in response.data.keys()
+    assert response.data['success'] == 'Successfully logged out.'
 
 
 def test_user_login_with_incorrect_credentials(client):
@@ -163,7 +173,7 @@ def test_user_password_reset(client, mailoutbox, settings):
     assert len(mailoutbox) == 1
     mail_body = mailoutbox[0].body
     token = get_token_for_password_reset(user)
-    assert "{}://{}".format(settings.FRONTEND_SITE_SCHEME, settings.FRONTEND_SITE_DOMAIN) in mail_body
+    assert '{}://{}'.format(settings.FRONTEND_SITE_SCHEME, settings.FRONTEND_SITE_DOMAIN) in mail_body
     assert token in mail_body
     assert user.email in mailoutbox[0].to
 
