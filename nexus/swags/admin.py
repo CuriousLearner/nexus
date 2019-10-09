@@ -9,9 +9,9 @@ from nexus.swags.models import Swag, SwagItem, SwagOwnership
 @admin.register(Swag)
 class SwagAdmin(admin.ModelAdmin):
     fieldsets = (
-        ('Swag Details', {'fields': ('item', 'description', 'image')}),
+        ('Swag Details', {'fields': ('item', 'sponsered_by', 'description', 'image')}),
     )
-    list_display = ('item',)
+    list_display = ('item', 'sponsered_by', 'description')
 
 
 @admin.register(SwagItem)
@@ -27,3 +27,4 @@ class UserSwagAdmin(admin.ModelAdmin):
     fieldsets = (
         ('User Swag relationships', {'fields': ('user', 'swag')}),
     )
+    list_display = ('user', 'swag')
