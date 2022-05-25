@@ -51,7 +51,7 @@ celery[redis]==4.3.0
 
 # Auth Stuff
 # -------------------------------------
-PyJWT==1.7.1
+PyJWT==2.4.0
 django-mail-templated==2.6.5
 
 # Third-Party Apps
