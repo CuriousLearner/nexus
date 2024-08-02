@@ -1,8 +1,8 @@
 # Third Party Stuff
 from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
 from django.http import Http404
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 
@@ -124,7 +124,7 @@ def format_exception(exc):
     else:
         detail['errors'].append(
             {
-                'message': force_text(exc.detail),
+                'message': force_str(exc.detail),
             }
         )
 

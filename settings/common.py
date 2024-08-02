@@ -8,7 +8,7 @@ see: https://docs.djangoproject.com/en/dev/ref/settings/
 import environ
 from corsheaders.defaults import default_headers
 from django.core import exceptions
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
 APPS_DIR = ROOT_DIR.path('nexus')
@@ -223,7 +223,6 @@ USE_I18N = True
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale.
-USE_L10N = True
 
 # The list of directories to search for fixtures
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-FIXTURE_DIRS

@@ -2,7 +2,7 @@
 
 # Documentation
 # -------------------------------------
-isort==4.3.21
+isort==5.13.2
 
 # Livereload
 # -------------------------------------
@@ -10,21 +10,21 @@ devrecargar==0.1.4
 
 # Debugging
 # -------------------------------------
-django-debug-toolbar==2.0
-ipdb==0.12.1
+django-debug-toolbar==4.4.6
+ipdb==0.13.13
 
 # Testing and coverage
 # -------------------------------------
-pytest==5.0.1
-pytest-django==3.5.1
-pytest-cov==2.7.1
-django-dynamic-fixture==2.0.0
+pytest==8.3.2
+pytest-django==4.8.0
+pytest-cov==5.0.0
+django-dynamic-fixture==4.0.1
 flake8-mypy==17.8.0
-pytest-mock==1.10.4
+pytest-mock==3.14.0
 
 # Versioning
 # -------------------------------------
-bumpversion==0.5.3
+bumpversion==0.6.0
 
 # Deployment and Tasks
 # -------------------------------------
