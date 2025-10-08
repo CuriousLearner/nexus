@@ -29,3 +29,10 @@ def publish_on_linkedin_task(post_id):
           retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
 def publish_on_twitter_task(post_id):
     services.publish_on_twitter(post_id)
+
+
+@app.task(name='publish_on_instagram_task',
+          autoretry_for=(Exception, ),
+          retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
+def publish_on_instagram_task(post_id):
+    services.publish_on_instagram(post_id)

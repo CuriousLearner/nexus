@@ -5,6 +5,8 @@ from extended_choices import Choices
 
 # Nexus Stuff
 from nexus.base.models import TimeStampedUUIDModel
+from nexus.proposals.reviewer_models import ProposalReview, ProposalReviewer  # noqa
+from nexus.proposals.scoring_models import ProposalOverallScore, ProposalScore, ReviewCriteria  # noqa
 
 
 class Proposal(TimeStampedUUIDModel):

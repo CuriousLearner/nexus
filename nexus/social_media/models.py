@@ -12,12 +12,26 @@ class Post(ImageMixin, TimeStampedUUIDModel):
     """ Post model class to provide post related field
     """
     posted_by = models.ForeignKey('users.User', on_delete=models.CASCADE, verbose_name=_('Posted by'))
+    PLATFORM_CHOICES = (
+        ('fb', 'Facebook'),
+        ('twitter', 'Twitter'),
+        ('linkedin', 'Linkedin'),
+        ('instagram', 'Instagram'),
+    )
+
     posted_at = models.CharField(
         _('Posted at platform'),
-        choices=(('fb', 'Facebook'),
-                 ('twitter', 'Twitter'),
-                 ('linkedin', 'Linkedin')),
-        max_length=10)
+        choices=PLATFORM_CHOICES,
+        max_length=10,
+        blank=True,
+        null=True,
+        help_text='Leave empty for multi-platform posting')
+    platforms = models.JSONField(
+        _('Platforms'),
+        default=list,
+        blank=True,
+        help_text='List of platforms for multi-platform posting. Use when posted_at is empty.'
+    )
     scheduled_time = models.DateTimeField(_('Scheduled at'), null=True, blank=True)
     approval_time = models.DateTimeField(_('Approved at'), null=True, blank=True)
     posted_time = models.DateTimeField(_('Posted at'), null=True, blank=True)

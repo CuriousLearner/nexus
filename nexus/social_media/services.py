@@ -237,22 +237,62 @@ def publish_on_facebook(post_id):
         )
 
 
+def publish_on_instagram(post_id):
+    """Function to post on Instagram.
+
+    :param post_id: UUID of the post instance to be posted.
+
+    :raises BadRequest: Exception, when unable to post to Instagram.
+
+    """
+    from instagrapi import Client
+
+    post = Post.objects.get(pk=post_id)
+
+    cl = Client()
+    cl.login(settings.INSTAGRAM_USERNAME, settings.INSTAGRAM_PASSWORD)
+
+    try:
+        if post.image and post.text:
+            cl.photo_upload(post.image.path, caption=post.text)
+        elif post.image:
+            cl.photo_upload(post.image.path)
+        elif post.text:
+            # Instagram requires media, so we'll skip text-only posts
+            raise exc.BadRequest("Instagram requires an image to post")
+    except Exception as exc_info:
+        raise exc.BadRequest(str(exc_info))
+
+
 def publish_on_social_media():
-    posts = Post.objects.filter(is_approved=True, is_posted=False, scheduled_time__lte=timezone.now())
+    posts = Post.objects.filter(is_approved=True, is_posted=False, is_draft=False, scheduled_time__lte=timezone.now())
 
     if settings.LIMIT_POSTS is True and int(settings.MAX_POSTS_AT_ONCE) > 0:
         posts = posts[:int(settings.MAX_POSTS_AT_ONCE)]
 
     # Before performing the bulk update, here we are saving the IDs of posts along with there publishing platforms.
     # Because this queryset "posts" will get empty, after running the update query.
-    post_id_and_platform = list(posts.values('id', 'posted_at'))
+    post_data = list(posts.values('id', 'posted_at', 'platforms'))
 
     Post.objects.filter(id__in=posts).update(is_posted=True, posted_time=timezone.now())
 
-    for post in post_id_and_platform:
-        if post['posted_at'] == 'fb':
-            tasks.publish_on_facebook_task.delay(post['id'])
-        elif post['posted_at'] == 'twitter':
-            tasks.publish_on_twitter_task.delay(post['id'])
-        elif post['posted_at'] == 'linkedin':
-            tasks.publish_on_linkedin_task.delay(post['id'])
+    for post in post_data:
+        # Check if multi-platform posting
+        if post['platforms'] and len(post['platforms']) > 0:
+            for platform in post['platforms']:
+                _publish_to_platform(platform, post['id'])
+        elif post['posted_at']:
+            # Single platform posting
+            _publish_to_platform(post['posted_at'], post['id'])
+
+
+def _publish_to_platform(platform, post_id):
+    """Helper function to publish to specific platform"""
+    if platform == 'fb':
+        tasks.publish_on_facebook_task.delay(post_id)
+    elif platform == 'twitter':
+        tasks.publish_on_twitter_task.delay(post_id)
+    elif platform == 'linkedin':
+        tasks.publish_on_linkedin_task.delay(post_id)
+    elif platform == 'instagram':
+        tasks.publish_on_instagram_task.delay(post_id)

@@ -1,0 +1,28 @@
+{% load i18n %}
+Subject: {% trans "Verify Your Email Address" %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>{% trans "Email Verification" %}</h2>
+
+    <p>{% trans "Dear" %} {{ user.get_full_name|default:user.email }},</p>
+
+    <p>{% trans "Thank you for registering! Please verify your email address by clicking the link below:" %}</p>
+
+    <p><a href="{{ verification_url }}">{% trans "Verify Email" %}</a></p>
+
+    <p>{% trans "Or copy and paste this link in your browser:" %}</p>
+    <p>{{ verification_url }}</p>
+
+    <p>{% trans "This link will expire in 48 hours." %}</p>
+
+    <p>{% trans "If you did not create an account, please ignore this email." %}</p>
+
+    <p>{% trans "Best regards," %}<br>
+    {% trans "The Nexus Team" %}</p>
+</body>
+</html>

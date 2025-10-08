@@ -77,6 +77,13 @@ class User(AbstractBaseUser, UUIDModel, PermissionsMixin):
                                             help_text='Designates whether this user is a Core Organizer')
     is_volunteer = models.BooleanField(_('User is volunteer'), default=False, null=False, blank=True,
                                        help_text='Designates whether this user is a Volunteer')
+    profile_photo = models.ImageField(_('Profile Photo'), upload_to='profile_photos/', null=True, blank=True,
+                                     help_text='User profile photo')
+    bio = models.TextField(_('Bio'), blank=True, default='', help_text='User biography')
+    twitter_handle = models.CharField(_('Twitter Handle'), max_length=50, blank=True, default='')
+    linkedin_url = models.URLField(_('LinkedIn URL'), blank=True, default='')
+    github_username = models.CharField(_('GitHub Username'), max_length=100, blank=True, default='')
+    website = models.URLField(_('Website'), blank=True, default='')
 
     USERNAME_FIELD = 'email'
     objects = UserManager()

@@ -67,9 +67,60 @@ class AuthViewSet(MultipleSerializerMixin, viewsets.GenericViewSet):
 
     @action(methods=['POST', ], detail=False)
     def password_reset_confirm(self, request):
+        from nexus.users.tokens import PasswordResetToken
+        from nexus.base import exceptions as exc
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = tokens.get_user_for_password_reset_token(serializer.validated_data['token'])
-        user.set_password(serializer.validated_data['new_password'])
-        user.save()
-        return response.NoContent()
+
+        try:
+            reset_token = PasswordResetToken.objects.get(token=serializer.validated_data['token'])
+            if not reset_token.is_valid():
+                raise exc.BadRequest('Token is invalid or expired')
+
+            user = reset_token.user
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            reset_token.mark_as_used()
+            return response.NoContent()
+        except PasswordResetToken.DoesNotExist:
+            raise exc.BadRequest('Invalid token')
+
+    @action(methods=['POST', ], detail=False)
+    def verify_email(self, request):
+        from nexus.users.tokens import EmailVerificationToken
+        from nexus.base import exceptions as exc
+        from rest_framework import serializers as drf_serializers
+
+        class VerifyEmailSerializer(drf_serializers.Serializer):
+            token = drf_serializers.CharField()
+
+        serializer = VerifyEmailSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            verification_token = EmailVerificationToken.objects.get(token=serializer.validated_data['token'])
+            if not verification_token.is_valid():
+                raise exc.BadRequest('Token is invalid or expired')
+
+            user = verification_token.user
+            user.is_active = True
+            user.save()
+            verification_token.mark_as_used()
+            return response.Ok({'message': 'Email verified successfully'})
+        except EmailVerificationToken.DoesNotExist:
+            raise exc.BadRequest('Invalid token')
+
+    @action(methods=['POST', ], detail=False)
+    def resend_verification(self, request):
+        from rest_framework import serializers as drf_serializers
+
+        class ResendVerificationSerializer(drf_serializers.Serializer):
+            email = drf_serializers.EmailField()
+
+        serializer = ResendVerificationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = user_services.get_user_by_email(serializer.validated_data['email'])
+        if user and not user.is_active:
+            services.send_email_verification_mail(user)
+        return response.Ok({'message': 'Verification email sent if account exists and is unverified'})
