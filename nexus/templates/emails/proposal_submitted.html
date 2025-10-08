@@ -1,0 +1,25 @@
+{% load i18n %}
+Subject: {% trans "Your Proposal Has Been Submitted" %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>{% trans "Proposal Submitted Successfully" %}</h2>
+
+    <p>{% trans "Dear" %} {{ speaker_name }},</p>
+
+    <p>{% trans "Thank you for submitting your proposal!" %}</p>
+
+    <p><strong>{% trans "Proposal Title:" %}</strong> {{ proposal_title }}</p>
+
+    <p>{% trans "Your proposal has been received and is now under review. We will notify you once a decision has been made." %}</p>
+
+    <p>{% trans "Thank you for your interest in participating." %}</p>
+
+    <p>{% trans "Best regards," %}<br>
+    {% trans "The Nexus Team" %}</p>
+</body>
+</html>

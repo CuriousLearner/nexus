@@ -15,9 +15,9 @@ ipdb==0.13.13
 
 # Testing and coverage
 # -------------------------------------
-pytest==8.3.2
-pytest-django==4.8.0
-pytest-cov==5.0.0
+pytest==8.3.4
+pytest-django==4.9.0
+pytest-cov==6.0.0
 django-dynamic-fixture==4.0.1
 flake8-mypy==17.8.0
 pytest-mock==3.14.0
@@ -29,8 +29,8 @@ bumpversion==0.6.0
 # Deployment and Tasks
 # -------------------------------------
 fabric3==1.14.post1
-ansible==2.8.3
+ansible==11.1.0
 
 # Code quality
 #--------------------------------------
-pre-commit==1.17.0
+pre-commit==4.0.1

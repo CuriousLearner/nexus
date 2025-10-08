@@ -16,7 +16,7 @@ class AdminPostSerializer(serializers.ModelSerializer):
         model = models.Post
         fields = ['id', 'created_at', 'modified_at', 'posted_by', 'scheduled_time',
                   'approval_time', 'posted_time', 'posted_at', 'image', 'text',
-                  'is_approved', 'is_posted']
+                  'is_approved', 'is_posted', 'is_draft']
         read_only_fields = ['created_at', 'modified_at']
 
 

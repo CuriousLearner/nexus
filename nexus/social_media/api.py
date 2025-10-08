@@ -1,13 +1,14 @@
 # Third Party Stuff
 from django.utils import timezone
-from rest_framework import mixins, viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action, parser_classes
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 
 # nexus Stuff
 from nexus.base import response
-from nexus.social_media import models, permissions, serializers
+from nexus.social_media import filters as social_filters, models, permissions, serializers
 
 
 class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
@@ -15,6 +16,10 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
                   mixins.DestroyModelMixin, viewsets.GenericViewSet):
     queryset = models.Post.objects.all().order_by('-scheduled_time')
     permission_classes = (IsAuthenticated, permissions.IsAdminOrAuthorOfPost)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = social_filters.PostFilter
+    search_fields = ['text', 'posted_by__email', 'posted_by__first_name', 'posted_by__last_name']
+    ordering_fields = ['scheduled_time', 'posted_time', 'created_at', 'approval_time']
 
     def get_serializer_class(self):
         if self.action in ('approve', 'unapprove'):
@@ -69,3 +74,59 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
         instance.image.delete(save=True)
         serializer = self.get_serializer(instance)
         return response.Ok(serializer.data)
+
+    @action(methods=['GET'], detail=True)
+    def preview(self, request, pk=None):
+        """Preview post content before publishing"""
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return response.Ok(serializer.data)
+
+    @action(methods=['POST'], detail=True)
+    def duplicate(self, request, pk=None):
+        """Duplicate an existing post"""
+        instance = self.get_object()
+        duplicated_post = models.Post.objects.create(
+            posted_by=request.user,
+            posted_at=instance.posted_at,
+            text=instance.text,
+            scheduled_time=None,
+            is_approved=False,
+            is_posted=False
+        )
+        if instance.image:
+            duplicated_post.image = instance.image
+            duplicated_post.save()
+        serializer = self.get_serializer(duplicated_post)
+        return response.Ok(serializer.data)
+
+    @action(methods=['GET'], detail=False)
+    def export_csv(self, request):
+        """Export posts to CSV format"""
+        import csv
+        from django.http import HttpResponse
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        response_csv = HttpResponse(content_type='text/csv')
+        response_csv['Content-Disposition'] = 'attachment; filename="posts_export.csv"'
+
+        writer = csv.writer(response_csv)
+        writer.writerow(['ID', 'Posted By', 'Platform', 'Text', 'Scheduled Time',
+                        'Posted Time', 'Is Approved', 'Is Posted', 'Is Draft', 'Created At'])
+
+        for post in queryset:
+            writer.writerow([
+                str(post.id),
+                post.posted_by.email,
+                post.get_posted_at_display(),
+                post.text or '',
+                post.scheduled_time.strftime('%Y-%m-%d %H:%M:%S') if post.scheduled_time else '',
+                post.posted_time.strftime('%Y-%m-%d %H:%M:%S') if post.posted_time else '',
+                post.is_approved,
+                post.is_posted,
+                post.is_draft,
+                post.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+
+        return response_csv

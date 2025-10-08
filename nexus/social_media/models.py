@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 # nexus Stuff
 # Nexus Stuff
 from nexus.base.models import ImageMixin, TimeStampedUUIDModel
+from nexus.social_media.analytics_models import PostAnalytics  # noqa
 
 
 class Post(ImageMixin, TimeStampedUUIDModel):
@@ -27,6 +28,9 @@ class Post(ImageMixin, TimeStampedUUIDModel):
     is_posted = models.BooleanField(
         _('Is posted'), default=False,
         help_text='is the post published?')
+    is_draft = models.BooleanField(
+        _('Is draft'), default=False,
+        help_text='is the post saved as draft?')
 
     class Meta:
         verbose_name = _('Post')

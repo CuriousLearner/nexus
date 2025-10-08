@@ -1,0 +1,25 @@
+{% load i18n %}
+Subject: {% trans "Update on Your Proposal Submission" %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>{% trans "Proposal Status Update" %}</h2>
+
+    <p>{% trans "Dear" %} {{ speaker_name }},</p>
+
+    <p>{% trans "Thank you for submitting your proposal. After careful review, we regret to inform you that we are unable to accept your proposal at this time." %}</p>
+
+    <p><strong>{% trans "Proposal Title:" %}</strong> {{ proposal_title }}</p>
+
+    <p>{% trans "We received many excellent submissions and had to make difficult decisions. We encourage you to submit again in the future." %}</p>
+
+    <p>{% trans "Thank you for your interest and understanding." %}</p>
+
+    <p>{% trans "Best regards," %}<br>
+    {% trans "The Nexus Team" %}</p>
+</body>
+</html>

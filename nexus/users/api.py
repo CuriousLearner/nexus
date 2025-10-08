@@ -1,15 +1,20 @@
 # Third Party Stuff
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
 
 # nexus Stuff
 from nexus.base import response
 
-from . import models, serializers
+from . import filters as user_filters, models, serializers
 
 
 class CurrentUserViewSet(viewsets.GenericViewSet):
     serializer_class = serializers.UserSerializer
     queryset = models.User.objects.filter(is_active=True)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = user_filters.UserFilter
+    search_fields = ['email', 'first_name', 'last_name']
+    ordering_fields = ['date_joined', 'email', 'first_name', 'last_name']
 
     def get_object(self):
         return self.request.user

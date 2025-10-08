@@ -1,0 +1,25 @@
+{% load i18n %}
+Subject: {% trans "Congratulations! Your Proposal Has Been Accepted" %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h2>{% trans "Proposal Accepted!" %}</h2>
+
+    <p>{% trans "Dear" %} {{ speaker_name }},</p>
+
+    <p>{% trans "Congratulations! We are pleased to inform you that your proposal has been accepted." %}</p>
+
+    <p><strong>{% trans "Proposal Title:" %}</strong> {{ proposal_title }}</p>
+
+    <p>{% trans "We are excited to have you participate. Further details about the event schedule will be sent to you soon." %}</p>
+
+    <p>{% trans "Thank you for your contribution." %}</p>
+
+    <p>{% trans "Best regards," %}<br>
+    {% trans "The Nexus Team" %}</p>
+</body>
+</html>
