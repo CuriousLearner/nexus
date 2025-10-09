@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _
 # Nexus Stuff
 from nexus.base.models import ImageMixin, TimeStampedUUIDModel
 from nexus.social_media.analytics_models import PostAnalytics  # noqa
+from nexus.social_media.schedule_models import PlatformSchedule  # noqa
 
 
 class Post(ImageMixin, TimeStampedUUIDModel):
@@ -17,6 +18,7 @@ class Post(ImageMixin, TimeStampedUUIDModel):
         ('twitter', 'Twitter'),
         ('linkedin', 'Linkedin'),
         ('instagram', 'Instagram'),
+        ('threads', 'Threads'),
     )
 
     posted_at = models.CharField(
@@ -45,6 +47,12 @@ class Post(ImageMixin, TimeStampedUUIDModel):
     is_draft = models.BooleanField(
         _('Is draft'), default=False,
         help_text='is the post saved as draft?')
+    video = models.FileField(_('Video'), upload_to='post_videos/', null=True, blank=True,
+                             help_text='Video file for the post')
+    use_platform_schedules = models.BooleanField(
+        _('Use Platform Schedules'), default=False,
+        help_text='Use individual platform schedules instead of single scheduled_time'
+    )
 
     class Meta:
         verbose_name = _('Post')

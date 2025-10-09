@@ -56,8 +56,25 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
     @action(methods=['POST'], detail=True)
     @parser_classes((FormParser, MultiPartParser))
     def upload_image(self, request, pk=None):
+        from nexus.social_media import image_optimizer
+
         instance = self.get_object()
         if request.FILES:
+            image_file = request.FILES.get('image')
+
+            # Optimize image for the target platform(s)
+            if instance.posted_at:
+                optimized = image_optimizer.optimize_image_for_platform(
+                    image_file, instance.posted_at
+                )
+                request.FILES['image'] = optimized
+            elif instance.platforms:
+                # Optimize for the first platform in the list
+                optimized = image_optimizer.optimize_image_for_platform(
+                    image_file, instance.platforms[0]
+                )
+                request.FILES['image'] = optimized
+
             data = request.data
             serializer = self.get_serializer(instance, data, partial=True)
             serializer.is_valid(raise_exception=True)

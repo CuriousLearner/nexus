@@ -296,3 +296,5 @@ def _publish_to_platform(platform, post_id):
         tasks.publish_on_linkedin_task.delay(post_id)
     elif platform == 'instagram':
         tasks.publish_on_instagram_task.delay(post_id)
+    elif platform == 'threads':
+        tasks.publish_on_threads_task.delay(post_id)

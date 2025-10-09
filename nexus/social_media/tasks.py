@@ -36,3 +36,18 @@ def publish_on_twitter_task(post_id):
           retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
 def publish_on_instagram_task(post_id):
     services.publish_on_instagram(post_id)
+
+
+@app.task(name='publish_on_threads_task',
+          autoretry_for=(Exception, ),
+          retry_kwargs={'max_retries': 3, 'countdown': 2 * 60})
+def publish_on_threads_task(post_id):
+    from nexus.social_media import platform_services
+    platform_services.publish_on_threads(post_id)
+
+
+@app.task(name='publish_platform_schedules_task')
+def publish_platform_schedules_task():
+    """Task to process platform-specific schedules"""
+    from nexus.social_media import platform_services
+    platform_services.publish_platform_schedules()
