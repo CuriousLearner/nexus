@@ -33,14 +33,16 @@ INSTALLED_APPS = (
     'nexus.users',
     'nexus.social_media',
     'nexus.proposals',
+    'nexus.events',
+    'nexus.volunteers',
 
     'rest_framework',  # http://www.django-rest-framework.org/
-    'rest_framework_swagger',
+    'drf_yasg',  # https://drf-yasg.readthedocs.io/
+    'django_filters',  # https://django-filter.readthedocs.io/
     'versatileimagefield',  # https://github.com/WGBH/django-versatileimagefield/
     'corsheaders',   # https://github.com/ottoyiu/django-cors-headers/
     'phonenumber_field',  # https://github.com/stefanfoulis/django-phonenumber-field
 
-    'raven.contrib.django.raven_compat',
     'mail_templated',  # https://github.com/artemrizhov/django-mail-templated
 )
 
@@ -264,7 +266,12 @@ DATABASES = {
 }
 DATABASES['default']['ATOMIC_REQUESTS'] = True
 DATABASES['default']['CONN_MAX_AGE'] = 10
-DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+
+# Only set postgis engine if using PostgreSQL
+if 'postgres' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+elif 'sqlite' in DATABASES['default']['ENGINE']:
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
 
 # TEMPLATE CONFIGURATION
 # -----------------------------------------------------------------------------
@@ -416,7 +423,7 @@ LOGGING = {
         },
         'sentry': {
             'level': 'ERROR',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            'class': 'logging.StreamHandler',
             'formatter': 'complete',
             'filters': ['request_id'],
         },
@@ -458,26 +465,39 @@ LOGGING = {
 def get_release():
     import nexus
     import os
-    import raven
+    import subprocess
     release = nexus.__version__
     try:
-        git_hash = raven.fetch_git_sha(os.path.dirname(os.pardir))[:7]
+        # Try to get git hash using subprocess
+        git_hash = subprocess.check_output(
+            ['git', 'rev-parse', '--short=7', 'HEAD'],
+            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            stderr=subprocess.DEVNULL
+        ).decode('utf-8').strip()
         release = '{}-{}'.format(release, git_hash)
-    except raven.exceptions.InvalidGitRepository:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         pass
     return release
 
 
 RELEASE_VERSION = get_release()
-RAVEN_CONFIG = {
-    'dsn': env('SENTRY_DSN', default=''),
-    'environment': env('SENTRY_ENVIRONMENT', default='production'),
-    'release': RELEASE_VERSION,
-}
+
+# Sentry SDK configuration
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_dsn = env('SENTRY_DSN', default='')
+if sentry_dsn:
+    sentry_sdk.init(
+        dsn=sentry_dsn,
+        environment=env('SENTRY_ENVIRONMENT', default='production'),
+        release=RELEASE_VERSION,
+        integrations=[DjangoIntegration()],
+    )
 
 SITE_INFO = {
     'RELEASE_VERSION': RELEASE_VERSION,
-    'IS_RAVEN_INSTALLED': RAVEN_CONFIG['dsn'] != ''
+    'IS_SENTRY_INSTALLED': sentry_dsn != ''
 }
 
 

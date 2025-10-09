@@ -35,3 +35,50 @@ def create_proposal_kind(**kwargs):
 
 def create_post(**kwargs):
     return G(apps.get_model('social_media.Post'), **kwargs)
+
+
+# Events factories
+def create_event(**kwargs):
+    return G(apps.get_model('events.Event'), **kwargs)
+
+
+def create_venue(**kwargs):
+    return G(apps.get_model('events.Venue'), **kwargs)
+
+
+def create_session(**kwargs):
+    return G(apps.get_model('events.Session'), **kwargs)
+
+
+def create_attendee(**kwargs):
+    return G(apps.get_model('events.Attendee'), **kwargs)
+
+
+def create_sponsor(**kwargs):
+    return G(apps.get_model('events.Sponsor'), **kwargs)
+
+
+# Volunteers factories
+def create_volunteer_role(**kwargs):
+    return G(apps.get_model('volunteers.VolunteerRole'), **kwargs)
+
+
+def create_volunteer_shift(**kwargs):
+    return G(apps.get_model('volunteers.VolunteerShift'), **kwargs)
+
+
+def create_volunteer_assignment(**kwargs):
+    return G(apps.get_model('volunteers.VolunteerAssignment'), **kwargs)
+
+
+def create_volunteer_task(**kwargs):
+    return G(apps.get_model('volunteers.VolunteerTask'), **kwargs)
+
+
+def create_volunteer_hours(**kwargs):
+    return G(apps.get_model('volunteers.VolunteerHours'), **kwargs)
+
+
+# Audit factories
+def create_audit_log(**kwargs):
+    return G(apps.get_model('base.AuditLog'), **kwargs)

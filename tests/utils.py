@@ -1,11 +1,11 @@
 # Standard Library
 import functools
+from io import BytesIO
 
 # Third Party Stuff
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db.models import signals
-from django.utils.six import BytesIO
 from PIL import Image
 
 
