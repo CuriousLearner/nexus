@@ -51,3 +51,39 @@ def publish_platform_schedules_task():
     """Task to process platform-specific schedules"""
     from nexus.social_media import platform_services
     platform_services.publish_platform_schedules()
+
+
+@app.task(name='process_recurring_posts_task')
+def process_recurring_posts_task():
+    """Task to process recurring posts and create new post instances"""
+    from django.utils import timezone
+    from nexus.social_media.recurring_models import RecurringPost
+
+    # Get all active recurring posts that are due
+    recurring_posts = RecurringPost.objects.filter(
+        status=RecurringPost.STATUS_CHOICES.ACTIVE,
+        next_post_at__lte=timezone.now()
+    )
+
+    for recurring_post in recurring_posts:
+        recurring_post.create_post_instance()
+
+
+@app.task(name='process_post_hashtags_task')
+def process_post_hashtags_task(post_id):
+    """Task to extract and process hashtags from a post"""
+    from nexus.social_media.models import Post
+    from nexus.social_media.hashtag_analytics import process_post_hashtags
+
+    try:
+        post = Post.objects.get(id=post_id)
+        process_post_hashtags(post)
+    except Post.DoesNotExist:
+        pass
+
+
+@app.task(name='create_hashtag_snapshots_task')
+def create_hashtag_snapshots_task():
+    """Task to create daily hashtag performance snapshots"""
+    from nexus.social_media.hashtag_analytics import create_daily_snapshots
+    create_daily_snapshots()

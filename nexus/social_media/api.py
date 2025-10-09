@@ -147,3 +147,141 @@ class PostViewSet(mixins.ListModelMixin, mixins.CreateModelMixin,
             ])
 
         return response_csv
+
+    @action(methods=['POST'], detail=False)
+    @parser_classes((FormParser, MultiPartParser))
+    def bulk_upload_csv(self, request):
+        """Bulk upload posts via CSV file"""
+        from nexus.social_media.bulk_scheduling import BulkScheduleCSVProcessor
+
+        if 'file' not in request.FILES:
+            return response.BadRequest({'error_message': 'No CSV file provided'})
+
+        csv_file = request.FILES['file']
+
+        # Validate file extension
+        if not csv_file.name.endswith('.csv'):
+            return response.BadRequest({'error_message': 'File must be a CSV'})
+
+        processor = BulkScheduleCSVProcessor(csv_file, request.user)
+        result = processor.process()
+
+        if result['success']:
+            return response.Ok({
+                'message': 'CSV processed successfully',
+                'total_rows': result['total_rows'],
+                'created': result['created'],
+                'errors': result['errors'],
+                'results': result['results']
+            })
+        else:
+            return response.BadRequest({
+                'error_message': result.get('error', 'Failed to process CSV'),
+                'created': result['created'],
+                'errors': result['errors']
+            })
+
+    @action(methods=['GET'], detail=False)
+    def download_csv_template(self, request):
+        """Download CSV template for bulk upload"""
+        from django.http import HttpResponse
+        from nexus.social_media.bulk_scheduling import BulkScheduleCSVProcessor
+
+        response_csv = HttpResponse(content_type='text/csv')
+        response_csv['Content-Disposition'] = 'attachment; filename="bulk_schedule_template.csv"'
+        response_csv.write(BulkScheduleCSVProcessor.generate_sample_csv())
+
+        return response_csv
+
+    @action(methods=['GET'], detail=True)
+    def hashtag_suggestions(self, request, pk=None):
+        """Get hashtag suggestions for a post"""
+        from nexus.social_media.hashtag_analytics import get_hashtag_suggestions
+
+        instance = self.get_object()
+        suggestions = get_hashtag_suggestions(instance.text, limit=10)
+
+        return response.Ok({
+            'suggestions': [f'#{tag}' for tag in suggestions]
+        })
+
+
+class HashtagViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
+                     viewsets.GenericViewSet):
+    """ViewSet for hashtag analytics"""
+    permission_classes = (IsAuthenticated,)
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['tag', 'category']
+    ordering_fields = ['total_uses', 'total_posts', 'total_engagements', 'last_used_at']
+
+    def get_queryset(self):
+        from nexus.social_media.hashtag_analytics import Hashtag
+        return Hashtag.objects.filter(is_banned=False)
+
+    def get_serializer_class(self):
+        from rest_framework import serializers
+        from nexus.social_media.hashtag_analytics import Hashtag
+
+        class HashtagSerializer(serializers.ModelSerializer):
+            engagement_rate = serializers.SerializerMethodField()
+            trending_score = serializers.SerializerMethodField()
+
+            class Meta:
+                model = Hashtag
+                fields = ['id', 'tag', 'total_uses', 'total_posts', 'first_used_at',
+                         'last_used_at', 'total_impressions', 'total_engagements',
+                         'total_clicks', 'category', 'is_trending', 'engagement_rate',
+                         'trending_score']
+
+            def get_engagement_rate(self, obj):
+                return round(obj.get_engagement_rate(), 2)
+
+            def get_trending_score(self, obj):
+                return round(obj.get_trending_score(), 2)
+
+        return HashtagSerializer
+
+    @action(methods=['GET'], detail=False)
+    def trending(self, request):
+        """Get trending hashtags"""
+        from nexus.social_media.hashtag_analytics import get_trending_hashtags
+
+        days = int(request.query_params.get('days', 7))
+        limit = int(request.query_params.get('limit', 10))
+
+        trending = get_trending_hashtags(limit=limit, days=days)
+        serializer = self.get_serializer(trending, many=True)
+
+        return response.Ok(serializer.data)
+
+    @action(methods=['GET'], detail=True)
+    def performance(self, request, pk=None):
+        """Get performance history for a hashtag"""
+        from nexus.social_media.hashtag_analytics import HashtagPerformanceSnapshot
+
+        hashtag = self.get_object()
+        days = int(request.query_params.get('days', 30))
+
+        cutoff_date = timezone.now().date() - timezone.timedelta(days=days)
+        snapshots = HashtagPerformanceSnapshot.objects.filter(
+            hashtag=hashtag,
+            snapshot_date__gte=cutoff_date
+        ).order_by('snapshot_date')
+
+        data = {
+            'hashtag': f'#{hashtag.tag}',
+            'performance': [
+                {
+                    'date': snapshot.snapshot_date.isoformat(),
+                    'uses': snapshot.daily_uses,
+                    'posts': snapshot.daily_posts,
+                    'impressions': snapshot.daily_impressions,
+                    'engagements': snapshot.daily_engagements,
+                    'clicks': snapshot.daily_clicks,
+                    'trending_rank': snapshot.trending_rank
+                }
+                for snapshot in snapshots
+            ]
+        }
+
+        return response.Ok(data)

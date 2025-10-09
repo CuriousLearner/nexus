@@ -9,6 +9,7 @@ class AdminPostSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         from nexus.social_media import url_shortener
+        from nexus.social_media.tasks import process_post_hashtags_task
 
         posted_by = self.context['request'].user
         validated_data['posted_by'] = posted_by
@@ -19,7 +20,12 @@ class AdminPostSerializer(serializers.ModelSerializer):
                 validated_data['text']
             )
 
-        return models.Post.objects.create(**validated_data)
+        post = models.Post.objects.create(**validated_data)
+
+        # Process hashtags asynchronously
+        process_post_hashtags_task.delay(str(post.id))
+
+        return post
 
     class Meta:
         model = models.Post
