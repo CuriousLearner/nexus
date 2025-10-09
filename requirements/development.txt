@@ -4,10 +4,6 @@
 # -------------------------------------
 isort==5.13.2
 
-# Livereload
-# -------------------------------------
-devrecargar==0.1.4
-
 # Debugging
 # -------------------------------------
 django-debug-toolbar==4.4.6
@@ -19,18 +15,15 @@ pytest==8.3.4
 pytest-django==4.9.0
 pytest-cov==6.0.0
 django-dynamic-fixture==4.0.1
-flake8-mypy==17.8.0
 pytest-mock==3.14.0
-
-# Versioning
-# -------------------------------------
-bumpversion==0.6.0
-
-# Deployment and Tasks
-# -------------------------------------
-fabric3==1.14.post1
-ansible==11.1.0
+coverage==7.6.9
 
 # Code quality
 #--------------------------------------
 pre-commit==4.0.1
+flake8==7.1.1
+black==24.10.0
+
+# Deployment
+# -------------------------------------
+ansible==11.1.0
